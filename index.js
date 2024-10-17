@@ -9,7 +9,7 @@ const token=process.env.TOKEN;
 const mytoken=process.env.MYTOKEN;//prasath_token
 
 app.listen(process.env.PORT,()=>{
-    console.log("webhook is listening"+ process.env.PORT);
+    console.log("webhook is listening");
 });
 
 //to verify the callback url from dashboard side - cloud api side
