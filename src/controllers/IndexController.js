@@ -13,7 +13,9 @@ const {
 } = require('../utils/shared');
 
 module.exports.DEFAULT = {
-    index: async (req, res) => res.json(responseSuccess(10000)),
+    index: async (req, res) => {
+        res.status(200).send('hello this is webhook setup');
+    },
 
 };
 module.exports.API = {
