@@ -4,7 +4,9 @@ Email: truongdx@runsystem.net
 */
 const http = require('http');
 const app = require('../src/app');
-require('dotenv').config();
+
+
+const { onError } = require('../src/utils/shared');
 
 /**
  * Create HTTP server.
