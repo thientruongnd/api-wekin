@@ -4,17 +4,15 @@ Email: truongdx@runsystem.net
 */
 const http = require('http');
 const app = require('../src/app');
-
-const { configEvn } = require('../src/configs/configEnvSchema');
-
-const { normalizePort, onError } = require('../src/utils/shared');
+require('dotenv').config();
 
 /**
  * Create HTTP server.
  */
 const server = http.createServer(app);
-const port = normalizePort(configEvn.PORT || 3500);
-server.listen(port, () => {
-    console.log(`App is listening at ${port}`);
+
+server.listen(process.env.PORT,()=>{
+    console.log("webhook is listening");
 });
+
 server.on('error', onError);
