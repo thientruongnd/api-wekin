@@ -1,13 +1,12 @@
 {
-  "name": "webhook-in-nodejs",
+  "name": "whatsapp-cloud-api",
   "version": "1.0.0",
   "description": "webhook in nodejs using express framework - whatsapp cloud api",
-  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
    "start": "node ./bin/server.js"
   },
-  "author": "Prasath from PMS",
+  "author": "TruongDx from GMO Runsystem Team",
   "license": "ISC",
   "dependencies": {
     "axios": "^1.6.2",

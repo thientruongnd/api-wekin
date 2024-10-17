@@ -8,8 +8,6 @@ const cors = require('cors');
 
 const express = require('express');
 
-const { configEvn } = require('./configs/configEnvSchema');
-
 const app = express();
 const corsOptions = {
     methods: ['OPTIONS', 'GET', 'PUT', 'POST', 'DELETE'],

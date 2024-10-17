@@ -14,7 +14,7 @@ const { onError } = require('../src/utils/shared');
 const server = http.createServer(app);
 
 server.listen(process.env.PORT,()=>{
-    console.log("webhook is listening");
+    console.log("api webkin is listening on port : "+ process.env.PORT);
 });
 
 server.on('error', onError);

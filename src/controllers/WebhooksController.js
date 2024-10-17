@@ -12,7 +12,8 @@ const {
     resJsonError,
 } = require('../utils/shared');
 
-const mytoken = 'apple';
+const token=process.env.TOKEN;
+const verifyTokenApp =process.env.VERIFY_TOKEN;//prasath_token
 
 module.exports.API = {
 
@@ -32,7 +33,7 @@ module.exports.API = {
         // Kiểm tra nếu mode và token tồn tại trong request
         if (mode && token) {
             // Xác minh token
-            if (mode === 'subscribe' && token === VERIFY_TOKEN) {
+            if (mode === 'subscribe' && token === verifyTokenApp) {
                 console.log('WEBHOOK_VERIFIED');
                 res.status(200).send(challenge); // Trả về giá trị challenge
             } else {
