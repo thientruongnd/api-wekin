@@ -6,13 +6,9 @@ const { DEFAULT, API } = require('../../controllers/IndexController');
 
 const indexRoute = (apiRouter) => {
     apiRouter.route('/').get(DEFAULT.index);
-};
-
-const apiIndexRoute = (apiRouter) => {
-    apiRouter.route('/signOut').put(API.auth);
+    apiRouter.route('/tests/sendMessage').post(DEFAULT.sendMessage);
 };
 
 module.exports = {
     indexRoute,
-    apiIndexRoute,
 };

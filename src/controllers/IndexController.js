@@ -4,7 +4,7 @@ Email: truongdx@runsystem.net
 */
 const util = require('util');
 const axios = require('axios');
-
+const WhatsappHelper = require('../helpers/WhatsappHelper');
 const {
     responseError,
     responseSuccess,
@@ -15,6 +15,11 @@ const {
 module.exports.DEFAULT = {
     index: async (req, res) => {
         res.status(200).send('Hello this is webhook setup by GMO');
+    },
+    sendMessage: async (req, res) => {
+        console.log(util.inspect(req.body, false, null, true));
+        const resData= await WhatsappHelper.sendMessage(req.body);
+        return res.json(responseSuccess(10261, resData, 'en'));
     },
 
 };
