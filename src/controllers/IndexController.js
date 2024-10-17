@@ -14,7 +14,7 @@ const {
 
 module.exports.DEFAULT = {
     index: async (req, res) => {
-        res.status(200).send('hello this is webhook setup');
+        res.status(200).send('Hello this is webhook setup by GMO');
     },
 
 };
