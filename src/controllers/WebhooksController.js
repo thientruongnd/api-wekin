@@ -24,12 +24,9 @@ module.exports.API = {
      * @param {any} next next
      */
     getWebhook: async (req, res) => {
-        console.log(util.inspect(req.query, false, null, true));
         const mode = req.query['hub.mode'];
         const token = req.query['hub.verify_token'];
         const challenge = req.query['hub.challenge'];
-        const VERIFY_TOKEN = 'apple'; // Đặt mã xác minh tùy chọn của bạn tại đây
-
         // Kiểm tra nếu mode và token tồn tại trong request
         if (mode && token) {
             // Xác minh token
