@@ -31,7 +31,6 @@ module.exports.API = {
         if (mode && token) {
             // Xác minh token
             if (mode === 'subscribe' && token === verifyTokenApp) {
-                console.log('WEBHOOK_VERIFIED');
                 res.status(200).send(challenge); // Trả về giá trị challenge
             } else {
                 res.status(403).send('Forbidden');
@@ -43,6 +42,7 @@ module.exports.API = {
     postWebhook: async (req, res) => {
         const body = req.body;
         console.log(util.inspect(req.body, false, null, true));
+        console.log('this log=================================================');
         // Kiểm tra request có chứa dữ liệu từ WhatsApp
         if (body.object === 'whatsapp_business_account') {
             body.entry.forEach((entry) => {

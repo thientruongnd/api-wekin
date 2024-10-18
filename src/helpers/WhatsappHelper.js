@@ -18,8 +18,9 @@ const {
     downloadImage,
 
 } = require('../utils/shared');
+
 class WhatsappHelper {
-    sendMessage = async (data) => {
+    sendMessage = async (dataPost) => {
         const uri = `${configEvn.URI_WHATS_APP}/${configEvn.VERSION}/${configEvn.PHONE_NUMBER_ID}/messages`;
         const config = {
             method: 'post',
@@ -28,13 +29,41 @@ class WhatsappHelper {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${configEvn.TOKEN}`,
             },
-            data,
+            data: JSON.stringify(dataPost),
         };
         const result = await axios(config);
-        console.log(util.inspect(result?.data, false, null, true));
         return result?.data;
     }
 
-    
+    sendMessageLocation = async (data) => {
+        const phone = data?.phone;
+        const dataPost = {
+            messaging_product: 'whatsapp',
+            recipient_type: 'individual',
+            type: 'interactive',
+            to: phone,
+            interactive: {
+                type: 'location_request_message',
+                body: {
+                    text: 'Where would you like to be picked up?',
+                },
+                action: {
+                    name: 'send_location',
+                },
+            },
+        };
+        const uri = `${configEvn.URI_WHATS_APP}/${configEvn.VERSION}/${configEvn.PHONE_NUMBER_ID}/messages`;
+        const config = {
+            method: 'post',
+            url: uri,
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${configEvn.TOKEN}`,
+            },
+            data: JSON.stringify(dataPost),
+        };
+        const result = await axios(config);
+        return result?.data;
+    }
 }
 module.exports = new WhatsappHelper();

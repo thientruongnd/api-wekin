@@ -4,7 +4,7 @@
   "description": "webhook in nodejs using express framework - whatsapp cloud api",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-   "start": "node ./bin/server.js"
+    "start": "node ./bin/server.js"
   },
   "author": "TruongDx from GMO Runsystem Team",
   "license": "ISC",
@@ -22,6 +22,7 @@
     "gulp-debug": "^3.2.0",
     "is-empty": "^1.2.0",
     "joi": "^17.4.1",
+    "moment-timezone": "^0.5.46",
     "morgan": "^1.10.0",
     "winston": "^3.15.0"
   },

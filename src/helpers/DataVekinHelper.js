@@ -1,0 +1,64 @@
+/**
+ * Created by Truong on 10/08/23.
+ * truongdx@runsystem.net - Xuan Truong
+ * Function Name
+ * */
+const util = require('util');
+const path = require('path');
+const fs = require('fs');
+const axios = require('axios');
+const { configEvn } = require('../configs/configEnvSchema');
+
+const {
+    isEmpty,
+    getYearToday,
+    getMonthToday,
+    getDayToday,
+    makeDir,
+    downloadImage,
+
+} = require('../utils/shared');
+
+class DataVekinHelper {
+    eventCarbonReceipt = async (data) => {
+        const uri = `${configEvn.BASE_URL_VEKIN}/api/event/carbon-receipt`;
+        const config = {
+            method: 'get',
+            url: uri,
+            headers: {
+                Authorization: `${configEvn.AUTHORIZATION_VEKIN}`,
+            },
+        };
+        const result = await axios(config);
+        return result?.data;
+    }
+
+    transportationList = async () => {
+        const uri = `${configEvn.BASE_URL_VEKIN}/api/event/dashboard/controller/transportation-list/`;
+        const config = {
+            method: 'get',
+            url: uri,
+            headers: {
+                Authorization: `${configEvn.AUTHORIZATION_VEKIN}`,
+            },
+        };
+        const result = await axios(config);
+        return result?.data;
+    }
+
+    eventCarbonReceiptPartner = async (data) => {
+        const uri = `${configEvn.BASE_URL_VEKIN}/api/event/carbon-receipt/controller/partner/`;
+        const config = {
+            method: 'post',
+            url: uri,
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `${configEvn.AUTHORIZATION_VEKIN}`,
+            },
+            data: JSON.stringify(data),
+        };
+        const result = await axios(config);
+        return result?.data;
+    }
+}
+module.exports = new DataVekinHelper();
