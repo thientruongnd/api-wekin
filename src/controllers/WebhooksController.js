@@ -12,8 +12,7 @@ const {
     resJsonError,
 } = require('../utils/shared');
 
-const token=process.env.TOKEN;
-const verifyTokenApp =process.env.VERIFY_TOKEN;//prasath_token
+const verifyTokenApp = process.env.VERIFY_TOKEN;// prasath_token
 
 module.exports.API = {
 
