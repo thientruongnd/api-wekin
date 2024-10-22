@@ -11,7 +11,11 @@ const {
 const {
     webhookRoute,
 } = require('../path/WebhooksRoute');
+const {
+    stripesRoute,
+} = require('../path/StripesRoute');
 
 indexRoute(defaultRouter);
 webhookRoute(defaultRouter);
+stripesRoute(defaultRouter);
 module.exports = defaultRouter;
