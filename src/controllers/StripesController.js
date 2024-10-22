@@ -39,5 +39,14 @@ module.exports.DEFAULT = {
         }
         // return res.json(responseSuccess(10261, resData, 'en'));
     },
-
+    webhook: async (req, res) => {
+        console.log('this log webhook');
+        try {
+            console.log(util.inspect(req.body, false, null, true));
+        } catch (errors) {
+            console.log(util.inspect(errors, false, null, true));
+            return resJsonError(res, errors);
+        }
+        // return res.json(responseSuccess(10261, resData, 'en'));
+    },
 };
