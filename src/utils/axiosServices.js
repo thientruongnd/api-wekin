@@ -83,50 +83,9 @@ const sendHeaders = async (data) => {
     }
 };
 
-const googleTranslateApi = async (text, targetLang, sourceLang) => {
-    try {
-        const apiKey = configEvn?.GOOGLE_TRANSLATE_API_KEY || null;
-        const uri = `https://translation.googleapis.com/language/translate/v2?key=${apiKey}`;
-
-        const request = {
-            q: text,
-            target: targetLang,
-            source: sourceLang,
-            format: 'text',
-        };
-
-        const result = await axios.post(uri, request);
-        const translatedText = result?.data?.data?.translations[0]?.translatedText || null;
-        return Promise.resolve(translatedText);
-    } catch (error) {
-        return Promise.resolve({ error: true, msg: error });
-    }
-};
-const axiosBodyChatGPT = async (uri, params) => {
-    try {
-        // const data = JSON.stringify(params);
-        const config = {
-            method: 'post',
-            url: uri,
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${configEvn.OPEN_API_KEY}`,
-                organization: configEvn.ORGANIZATION_ID,
-            },
-            data: params,
-        };
-        const result = await axios(config);
-        return Promise.resolve(result.data ? result.data : null);
-    } catch (error) {
-        // console.log(util.inspect(error, false, null, true));
-        return Promise.reject(error);
-    }
-};
 module.exports = {
     sendQueryToAPI,
     axiosBodyToAPI,
     sendHeaders,
-    googleTranslateApi,
-    axiosBodyChatGPT,
     axiosBodyFormDataToAPI,
 };
