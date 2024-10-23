@@ -6,7 +6,8 @@ const util = require('util');
 const moment = require('moment-timezone');
 const WhatsappHelper = require('../helpers/WhatsappHelper');
 const DataVekinHelper = require('../helpers/DataVekinHelper');
-
+// eslint-disable-next-line import/order
+const stripe = require('stripe')('sk_test_51QCZlt2LB1xmFw9BPr6qfcYgp49uOLs5G1uhWCcnUHyDQb2L1UUVRB2sTXuPJVDiaiLbeu5TyE2piDEzEmzRxkbS00R2xVcFdu');
 const {
     responseError,
     responseSuccess,
@@ -89,6 +90,29 @@ module.exports.DEFAULT = {
         const data = req.body;
         const resData = await DataVekinHelper.eventCarbonReceiptPartner(data);
         return res.json(responseSuccess(10261, resData, 'en'));
+    },
+    createCheckoutSessionStripe: async (req, res) => {
+        console.log('this log createCheckoutSessionStripe');
+        try {
+            const YOUR_DOMAIN = 'http://localhost:8900';
+            const session = await stripe.checkout.sessions.create({
+                line_items: [
+                    {
+                        // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+                        price: 'price_1QCaA52LB1xmFw9BEm1AYzfc',
+                        quantity: 1,
+                    },
+                ],
+                mode: 'subscription',
+                success_url: `${YOUR_DOMAIN}/success.html`,
+                cancel_url: `${YOUR_DOMAIN}/cancel.html`,
+            });
+            res.redirect(303, session.url);
+        } catch (errors) {
+            console.log(util.inspect(errors, false, null, true));
+            return resJsonError(res, errors);
+        }
+        // return res.json(responseSuccess(10261, resData, 'en'));
     },
 
 };

@@ -2,19 +2,11 @@
  Mr : Dang Xuan Truong
  Email: truongdx@runsystem.net
  */
-const util = require('util');
-const destroy = require('destroy');
 const path = require('path');
 const winston = require('winston');
-const fs = require('fs');
 const empty = require('is-empty');
-const axios = require('axios');
-const { configEvn } = require('../configs/configEnvSchema');
 
 const { CODES_SUCCESS, CODES_ERROR } = require('./messages');
-const {
-    IS_DELETED,
-} = require('./constants');
 
 /**
  * Normalize a port into a number, string, or false.
