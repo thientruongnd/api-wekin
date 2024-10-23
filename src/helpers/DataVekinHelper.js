@@ -46,6 +46,19 @@ class DataVekinHelper {
         return result?.data;
     }
 
+    eventLocations = async () => {
+        const uri = `${configEvn.BASE_URL_VEKIN}/api/event/locations/`;
+        const config = {
+            method: 'get',
+            url: uri,
+            headers: {
+                Authorization: `${configEvn.AUTHORIZATION_VEKIN}`,
+            },
+        };
+        const result = await axios(config);
+        return result?.data;
+    }
+
     eventCarbonReceiptPartner = async (data) => {
         const uri = `${configEvn.BASE_URL_VEKIN}/api/event/carbon-receipt/controller/partner/`;
         const config = {
