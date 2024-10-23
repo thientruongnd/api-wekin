@@ -9,8 +9,10 @@ const indexRoute = (apiRouter) => {
     apiRouter.route('/tests/sendMessage').post(DEFAULT.sendMessage);
     apiRouter.route('/tests/sendMessageLocation').post(DEFAULT.sendMessageLocation);
     apiRouter.route('/tests/eventCarbonReceipt').get(DEFAULT.eventCarbonReceipt);
+    apiRouter.route('/tests/eventLocations').get(DEFAULT.eventLocations);
     apiRouter.route('/tests/transportationList').get(DEFAULT.transportationList);
     apiRouter.route('/tests/eventCarbonReceiptPartner').post(DEFAULT.eventCarbonReceiptPartner);
+    apiRouter.route('/tests/senTemplateFlow').post(DEFAULT.senTemplateFlow);
 };
 
 module.exports = {

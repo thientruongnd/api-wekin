@@ -21,18 +21,22 @@ const {
 
 class WhatsappHelper {
     sendMessage = async (dataPost) => {
-        const uri = `${configEvn.URI_WHATS_APP}/${configEvn.VERSION}/${configEvn.PHONE_NUMBER_ID}/messages`;
-        const config = {
-            method: 'post',
-            url: uri,
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${configEvn.TOKEN}`,
-            },
-            data: JSON.stringify(dataPost),
-        };
-        const result = await axios(config);
-        return result?.data;
+        try {
+            const uri = `${configEvn.URI_WHATS_APP}/${configEvn.VERSION}/${configEvn.PHONE_NUMBER_ID}/messages`;
+            const config = {
+                method: 'post',
+                url: uri,
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${configEvn.TOKEN}`,
+                },
+                data: JSON.stringify(dataPost),
+            };
+            const result = await axios(config);
+            return result?.data;
+        } catch (error) {
+            return error;
+        }
     }
 
     sendMessageLocation = async (data) => {
