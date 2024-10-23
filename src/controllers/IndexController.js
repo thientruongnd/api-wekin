@@ -19,9 +19,13 @@ module.exports.DEFAULT = {
         res.status(200).send('Hello this is webhook setup by GMO');
     },
     sendMessage: async (req, res) => {
-        console.log(util.inspect(req.body, false, null, true));
-        const resData = await WhatsappHelper.sendMessage(req.body);
-        return res.json(responseSuccess(10261, resData, 'en'));
+        try {
+            console.log(util.inspect(req.body, false, null, true));
+            const resData = await WhatsappHelper.sendMessage(req.body);
+            return res.json(responseSuccess(10261, resData, 'en'));
+        } catch (error) {
+            return resJsonError(res, error);
+        }
     },
     sendMessageLocation: async (req, res) => {
         const resData = await WhatsappHelper.sendMessageLocation({ phone: '84902103222' });
