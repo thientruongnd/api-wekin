@@ -67,7 +67,8 @@ module.exports.API = {
                 params.phone = phone;
                 params.name = fullName;
                 params.imageId = '439102592147175';
-                await WhatsappService.message001(params);
+                const resData = await WhatsappService.message001(params);
+                console.log(util.inspect(resData, false, null, true));
             }
             // Trả về 200 OK để xác nhận đã nhận thông báo
             res.status(200).send('EVENT_RECEIVED');
