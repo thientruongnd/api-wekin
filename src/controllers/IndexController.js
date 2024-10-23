@@ -10,8 +10,6 @@ const DataVekinHelper = require('../helpers/DataVekinHelper');
 const WhatsappService = require('../services/WhatsappService');
 const { configEvn } = require('../configs/configEnvSchema');
 
-// eslint-disable-next-line import/order
-const stripe = require('stripe')('sk_test_51QCZlt2LB1xmFw9BPr6qfcYgp49uOLs5G1uhWCcnUHyDQb2L1UUVRB2sTXuPJVDiaiLbeu5TyE2piDEzEmzRxkbS00R2xVcFdu');
 const {
     responseError,
     responseSuccess,
