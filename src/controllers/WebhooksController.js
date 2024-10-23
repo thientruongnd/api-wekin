@@ -48,10 +48,25 @@ module.exports.API = {
                 const changes = entry.changes;
                 changes.forEach((change) => {
                     const messageData = change.value.messages;
+                    const contacts = change.value.contacts;
+                    let name = '';
+                    if (contacts) {
+                        contacts.forEach((contact) => {
+                            name = contact.profile.name;
+                        });
+                    }
                     if (messageData) {
                         messageData.forEach((message) => {
-                            console.log('Message:', message);
                         // Xử lý tin nhắn từ người dùng tại đây
+                            console.log('Message:', message);
+                            const text = message?.text?.body;
+                            const from = message?.from;
+                            const type = message?.type;
+                            if (type === 'text' && text === 'Hi') {
+                                console.log('Text:', text);
+                                console.log('name:', name);
+                                console.log('from:', from);
+                            }
                         });
                     }
                 });

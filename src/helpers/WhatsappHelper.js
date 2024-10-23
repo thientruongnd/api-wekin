@@ -35,9 +35,9 @@ class WhatsappHelper {
                 data: JSON.stringify(dataPost),
             };
             const result = await axios(config);
-            return promiseResolve(result?.data);
+            return result?.data;
         } catch (error) {
-            return promiseReject(error?.response?.data || error);
+            return error;
         }
     }
 
