@@ -3,14 +3,7 @@ Mr : Dang Xuan Truong
 Email: truongdx@runsystem.net
 */
 const util = require('util');
-const axios = require('axios');
-
-const {
-    responseError,
-    responseSuccess,
-    isEmpty,
-    resJsonError,
-} = require('../utils/shared');
+const WhatsappService = require('../services/WhatsappService');
 
 const verifyTokenApp = process.env.VERIFY_TOKEN;// prasath_token
 
@@ -43,16 +36,16 @@ module.exports.API = {
         console.log(util.inspect(req.body, false, null, true));
         console.log('this log=================================================');
         // Kiểm tra request có chứa dữ liệu từ WhatsApp
+        let typeMessage = ''; let phone = ''; let fullName = '';
         if (body.object === 'whatsapp_business_account') {
             body.entry.forEach((entry) => {
                 const changes = entry.changes;
                 changes.forEach((change) => {
                     const messageData = change.value.messages;
                     const contacts = change.value.contacts;
-                    let name = '';
                     if (contacts) {
                         contacts.forEach((contact) => {
-                            name = contact.profile.name;
+                            fullName = contact.profile.name;
                         });
                     }
                     if (messageData) {
@@ -60,18 +53,23 @@ module.exports.API = {
                         // Xử lý tin nhắn từ người dùng tại đây
                             console.log('Message:', message);
                             const text = message?.text?.body;
-                            const from = message?.from;
                             const type = message?.type;
                             if (type === 'text' && text === 'Hi') {
-                                console.log('Text:', text);
-                                console.log('name:', name);
-                                console.log('from:', from);
+                                phone = message?.from;
+                                typeMessage = 'message001';
                             }
                         });
                     }
                 });
             });
-
+            if (typeMessage === 'message001') {
+                const params = {};
+                params.phone = phone;
+                params.name = fullName;
+                params.imageId = '439102592147175';
+                const resData = await WhatsappService.message001(params);
+                console.log(util.inspect(resData, false, null, true));
+            }
             // Trả về 200 OK để xác nhận đã nhận thông báo
             res.status(200).send('EVENT_RECEIVED');
         } else {
