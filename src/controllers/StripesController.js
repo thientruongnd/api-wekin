@@ -50,8 +50,8 @@ module.exports.DEFAULT = {
                     secret_code: 'mysecretcode', // Mã bí mật
                 },
                 mode: 'payment', // Thay vì subscription
-                success_url: `${YOUR_DOMAIN}/success.html`,
-                cancel_url: `${YOUR_DOMAIN}/cancel.html`,
+                success_url: `https://wa.me/${configEvn.PHONE_WHATSAPP}`,
+                cancel_url: `https://wa.me/${configEvn.PHONE_WHATSAPP}`,
             });
             console.log(session.url);
             res.redirect(303, session.url);
@@ -65,6 +65,7 @@ module.exports.DEFAULT = {
         const body = req.body;
         try {
             if (body?.type === 'checkout.session.completed') {
+                console.log('--------checkout.session.completed-----');
                 const sessionId = body?.data?.object?.id;
                 const amountTotal = body?.data?.object?.amount_total;
                 const currency = body?.data?.object?.currency;
@@ -83,6 +84,27 @@ module.exports.DEFAULT = {
                 console.log('paymentIntentId', paymentIntentId);
                 console.log('metadata', metadata);
             }
+            if (body?.type === 'checkout.session.expired') {
+                console.log('--------START checkout.session.expired-----');
+                console.log(body);
+                console.log('--------END checkout.session.expired-----');
+            }
+            if (body?.type === 'payment_intent.canceled') {
+                console.log('-------- START payment_intent.canceled-----');
+                console.log(body);
+                console.log('--------END payment_intent.canceled-----');
+            }
+            if (body?.type === 'payment_intent.payment_failed') {
+                console.log('-------- START payment_intent.payment_failed-----');
+                console.log(body);
+                console.log('--------END payment_intent.payment_failed-----');
+            }
+            if (body?.type === 'payment_intent.partially_funded') {
+                console.log('-------- START payment_intent.partially_funded-----');
+                console.log(body);
+                console.log('--------END payment_intent.partially_funded-----');
+            }
+
             res.status(200).send('EVENT_RECEIVED');
         } catch (errors) {
             console.log(util.inspect(errors, false, null, true));
