@@ -45,6 +45,10 @@ module.exports.DEFAULT = {
                 phone_number_collection: {
                     enabled: true,
                 },
+                metadata: {
+                    order_id: '12345', // ID đơn hàng
+                    secret_code: 'mysecretcode', // Mã bí mật
+                },
                 mode: 'payment', // Thay vì subscription
                 success_url: `${YOUR_DOMAIN}/success.html`,
                 cancel_url: `${YOUR_DOMAIN}/cancel.html`,
@@ -68,6 +72,7 @@ module.exports.DEFAULT = {
                 const name = body?.data?.object?.customer_details?.name;
                 const phone = body?.data?.object?.customer_details?.phone;
                 const paymentIntentId = body?.data?.object?.payment_intent;
+                const metadata = body?.data?.object.metadata;
                 console.log('-------------------------DATA----------------------');
                 console.log('sessionId', sessionId);
                 console.log('email', email);
@@ -76,6 +81,7 @@ module.exports.DEFAULT = {
                 console.log('amountTotal', amountTotal);
                 console.log('currency', currency);
                 console.log('paymentIntentId', paymentIntentId);
+                console.log('metadata', metadata);
             }
             res.status(200).send('EVENT_RECEIVED');
         } catch (errors) {
@@ -88,7 +94,9 @@ module.exports.DEFAULT = {
         try {
             // const sessionId = 'cs_test_a1fmJD4JxnJciLU49x6f2rtKjChqKBRdJpnjJfy0ZL94ql0EfWN7ajS9Cd'
             const sessionId = req.query.sessionId;
-            const infoSession = await stripe.checkout.sessions.retrieve(sessionId);
+            const infoSession = await stripe.checkout.sessions.retrieve(sessionId, {
+                expand: ['line_items', 'payment_intent'],
+            });
             return res.json(responseSuccess(10261, infoSession, 'en'));
         } catch (errors) {
             return resJsonError(res, errors);
