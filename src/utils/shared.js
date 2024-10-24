@@ -125,7 +125,7 @@ const resJsonError = (res, error, filename) => {
         time: new Date(),
         error,
     };
-    writeLog(filename, msg);
+    if (filename) writeLog(filename, msg);
     return res.json(responseError(100001, error));
 };
 const inArray = (array, value) => array.indexOf(value) > -1;
@@ -150,6 +150,7 @@ const regExpSearch = (string = '') => {
 const notSpaceAllow = (value) => /^\S*$/.test(value);
 const regexSpace = (value) => /^(?!\s)(?!.*\s$).+$/.test(value);
 const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1);
+
 module.exports = {
     normalizePort,
     onError,

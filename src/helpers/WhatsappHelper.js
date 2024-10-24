@@ -16,6 +16,8 @@ const {
     getDayToday,
     makeDir,
     downloadImage,
+    promiseResolve,
+    promiseReject,
 
 } = require('../utils/shared');
 

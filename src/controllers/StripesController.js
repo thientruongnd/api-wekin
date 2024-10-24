@@ -42,10 +42,14 @@ module.exports.DEFAULT = {
                         quantity: 1,
                     },
                 ],
+                phone_number_collection: {
+                    enabled: true,
+                },
                 mode: 'payment', // Thay vì subscription
                 success_url: `${YOUR_DOMAIN}/success.html`,
                 cancel_url: `${YOUR_DOMAIN}/cancel.html`,
             });
+            console.log(session.url);
             res.redirect(303, session.url);
         } catch (errors) {
             console.log(util.inspect(errors, false, null, true));
@@ -54,13 +58,49 @@ module.exports.DEFAULT = {
         // return res.json(responseSuccess(10261, resData, 'en'));
     },
     webhook: async (req, res) => {
-        console.log('this log webhook');
+        const body = req.body;
         try {
-            console.log(util.inspect(req.body, false, null, true));
+            if (body?.type === 'checkout.session.completed') {
+                const sessionId = body?.data?.object?.id;
+                const amountTotal = body?.data?.object?.amount_total;
+                const currency = body?.data?.object?.currency;
+                const email = body?.data?.object?.customer_details?.email;
+                const name = body?.data?.object?.customer_details?.name;
+                const phone = body?.data?.object?.customer_details?.phone;
+                const paymentIntentId = body?.data?.object?.payment_intent;
+                console.log('-------------------------DATA----------------------');
+                console.log('sessionId', sessionId);
+                console.log('email', email);
+                console.log('name', name);
+                console.log('phone', phone);
+                console.log('amountTotal', amountTotal);
+                console.log('currency', currency);
+                console.log('paymentIntentId', paymentIntentId);
+            }
+            res.status(200).send('EVENT_RECEIVED');
         } catch (errors) {
             console.log(util.inspect(errors, false, null, true));
-            return resJsonError(res, errors);
+            res.status(404).send('Not Found');
         }
         // return res.json(responseSuccess(10261, resData, 'en'));
+    },
+    info: async (req, res) => {
+        try {
+            // const sessionId = 'cs_test_a1fmJD4JxnJciLU49x6f2rtKjChqKBRdJpnjJfy0ZL94ql0EfWN7ajS9Cd'
+            const sessionId = req.query.sessionId;
+            const infoSession = await stripe.checkout.sessions.retrieve(sessionId);
+            return res.json(responseSuccess(10261, infoSession, 'en'));
+        } catch (errors) {
+            return resJsonError(res, errors);
+        }
+    },
+    infoPaymentIntent: async (req, res) => {
+        try {
+            const paymentIntentId = req.query.paymentIntentId;
+            const infoPaymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId);
+            return res.json(responseSuccess(10261, infoPaymentIntent, 'en'));
+        } catch (errors) {
+            return resJsonError(res, errors);
+        }
     },
 };
