@@ -21,14 +21,28 @@ module.exports.DEFAULT = {
         try {
             const YOUR_DOMAIN = 'http://localhost:8900';
             const session = await stripe.checkout.sessions.create({
+                // line_items: [
+                //     {
+                //         // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+                //         price: 'price_1QDIlM2LB1xmFw9BMl7Q7bQ8',//price_1QCaA52LB1xmFw9BEm1AYzfc
+                //         quantity: 1,
+                //     },
+                // ],
+                // mode: 'subscription',
+                payment_method_types: ['card'],
                 line_items: [
                     {
-                        // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-                        price: 'price_1QCaA52LB1xmFw9BEm1AYzfc',
+                        price_data: {
+                            currency: 'usd', // Đơn vị tiền tệ (có thể thay đổi theo nhu cầu của bạn)
+                            product_data: {
+                                name: 'Custom Amount Product', // Tên sản phẩm
+                            },
+                            unit_amount: 5000, // Số tiền bạn muốn truyền vào (5000 là 50.00 USD)
+                        },
                         quantity: 1,
                     },
                 ],
-                mode: 'subscription',
+                mode: 'payment', // Thay vì subscription
                 success_url: `${YOUR_DOMAIN}/success.html`,
                 cancel_url: `${YOUR_DOMAIN}/cancel.html`,
             });
