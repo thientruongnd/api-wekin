@@ -28,10 +28,14 @@ module.exports.DEFAULT = {
                         quantity: 1,
                     },
                 ],
-                mode: 'subscription',
+                phone_number_collection: {
+                    enabled: true,
+                },
+                mode: 'subscription', // payment
                 success_url: `${YOUR_DOMAIN}/success.html`,
                 cancel_url: `${YOUR_DOMAIN}/cancel.html`,
             });
+            console.log(session.url);
             res.redirect(303, session.url);
         } catch (errors) {
             console.log(util.inspect(errors, false, null, true));
@@ -40,12 +44,22 @@ module.exports.DEFAULT = {
         // return res.json(responseSuccess(10261, resData, 'en'));
     },
     webhook: async (req, res) => {
-        console.log('this log webhook');
+        // checkout.session.completed
+        // customer.subscription.created
+        // payment_intent.succeeded //
+        // invoice.create //
+        // invoice.finalized //
+        // invoice.updated //
+        // invoice.paid
+        // invoice.payment_succeeded
+        const body = req.body;
+        console.log('this log webhook stripe', body?.type);
         try {
-            console.log(util.inspect(req.body, false, null, true));
+            console.log(body);
+            res.status(200).send('EVENT_RECEIVED');
         } catch (errors) {
             console.log(util.inspect(errors, false, null, true));
-            return resJsonError(res, errors);
+            res.status(404).send('Not Found');
         }
         // return res.json(responseSuccess(10261, resData, 'en'));
     },
