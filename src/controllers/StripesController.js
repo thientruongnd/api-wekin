@@ -15,29 +15,23 @@ const {
 } = require('../utils/shared');
 
 module.exports.DEFAULT = {
-
     createCheckoutSession: async (req, res) => {
-        console.log('this log createCheckoutSessionStripe');
+        const productName = req.query?.productName;
+        const unitAmount = req.query?.unitAmount;
+        const blockchain = req.query?.blockchain;
+        const phone = req.query?.phone;
+        const name = req.query?.name;
         try {
-            const YOUR_DOMAIN = 'http://localhost:8900';
             const session = await stripe.checkout.sessions.create({
-                // line_items: [
-                //     {
-                //         // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-                //         price: 'price_1QDIlM2LB1xmFw9BMl7Q7bQ8',//price_1QCaA52LB1xmFw9BEm1AYzfc
-                //         quantity: 1,
-                //     },
-                // ],
-                // mode: 'subscription',
                 payment_method_types: ['card'],
                 line_items: [
                     {
                         price_data: {
                             currency: 'usd', // Đơn vị tiền tệ (có thể thay đổi theo nhu cầu của bạn)
                             product_data: {
-                                name: 'Custom Amount Product', // Tên sản phẩm
+                                name: productName, // Tên sản phẩm
                             },
-                            unit_amount: 5000, // Số tiền bạn muốn truyền vào (5000 là 50.00 USD)
+                            unit_amount: unitAmount, // Số tiền bạn muốn truyền vào (5000 là 50.00 USD)
                         },
                         quantity: 1,
                     },
@@ -46,8 +40,9 @@ module.exports.DEFAULT = {
                     enabled: true,
                 },
                 metadata: {
-                    order_id: '12345', // ID đơn hàng
-                    secret_code: 'mysecretcode', // Mã bí mật
+                    blockchain,
+                    phone,
+                    name,
                 },
                 mode: 'payment', // Thay vì subscription
                 success_url: `https://wa.me/${configEvn.PHONE_WHATSAPP}`,
