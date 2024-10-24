@@ -37,52 +37,9 @@ module.exports.DEFAULT = {
     },
     eventCarbonReceipt: async (req, res) => {
         const phone = '84902103222';
-        const resData = await DataVekinHelper.eventCarbonReceipt();
-        const rows = [];
-        if (!isEmpty(resData)) {
-            for (let i = 0; i < resData.length; i++) {
-                const element = {};
-                element.id = resData[i].id;
-                element.title = resData[i].name;
-                element.title = element.title.substring(0, 24);
-                let eventStartDate = resData[i].event_start_date;
-                let eventEndDate = resData[i].event_end_date;
-                eventStartDate = moment(eventStartDate).format('YYYY-MM-DD HH:mm:ss');
-                eventEndDate = moment(eventEndDate).format('YYYY-MM-DD HH:mm:ss');
-                element.description = `Start: ${eventStartDate} - End: ${eventEndDate}`;
-                rows.push(element);
-            }
-        }
-        const params = {
-            messaging_product: 'whatsapp',
-            recipient_type: 'individual',
-            to: phone,
-            type: 'interactive',
-            interactive: {
-                type: 'list',
-                header: {
-                    type: 'text',
-                    text: 'Choose Sustainable Events',
-                },
-                body: {
-                    // eslint-disable-next-line max-len
-                    text: 'Here’s a curated list of Sustainable Events happening near you, brought to you by Vekin Group and our trusted eco-partners. Join us in making a positive impact on the environment by attending these events! Please choose an event.',
-                },
-
-                action: {
-                    button: 'Choose an event.',
-                    sections: [
-                        {
-                            title: 'List events',
-                            rows,
-                        },
-
-                    ],
-                },
-            },
-        };
-        const resDataWhatsapp = await WhatsappHelper.sendMessage(params);
-        return res.json(responseSuccess(10261, resDataWhatsapp, 'en'));
+        const resData = await WhatsappService.message003();
+        
+        return res.json(responseSuccess(10261, resData, 'en'));
     },
     transportationList: async (req, res) => {
         const resData = await DataVekinHelper.transportationList();
@@ -106,29 +63,7 @@ module.exports.DEFAULT = {
         const resData = await DataVekinHelper.eventCarbonReceiptPartner(data);
         return res.json(responseSuccess(10261, resData, 'en'));
     },
-    createCheckoutSessionStripe: async (req, res) => {
-        console.log('this log createCheckoutSessionStripe');
-        try {
-            const YOUR_DOMAIN = 'http://localhost:8900';
-            const session = await stripe.checkout.sessions.create({
-                line_items: [
-                    {
-                        // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-                        price: 'price_1QCaA52LB1xmFw9BEm1AYzfc',
-                        quantity: 1,
-                    },
-                ],
-                mode: 'subscription',
-                success_url: `${YOUR_DOMAIN}/success.html`,
-                cancel_url: `${YOUR_DOMAIN}/cancel.html`,
-            });
-            res.redirect(303, session.url);
-        } catch (errors) {
-            console.log(util.inspect(errors, false, null, true));
-            return resJsonError(res, errors);
-        }
-        // return res.json(responseSuccess(10261, resData, 'en'));
-    },
+    
     senTemplateFlow: async (req, res) => {
         // URL API WhatsApp để gửi tin nhắn
         const apiUrl = `${configEvn.URI_WHATS_APP}/${configEvn.VERSION}/${configEvn.PHONE_NUMBER_ID}/messages`;
