@@ -4,6 +4,7 @@
  * Common
  */
 const util = require('util');
+const moment = require('moment');
 const WhatsappHelper = require('../helpers/WhatsappHelper');
 const DataVekinHelper = require('../helpers/DataVekinHelper');
 
@@ -11,6 +12,8 @@ const {
     promiseReject,
     promiseResolve,
     isEmpty,
+    calculateCost,
+    buildCheckoutSessionURL,
 } = require('../utils/shared');
 
 const message001 = async (data) => {
@@ -184,8 +187,98 @@ const paymentSuccess = async (data) => {
         return promiseReject(err);
     }
 };
+const paymentConfirmation = async (data) => {
+    try {
+        const resDataVekin = await DataVekinHelper.eventCarbonReceiptPartner(data);
+        if (resDataVekin?.receipt) {
+            const phone = data?.phone || '84902103222';
+            const name = data?.name || 'Xuân Trường';
+            const receipt = resDataVekin?.receipt;
+            const date = receipt?.date;
+            const eventName = receipt?.event_name;
+            const eventEmission = receipt?.event_emission;
+            const eventCarbonSaved = receipt?.event_carbon_saved;
+            const blockchain = receipt?.blockchain;
+            const refNumber = receipt?.ref_number;
+            const verifiedBy = receipt?.verified_by;
+            const eventId = receipt?.event_id;
+            const formattedDate = moment(date).format('DD MMMM YYYY HH:mm');
+            const amount = calculateCost(eventEmission.value);
+            const paramBody = [
+                {
+                    type: 'text',
+                    text: formattedDate,
+                },
+                {
+                    type: 'text',
+                    text: eventEmission.value + eventEmission.unit,
+                },
+                {
+                    type: 'text',
+                    text: eventCarbonSaved.value + eventCarbonSaved.unit,
+                },
+                {
+                    type: 'text',
+                    text: blockchain,
+                },
+            ];
+            const baseURL = 'stripes/createCheckoutSession';
+            const params = {
+                productName: eventName,
+                unitAmount: amount,
+                blockchain,
+                phone,
+                name,
+            };
+
+            const checkoutSessionURL = buildCheckoutSessionURL(baseURL, params);
+            const paramButton = [
+                {
+                    type: 'text',
+                    text: checkoutSessionURL,
+                },
+            ];
+            const template = {
+                messaging_product: 'whatsapp',
+                to: phone,
+                type: 'template',
+                template: {
+                    name: 'payment_confirmation_1',
+                    language: {
+                        code: 'en_US',
+                    },
+                    components: [
+                        {
+                            type: 'body',
+                            parameters: paramBody,
+                        },
+                        {
+                            type: 'button',
+                            sub_type: 'url',
+                            index: '0',
+                            parameters: paramButton,
+                        },
+                    ],
+                },
+            };
+            const resData = await WhatsappHelper.sendMessage(template);
+            const response = {};
+            if (resData?.status && resData?.status !== 200) {
+                response.status = resData.status;
+                response.message = resData.message;
+                response.code = resData.code;
+                return promiseResolve(response);
+            }
+            return promiseResolve(resData);
+        }
+        return promiseResolve(resDataVekin);
+    } catch (err) {
+        return promiseReject(err);
+    }
+};
 module.exports = {
     message001,
     message003,
     paymentSuccess,
+    paymentConfirmation,
 };

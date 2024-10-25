@@ -60,7 +60,7 @@ module.exports.DEFAULT = {
 
     eventCarbonReceiptPartner: async (req, res) => {
         const data = req.body;
-        const resData = await DataVekinHelper.eventCarbonReceiptPartner(data);
+        const resData = await WhatsappService.paymentConfirmation(data);
         return res.json(responseSuccess(10261, resData, 'en'));
     },
 

@@ -3,7 +3,6 @@ Mr : Dang Xuan Truong
 Email: truongdx@runsystem.net
 */
 const util = require('util');
-const moment = require('moment-timezone');
 const { configEvn } = require('../configs/configEnvSchema');
 // eslint-disable-next-line import/order
 const stripe = require('stripe')(configEvn.KEY_STRIPE);
@@ -16,35 +15,32 @@ const {
 } = require('../utils/shared');
 
 module.exports.DEFAULT = {
-
     createCheckoutSession: async (req, res) => {
-        console.log('this log createCheckoutSessionStripe');
+        const productName = req.query?.productName;
+        const unitAmount = parseInt(req.query?.unitAmount, 10);
+        const blockchain = req.query?.blockchain;
+        const phone = req.query?.phone;
+        const name = req.query?.name;
+        const amount = req.query?.amount;
+        const urlImage = req.query?.urlImage;
         try {
             const metadata = {
-                // order_id: '12345', // ID đơn hàng
-                // secret_code: 'mysecretcode', // Mã bí mật
-                phone: '84974418454',
-                amount: '6.14',
-                urlImage: 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png',
+                blockchain,
+                phone,
+                name,
+                amount,
+                urlImage,
             };
             const session = await stripe.checkout.sessions.create({
-                // line_items: [
-                //     {
-                //         // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-                //         price: 'price_1QDIlM2LB1xmFw9BMl7Q7bQ8',//price_1QCaA52LB1xmFw9BEm1AYzfc
-                //         quantity: 1,
-                //     },
-                // ],
-                // mode: 'subscription',
                 payment_method_types: ['card'],
                 line_items: [
                     {
                         price_data: {
-                            currency: 'usd', // Đơn vị tiền tệ (có thể thay đổi theo nhu cầu của bạn)
+                            currency: 'thb', // Đơn vị tiền tệ (có thể thay đổi theo nhu cầu của bạn)
                             product_data: {
-                                name: 'Custom Amount Product', // Tên sản phẩm
+                                name: productName, // Tên sản phẩm
                             },
-                            unit_amount: 5000, // Số tiền bạn muốn truyền vào (5000 là 50.00 USD)
+                            unit_amount: Math.round(unitAmount * 100), // Số tiền bạn muốn truyền vào (5000 là 50.00 USD)
                         },
                         quantity: 1,
                     },
@@ -60,7 +56,6 @@ module.exports.DEFAULT = {
                 success_url: `https://wa.me/${configEvn.PHONE_WHATSAPP}`,
                 cancel_url: `https://wa.me/${configEvn.PHONE_WHATSAPP}`,
             });
-            console.log(session.url);
             res.redirect(303, session.url);
         } catch (errors) {
             console.log(util.inspect(errors, false, null, true));
