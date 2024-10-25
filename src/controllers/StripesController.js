@@ -3,7 +3,6 @@ Mr : Dang Xuan Truong
 Email: truongdx@runsystem.net
 */
 const util = require('util');
-const moment = require('moment-timezone');
 const { configEvn } = require('../configs/configEnvSchema');
 // eslint-disable-next-line import/order
 const stripe = require('stripe')(configEvn.KEY_STRIPE);
@@ -17,7 +16,7 @@ const {
 module.exports.DEFAULT = {
     createCheckoutSession: async (req, res) => {
         const productName = req.query?.productName;
-        const unitAmount = req.query?.unitAmount;
+        const unitAmount = parseInt(req.query?.unitAmount, 10);
         const blockchain = req.query?.blockchain;
         const phone = req.query?.phone;
         const name = req.query?.name;
@@ -27,11 +26,11 @@ module.exports.DEFAULT = {
                 line_items: [
                     {
                         price_data: {
-                            currency: 'usd', // Đơn vị tiền tệ (có thể thay đổi theo nhu cầu của bạn)
+                            currency: 'thb', // Đơn vị tiền tệ (có thể thay đổi theo nhu cầu của bạn)
                             product_data: {
                                 name: productName, // Tên sản phẩm
                             },
-                            unit_amount: unitAmount, // Số tiền bạn muốn truyền vào (5000 là 50.00 USD)
+                            unit_amount: Math.round(unitAmount * 100), // Số tiền bạn muốn truyền vào (5000 là 50.00 USD)
                         },
                         quantity: 1,
                     },
@@ -48,7 +47,6 @@ module.exports.DEFAULT = {
                 success_url: `https://wa.me/${configEvn.PHONE_WHATSAPP}`,
                 cancel_url: `https://wa.me/${configEvn.PHONE_WHATSAPP}`,
             });
-            console.log(session.url);
             res.redirect(303, session.url);
         } catch (errors) {
             console.log(util.inspect(errors, false, null, true));
