@@ -172,6 +172,12 @@ module.exports.DEFAULT = {
         const resData = await WhatsappService.paymentSuccess(params);
         return res.json(responseSuccess(10261, resData, 'en'));
     },
+    selectCountry: async (req, res) => {
+        const params = {};
+        params.phone = req.body.phone || '84974418454';
+        const resData = await WhatsappService.selectCountry(params);
+        return res.json(responseSuccess(10261, resData, 'en'));
+    },
 };
 module.exports.API = {
 
