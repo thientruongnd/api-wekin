@@ -52,6 +52,17 @@ const joinNow = async (data) => {
                             },
                         ],
                     },
+                    {
+                        type: 'button',
+                        sub_type: 'quick_reply',
+                        index: 0,
+                        parameters: [
+                            {
+                                type: 'payload',
+                                payload: 'join_now_payload', // Thay thế bằng chuỗi payload tùy chọn
+                            },
+                        ],
+                    },
                 ],
             },
         };
