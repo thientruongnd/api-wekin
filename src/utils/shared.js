@@ -5,7 +5,6 @@
 const path = require('path');
 const winston = require('winston');
 const empty = require('is-empty');
-
 const { CODES_SUCCESS, CODES_ERROR } = require('./messages');
 
 /**
@@ -161,7 +160,7 @@ const buildCheckoutSessionURL = (baseURL, params) => {
     // Loại bỏ 'https://' trong kết quả trả về
     return url.toString().replace('https://', '');
 };
-
+const getImageLink = (req, pathName = '') => `${req.headers.host}${pathName}`;
 module.exports = {
     normalizePort,
     onError,
@@ -185,4 +184,5 @@ module.exports = {
     resJsonError,
     calculateCost,
     buildCheckoutSessionURL,
+    getImageLink,
 };

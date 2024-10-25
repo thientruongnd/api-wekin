@@ -12,6 +12,7 @@ const {
     responseSuccess,
     isEmpty,
     resJsonError,
+    getImageLink,
 } = require('../utils/shared');
 
 module.exports.DEFAULT = {
@@ -21,8 +22,9 @@ module.exports.DEFAULT = {
         const blockchain = req.query?.blockchain;
         const phone = req.query?.phone;
         const name = req.query?.name;
-        const amount = req.query?.amount;
-        const urlImage = req.query?.urlImage;
+        const amount = req.query?.amount || 0;
+        const image = getImageLink(req, '/images/logo_cero.png');
+        const urlImage = req.query?.urlImage || image;
         try {
             const metadata = {
                 blockchain,
