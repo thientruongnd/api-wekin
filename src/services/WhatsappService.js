@@ -264,6 +264,7 @@ const selectCountry = async (data) => {
         };
         const template = {
             messaging_product: 'whatsapp',
+            recipient_type: 'individual',
             to: phone,
             type: 'template',
             template: {
@@ -276,16 +277,6 @@ const selectCountry = async (data) => {
                         type: 'button',
                         sub_type: 'flow',
                         index: '0',
-                        // parameters: [
-                        //     {
-                        //         type: 'action',
-                        //         action: {
-                        //             flow_action_data: {
-                        //                 title: 'Mongolia',
-                        //             },
-                        //         },
-                        //     },
-                        // ],
                     },
                 ],
             },
