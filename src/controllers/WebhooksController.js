@@ -54,7 +54,7 @@ module.exports.API = {
                             console.log('Message:', message);
                             const text = message?.text?.body;
                             const type = message?.type;
-                            if (type === 'text' && text === 'Hi') {
+                            if (type === 'text' && text === 'Starting conversation') {
                                 phone = message?.from;
                                 typeMessage = 'message001';
                             }

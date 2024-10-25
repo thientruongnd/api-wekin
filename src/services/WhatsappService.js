@@ -14,9 +14,10 @@ const {
     isEmpty,
     calculateCost,
     buildCheckoutSessionURL,
+    getNearestLocations,
 } = require('../utils/shared');
 
-const message001 = async (data) => {
+const joinNow = async (data) => {
     try {
         const phone = data?.phone || '84902103222';
         const name = data?.name || 'Xuan Truong';
@@ -26,7 +27,7 @@ const message001 = async (data) => {
             to: phone,
             type: 'template',
             template: {
-                name: 'ms001',
+                name: 'join_now',
                 language: {
                     code: 'en_US',
                 },
@@ -76,54 +77,61 @@ const message003 = async (data) => {
         const resDataVekin = await DataVekinHelper.eventCarbonReceipt();
         const rows = [];
         if (!isEmpty(resDataVekin)) {
-            for (let i = 0; i < resDataVekin.length; i++) {
+            // khi có sự kiện
+            const latitude = 13.7379374;
+            const longitude = 100.5239999;
+            const nearestLocations = getNearestLocations(resDataVekin, latitude, longitude);
+            for (let i = 0; i < nearestLocations.length; i++) {
                 const element = {};
-                element.id = resDataVekin[i].id;
-                element.title = resDataVekin[i].name;
-                element.title.substring(0, 24);
-                element.description = resDataVekin[i].event_code;
+                element.id = nearestLocations[i].id;
+                element.title = nearestLocations[i].name;
+                // Gán lại giá trị sau khi cắt chuỗi
+                element.title = element.title.substring(0, 24);
+                element.description = nearestLocations[i].event_code;
+                // Kiểm tra số lượng phần tử trong rows
                 if (rows.length < 10) {
                     rows.push(element);
                 }
             }
-        }
-        const template = {
-            messaging_product: 'whatsapp',
-            to: phone,
-            type: 'interactive',
-            interactive: {
-                type: 'list',
-                header: {
-                    type: 'text',
-                    text: 'Choose an Event:',
-                },
-                body: {
-                    text: 'Here’s a curated list of Sustainable Events,\n'
-                        + 'brought to you by Vekin Group and our trusted eco-partners.\n'
-                        + 'Join us in making a positive impact on the environment\n'
-                        + 'by attending these events! Please choose an event.',
-                },
+            const template = {
+                messaging_product: 'whatsapp',
+                to: phone,
+                type: 'interactive',
+                interactive: {
+                    type: 'list',
+                    header: {
+                        type: 'text',
+                        text: 'Choose an Event:',
+                    },
+                    body: {
+                        text: 'Here’s a curated list of Sustainable Events,\n'
+                            + 'brought to you by Vekin Group and our trusted eco-partners.\n'
+                            + 'Join us in making a positive impact on the environment\n'
+                            + 'by attending these events! Please choose an event.',
+                    },
 
-                action: {
-                    button: 'Select',
-                    sections: [
-                        {
-                            title: 'Section',
-                            rows,
-                        },
-                    ],
+                    action: {
+                        button: 'Select',
+                        sections: [
+                            {
+                                title: 'Section',
+                                rows,
+                            },
+                        ],
+                    },
                 },
-            },
-        };
-        const resData = await WhatsappHelper.sendMessage(template);
-        const response = {};
-        if (resData?.status && resData?.status !== 200) {
-            response.status = resData.status;
-            response.message = resData.message;
-            response.code = resData.code;
-            return promiseResolve(response);
+            };
+            const resData = await WhatsappHelper.sendMessage(template);
+            const response = {};
+            if (resData?.status && resData?.status !== 200) {
+                response.status = resData.status;
+                response.message = resData.message;
+                response.code = resData.code;
+                return promiseResolve(response);
+            }
+            return promiseResolve(resDataVekin);
         }
-        return promiseResolve(resDataVekin);
+        // không có sự kiện nào <- redirect to website "https://www.cero.org/"
     } catch (err) {
         return promiseReject(err);
     }
@@ -277,7 +285,7 @@ const paymentConfirmation = async (data) => {
     }
 };
 module.exports = {
-    message001,
+    joinNow,
     message003,
     paymentSuccess,
     paymentConfirmation,
