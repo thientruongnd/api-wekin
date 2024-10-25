@@ -34,7 +34,7 @@ module.exports.API = {
     postWebhook: async (req, res) => {
         const body = req.body;
         console.log(util.inspect(req.body, false, null, true));
-        console.log('this log=================================================');
+        console.log('this log============================================');
         // Kiểm tra request có chứa dữ liệu từ WhatsApp
         let typeMessage = ''; let phone = ''; let fullName = '';
         if (body.object === 'whatsapp_business_account') {
