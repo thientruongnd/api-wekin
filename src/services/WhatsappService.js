@@ -128,6 +128,65 @@ const message003 = async (data) => {
         return promiseReject(err);
     }
 };
+const paymentSuccess = async (data) => {
+    try {
+        const phone = data?.phone || '84902103222';
+        const amount = data?.amount || '0';
+        const urlImage = data?.urlImage || 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
+        const template = {
+            messaging_product: 'whatsapp',
+            to: phone,
+            type: 'template',
+            template: {
+                name: 'payment_success_test',
+                language: {
+                    code: 'en_US',
+                },
+                components: [
+                    {
+                        type: 'header',
+                        parameters: [
+                            {
+                                type: 'image',
+                                image: {
+                                    link: urlImage,
+                                },
+                            },
+                        ],
+                    },
+                    {
+                        type: 'body',
+                        parameters: [
+                            {
+                                type: 'text',
+                                text: amount,
+                            },
+                        ],
+                    },
+                ],
+            },
+        };
+        // const template = {
+        //     messaging_product: 'whatsapp',
+        //     to: phone,
+        //     type: 'image',
+        //     image: {
+        //         link: urlImage,
+        //     },
+        // };
+        const resData = await WhatsappHelper.sendMessage(template);
+        const response = {};
+        if (resData?.status && resData?.status !== 200) {
+            response.status = resData.status;
+            response.message = resData.message;
+            response.code = resData.code;
+            return promiseResolve(response);
+        }
+        return promiseResolve(resData);
+    } catch (err) {
+        return promiseReject(err);
+    }
+};
 const paymentConfirmation = async (data) => {
     try {
         const resDataVekin = await DataVekinHelper.eventCarbonReceiptPartner(data);
@@ -220,5 +279,6 @@ const paymentConfirmation = async (data) => {
 module.exports = {
     message001,
     message003,
+    paymentSuccess,
     paymentConfirmation,
 };

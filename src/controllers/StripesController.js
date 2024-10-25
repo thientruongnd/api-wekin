@@ -6,11 +6,13 @@ const util = require('util');
 const { configEvn } = require('../configs/configEnvSchema');
 // eslint-disable-next-line import/order
 const stripe = require('stripe')(configEvn.KEY_STRIPE);
+const WhatsappService = require('../services/WhatsappService');
 const {
     responseError,
     responseSuccess,
     isEmpty,
     resJsonError,
+    getImageLink,
 } = require('../utils/shared');
 
 module.exports.DEFAULT = {
@@ -20,7 +22,17 @@ module.exports.DEFAULT = {
         const blockchain = req.query?.blockchain;
         const phone = req.query?.phone;
         const name = req.query?.name;
+        const amount = req.query?.amount || 0;
+        const image = getImageLink(req, '/images/logo_cero.png');
+        const urlImage = req.query?.urlImage || image;
         try {
+            const metadata = {
+                blockchain,
+                phone,
+                name,
+                amount,
+                urlImage,
+            };
             const session = await stripe.checkout.sessions.create({
                 payment_method_types: ['card'],
                 line_items: [
@@ -38,10 +50,9 @@ module.exports.DEFAULT = {
                 phone_number_collection: {
                     enabled: true,
                 },
-                metadata: {
-                    blockchain,
-                    phone,
-                    name,
+                metadata,
+                payment_intent_data: {
+                    metadata,
                 },
                 mode: 'payment', // Thay vì subscription
                 success_url: `https://wa.me/${configEvn.PHONE_WHATSAPP}`,
@@ -62,20 +73,22 @@ module.exports.DEFAULT = {
                 const sessionId = body?.data?.object?.id;
                 const amountTotal = body?.data?.object?.amount_total;
                 const currency = body?.data?.object?.currency;
-                const email = body?.data?.object?.customer_details?.email;
-                const name = body?.data?.object?.customer_details?.name;
-                const phone = body?.data?.object?.customer_details?.phone;
+                const customer = body?.data?.object?.customer_details;
                 const paymentIntentId = body?.data?.object?.payment_intent;
                 const metadata = body?.data?.object.metadata;
-                console.log('-------------------------DATA----------------------');
+                const paymentStatus = body?.data?.object.payment_status;
                 console.log('sessionId', sessionId);
-                console.log('email', email);
-                console.log('name', name);
-                console.log('phone', phone);
+                console.log('customer', customer);
                 console.log('amountTotal', amountTotal);
                 console.log('currency', currency);
                 console.log('paymentIntentId', paymentIntentId);
+                console.log('payment_status', paymentStatus);
                 console.log('metadata', metadata);
+                if (paymentStatus === 'paid') {
+                    const params = body?.data?.object?.metadata;
+                    const resData = await WhatsappService.paymentSuccess(params);
+                    console.log(util.inspect(resData, false, null, true));
+                }
             }
             if (body?.type === 'checkout.session.expired') {
                 console.log('--------START checkout.session.expired-----');

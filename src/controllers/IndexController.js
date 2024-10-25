@@ -38,7 +38,7 @@ module.exports.DEFAULT = {
     eventCarbonReceipt: async (req, res) => {
         const phone = '84902103222';
         const resData = await WhatsappService.message003();
-        
+
         return res.json(responseSuccess(10261, resData, 'en'));
     },
     transportationList: async (req, res) => {
@@ -63,7 +63,7 @@ module.exports.DEFAULT = {
         const resData = await WhatsappService.paymentConfirmation(data);
         return res.json(responseSuccess(10261, resData, 'en'));
     },
-    
+
     senTemplateFlow: async (req, res) => {
         // URL API WhatsApp để gửi tin nhắn
         const apiUrl = `${configEvn.URI_WHATS_APP}/${configEvn.VERSION}/${configEvn.PHONE_NUMBER_ID}/messages`;
@@ -163,7 +163,15 @@ module.exports.DEFAULT = {
             console.error('Error sending message:', error.response ? error.response.data : error.message);
         }
     },
-
+    paymentSuccess: async (req, res) => {
+        const params = {};
+        params.phone = '84974418454';
+        params.amount = 6.14;
+        params.urlImage = 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
+        // params.urlImage = 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/User_icon_2.svg/1200px-User_icon_2.svg.png';
+        const resData = await WhatsappService.paymentSuccess(params);
+        return res.json(responseSuccess(10261, resData, 'en'));
+    },
 };
 module.exports.API = {
 

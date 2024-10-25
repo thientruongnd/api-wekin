@@ -13,6 +13,7 @@ const indexRoute = (apiRouter) => {
     apiRouter.route('/tests/transportationList').get(DEFAULT.transportationList);
     apiRouter.route('/tests/eventCarbonReceiptPartner').post(DEFAULT.eventCarbonReceiptPartner);
     apiRouter.route('/tests/senTemplateFlow').post(DEFAULT.senTemplateFlow);
+    apiRouter.route('/tests/paymentSuccess').post(DEFAULT.paymentSuccess);
 };
 
 module.exports = {
