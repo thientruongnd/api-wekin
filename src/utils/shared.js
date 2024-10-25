@@ -150,6 +150,17 @@ const regExpSearch = (string = '') => {
 const notSpaceAllow = (value) => /^\S*$/.test(value);
 const regexSpace = (value) => /^(?!\s)(?!.*\s$).+$/.test(value);
 const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1);
+const calculateCost = (kgCO2) => {
+    const ratePerKg = 1; // 1 kg CO2 = 1 THB
+    return kgCO2 * ratePerKg;
+};
+const buildCheckoutSessionURL = (baseURL, params) => {
+    const url = new URL(`https://${ baseURL}`); // Thêm 'https://' vào baseURL
+    const searchParams = new URLSearchParams(params); // Tạo đối tượng URLSearchParams từ params
+    url.search = searchParams.toString(); // Thêm chuỗi query vào URL
+    // Loại bỏ 'https://' trong kết quả trả về
+    return url.toString().replace('https://', '');
+};
 
 module.exports = {
     normalizePort,
@@ -172,4 +183,6 @@ module.exports = {
     regexSpace,
     isNumberIntegerGtZero,
     resJsonError,
+    calculateCost,
+    buildCheckoutSessionURL,
 };

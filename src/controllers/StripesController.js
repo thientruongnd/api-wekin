@@ -15,29 +15,23 @@ const {
 } = require('../utils/shared');
 
 module.exports.DEFAULT = {
-
     createCheckoutSession: async (req, res) => {
-        console.log('this log createCheckoutSessionStripe');
+        const productName = req.query?.productName;
+        const unitAmount = parseInt(req.query?.unitAmount, 10);
+        const blockchain = req.query?.blockchain;
+        const phone = req.query?.phone;
+        const name = req.query?.name;
         try {
-            const YOUR_DOMAIN = 'http://localhost:8900';
             const session = await stripe.checkout.sessions.create({
-                // line_items: [
-                //     {
-                //         // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-                //         price: 'price_1QDIlM2LB1xmFw9BMl7Q7bQ8',//price_1QCaA52LB1xmFw9BEm1AYzfc
-                //         quantity: 1,
-                //     },
-                // ],
-                // mode: 'subscription',
                 payment_method_types: ['card'],
                 line_items: [
                     {
                         price_data: {
-                            currency: 'usd', // Đơn vị tiền tệ (có thể thay đổi theo nhu cầu của bạn)
+                            currency: 'thb', // Đơn vị tiền tệ (có thể thay đổi theo nhu cầu của bạn)
                             product_data: {
-                                name: 'Custom Amount Product', // Tên sản phẩm
+                                name: productName, // Tên sản phẩm
                             },
-                            unit_amount: 5000, // Số tiền bạn muốn truyền vào (5000 là 50.00 USD)
+                            unit_amount: Math.round(unitAmount * 100), // Số tiền bạn muốn truyền vào (5000 là 50.00 USD)
                         },
                         quantity: 1,
                     },
@@ -45,11 +39,15 @@ module.exports.DEFAULT = {
                 phone_number_collection: {
                     enabled: true,
                 },
+                metadata: {
+                    blockchain,
+                    phone,
+                    name,
+                },
                 mode: 'payment', // Thay vì subscription
-                success_url: `${YOUR_DOMAIN}/success.html`,
-                cancel_url: `${YOUR_DOMAIN}/cancel.html`,
+                success_url: `https://wa.me/${configEvn.PHONE_WHATSAPP}`,
+                cancel_url: `https://wa.me/${configEvn.PHONE_WHATSAPP}`,
             });
-            console.log(session.url);
             res.redirect(303, session.url);
         } catch (errors) {
             console.log(util.inspect(errors, false, null, true));
@@ -61,6 +59,7 @@ module.exports.DEFAULT = {
         const body = req.body;
         try {
             if (body?.type === 'checkout.session.completed') {
+                console.log('--------checkout.session.completed-----');
                 const sessionId = body?.data?.object?.id;
                 const amountTotal = body?.data?.object?.amount_total;
                 const currency = body?.data?.object?.currency;
@@ -68,6 +67,7 @@ module.exports.DEFAULT = {
                 const name = body?.data?.object?.customer_details?.name;
                 const phone = body?.data?.object?.customer_details?.phone;
                 const paymentIntentId = body?.data?.object?.payment_intent;
+                const metadata = body?.data?.object.metadata;
                 console.log('-------------------------DATA----------------------');
                 console.log('sessionId', sessionId);
                 console.log('email', email);
@@ -76,7 +76,29 @@ module.exports.DEFAULT = {
                 console.log('amountTotal', amountTotal);
                 console.log('currency', currency);
                 console.log('paymentIntentId', paymentIntentId);
+                console.log('metadata', metadata);
             }
+            if (body?.type === 'checkout.session.expired') {
+                console.log('--------START checkout.session.expired-----');
+                console.log(body);
+                console.log('--------END checkout.session.expired-----');
+            }
+            if (body?.type === 'payment_intent.canceled') {
+                console.log('-------- START payment_intent.canceled-----');
+                console.log(body);
+                console.log('--------END payment_intent.canceled-----');
+            }
+            if (body?.type === 'payment_intent.payment_failed') {
+                console.log('-------- START payment_intent.payment_failed-----');
+                console.log(body);
+                console.log('--------END payment_intent.payment_failed-----');
+            }
+            if (body?.type === 'payment_intent.partially_funded') {
+                console.log('-------- START payment_intent.partially_funded-----');
+                console.log(body);
+                console.log('--------END payment_intent.partially_funded-----');
+            }
+
             res.status(200).send('EVENT_RECEIVED');
         } catch (errors) {
             console.log(util.inspect(errors, false, null, true));
@@ -88,7 +110,9 @@ module.exports.DEFAULT = {
         try {
             // const sessionId = 'cs_test_a1fmJD4JxnJciLU49x6f2rtKjChqKBRdJpnjJfy0ZL94ql0EfWN7ajS9Cd'
             const sessionId = req.query.sessionId;
-            const infoSession = await stripe.checkout.sessions.retrieve(sessionId);
+            const infoSession = await stripe.checkout.sessions.retrieve(sessionId, {
+                expand: ['line_items', 'payment_intent'],
+            });
             return res.json(responseSuccess(10261, infoSession, 'en'));
         } catch (errors) {
             return resJsonError(res, errors);
