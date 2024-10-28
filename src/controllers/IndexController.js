@@ -61,7 +61,9 @@ module.exports.DEFAULT = {
     },
 
     eventCarbonReceiptPartner: async (req, res) => {
+        const host = req.headers.host;
         const data = req.body;
+        data.host = host;
         const resData = await WhatsappService.paymentConfirmation(data);
         return res.json(responseSuccess(10261, resData, 'en'));
     },
