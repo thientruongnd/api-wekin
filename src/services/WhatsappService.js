@@ -572,7 +572,6 @@ const checkCountry = async (data) => {
         const infoCountry = await getCountry(countryName);
         const latitudeFrom = infoCountry?.latitude || '13.7379374';
         const longitudeFrom = infoCountry?.longitude || '100.5239999';
-
         // const myCountry = await getCountryFromCoordinates(myLatitude, myLongitude);
         // const countryFrom = await getCountryFromCoordinates(latitudeFrom, longitudeFrom);
         const locationFrom = {};
@@ -582,8 +581,7 @@ const checkCountry = async (data) => {
         // if (myCountry.country_code !== countryFrom.country_code) {
         if ('nd' !== 'na') {
         // select different country
-            locationFrom.lat = latitudeFrom;
-            locationFrom.long = longitudeFrom;
+            locationFrom.code = infoCountry?.country;
             const resData = await DataVekinHelper.transportationList();
             const rows = [];
             if (!isEmpty(resData)) {
@@ -673,8 +671,8 @@ const paymentConfirmation = async (data) => {
             const fileName = getRandomFileName('png');
             const outputPath = path.join(__dirname, '../public/images', fileName);
             await downloadImage(receipt?.event_image, outputPath);
-            const eventImage = getImageLink(data.host, `/images/${fileName}`);
-            // const eventImage = 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
+            // const eventImage = getImageLink(data.host, `/images/${fileName}`);
+            const eventImage = 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
             const paramHeader = [
                 {
                     type: 'image',
@@ -792,15 +790,15 @@ const paymentConfirmation = async (data) => {
                     ],
                 },
             };
-            const resData = await WhatsappHelper.sendMessage(template);
-            const response = {};
-            if (resData?.status && resData?.status !== 200) {
-                response.status = resData.status;
-                response.message = resData.message;
-                response.code = resData.code;
-                return promiseResolve(response);
-            }
-            return promiseResolve(resData);
+            // const resData = await WhatsappHelper.sendMessage(template);
+            // const response = {};
+            // if (resData?.status && resData?.status !== 200) {
+            //     response.status = resData.status;
+            //     response.message = resData.message;
+            //     response.code = resData.code;
+            //     return promiseResolve(response);
+            // }
+            // return promiseResolve(resData);
         }
         return promiseResolve(resDataVekin);
     } catch (err) {
