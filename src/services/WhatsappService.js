@@ -432,6 +432,7 @@ const paymentConfirmation = async (data) => {
             const outputPath = path.join(__dirname, '../public/images', fileName);
             await downloadImage(receipt?.event_image, outputPath);
             const eventImage = getImageLink(data.host, `/images/${fileName}`);
+            // const eventImage = 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
             const paramHeader = [
                 {
                     type: 'image',
@@ -509,6 +510,8 @@ const paymentConfirmation = async (data) => {
                     text: checkoutSessionURL,
                 },
             ];
+            const payloadParams = { type: 'maybe_later_payload' };
+            const payloadEncode = Base64.encode(JSON.stringify(payloadParams));
             const template = {
                 messaging_product: 'whatsapp',
                 to: phone,
@@ -540,7 +543,7 @@ const paymentConfirmation = async (data) => {
                             parameters: [
                                 {
                                     type: 'payload',
-                                    payload: 'maybe_later_payload', // Thay thế bằng chuỗi payload tùy chọn
+                                    payload: payloadEncode,
                                 },
                             ],
                         },
