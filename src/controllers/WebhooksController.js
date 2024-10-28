@@ -87,12 +87,13 @@ module.exports.API = {
                             }
                             if (type === 'interactive' && typeInteractive === 'nfm_reply') {
                                 const nfmReply = message?.interactive?.nfm_reply;
-                                const customerName = nfmReply?.screen_0_TextInput_0;
-                                console.log('customerName==: ', customerName);
-                                const responseJson = nfmReply?.response_json;
-                                const decodedToken = JSON.parse(Base64.decode(responseJson?.flow_token));
-                                console.log(util.inspect(decodedToken, false, null, true));
-                                console.log('====responseJson============: ', decodedToken);
+                                console.log(util.inspect(nfmReply, false, null, true));
+                                // const customerName = nfmReply?.screen_0_TextInput_0;
+                                // console.log('customerName==: ', customerName);
+                                // const responseJson = nfmReply?.response_json;
+                                // const decodedToken = JSON.parse(Base64.decode(responseJson?.flow_token));
+                                // console.log(util.inspect(decodedToken, false, null, true));
+                                // console.log('====responseJson============: ', decodedToken);
                                 // console.log(util.inspect(responseJson, false, null, true));
                                 // const flowToken = responseJson?.flow_token;
                                 // const decodedToken = JSON.parse(Base64.decode(flowToken));
