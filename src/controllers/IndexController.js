@@ -15,6 +15,8 @@ const {
     responseSuccess,
     isEmpty,
     resJsonError,
+    getCountry,
+    convertTemplateName,
 } = require('../utils/shared');
 
 module.exports.DEFAULT = {
@@ -180,10 +182,8 @@ module.exports.DEFAULT = {
     },
     selectCountry: async (req, res) => {
         const regionName = '2_South-central_Asia';
-        const templateName = regionName
-            .replace(/^\d+_/, '') // Xóa số và ký tự gạch dưới ở đầu
-            .toLowerCase() // Chuyển thành chữ thường
-            .replace(/-/g, '_'); // Thay dấu '-' bằng '_'
+        const templateName = convertTemplateName(regionName);
+        const findCountry = getCountry('2_United_Arab_Emirates');
         const params = {};
         params.phone = req.body.phone || '84974418454';
         params.templateName = templateName;

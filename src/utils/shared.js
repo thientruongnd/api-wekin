@@ -5,6 +5,7 @@
 const path = require('path');
 const winston = require('winston');
 const empty = require('is-empty');
+const { countries: dataCountries } = require('./dataSample/data.countries');
 const { CODES_SUCCESS, CODES_ERROR } = require('./messages');
 
 /**
@@ -181,6 +182,21 @@ const getNearestLocations = (data, latitude, longitude, count = 10) => {
         .sort((a, b) => a.distance - b.distance)
         .slice(0, count);
 };
+const getCountry = (name) => {
+    const countries = dataCountries;
+    const countryName = name
+        ?.replace(/^\d+_/, '') // Xóa số và ký tự gạch dưới ở đầu
+        .replace(/_/g, ' '); // Thay dấu '_' bằng ''
+    const country = countries.find((el) => el.name === countryName);
+    return country;
+};
+const convertTemplateName = (regionName) => {
+    const templateName = regionName
+        .replace(/^\d+_/, '') // Xóa số và ký tự gạch dưới ở đầu
+        .toLowerCase() // Chuyển thành chữ thường
+        .replace(/-/g, '_'); // Thay dấu '-' bằng '_'
+    return templateName;
+};
 module.exports = {
     normalizePort,
     onError,
@@ -206,4 +222,6 @@ module.exports = {
     buildCheckoutSessionURL,
     getImageLink,
     getNearestLocations,
+    getCountry,
+    convertTemplateName,
 };
