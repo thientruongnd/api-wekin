@@ -9,7 +9,7 @@ const { Base64 } = require('js-base64');
 const path = require('path');
 const WhatsappHelper = require('../helpers/WhatsappHelper');
 const DataVekinHelper = require('../helpers/DataVekinHelper');
-
+const { countries: dataCountries } = require('../utils/dataSample/data.countries');
 const {
     promiseReject,
     promiseResolve,
@@ -577,7 +577,7 @@ const checkCountry = async (data) => {
         const locationFrom = {};
         const userDetails = {};
         userDetails.name = customerName;
-        userDetails.phone_number = phone;
+        userDetails.phone = phone;
         // if (myCountry.country_code !== countryFrom.country_code) {
         if ('nd' !== 'na') {
         // select different country
@@ -592,6 +592,7 @@ const checkCountry = async (data) => {
                     flowToken.lf = locationFrom;
                     flowToken.uds = userDetails;
                     flowToken.eid = eventId;
+                    flowToken.type = 'receipt';
                     const encodedToken = Base64.encode(JSON.stringify(flowToken));
                     element.id = encodedToken;
                     element.title = emissionList[i].name;
@@ -650,9 +651,31 @@ const checkCountry = async (data) => {
 };
 const paymentConfirmation = async (data) => {
     try {
-        const resDataVekin = await DataVekinHelper.eventCarbonReceiptPartner(data);
+        const resData = await DataVekinHelper.transportationList();
+        if (isEmpty(resData)) return false;
+        const emissionId = data?.id;
+        const emissionList = resData?.emission_list || [];
+        const transportation = emissionList.find((emission) => emission.id === emissionId);
+        const countryCode = data?.lf?.code;
+        const locationFrom = dataCountries.find((country) => country.country === countryCode);
+        const customerName = data?.uds?.name;
+        const phone = data?.uds?.phone || '84902103222';
+        const eventId = data?.eid;
+        const eventCarbonReceipt = {};
+        eventCarbonReceipt.transportation = transportation;
+        eventCarbonReceipt.location_from = {
+            id: 111,
+            name: locationFrom.name,
+            lat: locationFrom.latitude,
+            long: locationFrom.longitude,
+        };
+        eventCarbonReceipt.user_details = {
+            name: customerName,
+            phone_number: phone,
+        };
+        eventCarbonReceipt.event_id = eventId;
+        const resDataVekin = await DataVekinHelper.eventCarbonReceiptPartner(eventCarbonReceipt);
         if (resDataVekin?.receipt) {
-            const phone = data?.phone || '84902103222';
             const name = data?.name || 'Xuân Trường';
             const receipt = resDataVekin?.receipt;
             const title = receipt?.title;
@@ -790,15 +813,15 @@ const paymentConfirmation = async (data) => {
                     ],
                 },
             };
-            // const resData = await WhatsappHelper.sendMessage(template);
-            // const response = {};
-            // if (resData?.status && resData?.status !== 200) {
-            //     response.status = resData.status;
-            //     response.message = resData.message;
-            //     response.code = resData.code;
-            //     return promiseResolve(response);
-            // }
-            // return promiseResolve(resData);
+            const resData = await WhatsappHelper.sendMessage(template);
+            const response = {};
+            if (resData?.status && resData?.status !== 200) {
+                response.status = resData.status;
+                response.message = resData.message;
+                response.code = resData.code;
+                return promiseResolve(response);
+            }
+            return promiseResolve(resData);
         }
         return promiseResolve(resDataVekin);
     } catch (err) {
