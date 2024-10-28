@@ -116,22 +116,20 @@ module.exports.API = {
             if (typeMessage === 'location') {
                 console.log('location=======================selectEvent======================');
                 const resData = await WhatsappService.listEvent(params);
-                console.log(util.inspect(resData, false, null, true));
+                console.log(`location==========: ${ resData}`);
             }
             if (typeMessage === 'selectEvent') {
-                console.log('location==========================ecoTravel===================');
                 const resData = await WhatsappService.ecoTravel(params);
-                console.log(util.inspect(resData, false, null, true));
+                console.log('selectEvent============ecoTravel===========: ', resData);
             }
             if (typeMessage === 'sameCountry') {
                 console.log('location==========================sameCountry===================');
             }
             if (typeMessage === 'differentCountry') {
-                console.log('location==========================differentCountry===================');
-                await WhatsappService.selectRegion(params);
+                const resData = await WhatsappService.selectRegion(params);
+                console.log('=differentCountry==============: ', resData);
             }
             if (typeMessage === 'region') {
-                console.log('======region===================', params);
                 await WhatsappService.selectCountry(params);
             }
             // Trả về 200 OK để xác nhận đã nhận thông báo
