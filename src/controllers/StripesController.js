@@ -19,15 +19,10 @@ module.exports.DEFAULT = {
     createCheckoutSession: async (req, res) => {
         const productName = req.query?.productName;
         const unitAmount = parseInt(req.query?.unitAmount, 10);
-        const blockchain = req.query?.blockchain;
-        const phone = req.query?.phone;
-        const name = req.query?.name;
-        const amount = req.query?.amount || 0;
-        const image = getImageLink(req, '/images/logo_cero.png');
+        const image = getImageLink(req.headers.host, '/images/logo_cero.png');
         const eventImage = req.query?.eventImage || image;
         try {
             const metadata = { ...req.query, eventImage };
-            console.log(metadata);
             const session = await stripe.checkout.sessions.create({
                 payment_method_types: ['card'],
                 line_items: [
