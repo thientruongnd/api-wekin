@@ -132,7 +132,7 @@ module.exports.API = {
             }
             if (typeMessage === 'region') {
                 console.log('location==========================region===================');
-                // await WhatsappService.selectCountry(params);
+                await WhatsappService.selectCountry(params);
             }
             // Trả về 200 OK để xác nhận đã nhận thông báo
             res.status(200).send('EVENT_RECEIVED');
