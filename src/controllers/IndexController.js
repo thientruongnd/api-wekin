@@ -15,6 +15,8 @@ const {
     responseSuccess,
     isEmpty,
     resJsonError,
+    getCountry,
+    convertTemplateName,
 } = require('../utils/shared');
 
 module.exports.DEFAULT = {
@@ -170,6 +172,27 @@ module.exports.DEFAULT = {
         params.urlImage = 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
         // params.urlImage = 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/User_icon_2.svg/1200px-User_icon_2.svg.png';
         const resData = await WhatsappService.paymentSuccess(params);
+        return res.json(responseSuccess(10261, resData, 'en'));
+    },
+    selectRegion: async (req, res) => {
+        const params = {};
+        params.phone = req.body.phone || '84974418454';
+        const resData = await WhatsappService.selectRegion(params);
+        return res.json(responseSuccess(10261, resData, 'en'));
+    },
+    selectCountry: async (req, res) => {
+        const regionName = '2_South-central_Asia';
+        const templateName = convertTemplateName(regionName);
+        const findCountry = getCountry('2_United_Arab_Emirates');
+        const params = {};
+        params.phone = req.body.phone || '84974418454';
+        params.templateName = templateName;
+        params.flowToken = 'country';
+        const resData = await WhatsappService.selectCountry(params);
+        return res.json(responseSuccess(10261, resData, 'en'));
+    },
+    ecoTravel: async (req, res) => {
+        const resData = await WhatsappService.ecoTravel();
         return res.json(responseSuccess(10261, resData, 'en'));
     },
 };

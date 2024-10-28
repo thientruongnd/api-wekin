@@ -3,6 +3,7 @@ Mr : Dang Xuan Truong
 Email: truongdx@runsystem.net
 */
 const util = require('util');
+const { Base64 } = require('js-base64');
 const WhatsappService = require('../services/WhatsappService');
 const WhatsappHelper = require('../helpers/WhatsappHelper');
 
@@ -38,7 +39,7 @@ module.exports.API = {
         console.log('this log============================================');
         // Kiểm tra request có chứa dữ liệu từ WhatsApp
         const params = {};
-        let typeMessage = ''; let phone = ''; let fullName = '';
+        let typeMessage = ''; let phone = ''; let fullName = ''; let eventId;
         if (body.object === 'whatsapp_business_account') {
             body.entry.forEach((entry) => {
                 const changes = entry.changes;
@@ -57,6 +58,7 @@ module.exports.API = {
                             const text = message?.text?.body;
                             const type = message?.type;
                             const payload = message?.button?.payload;
+                            const typeListReply = message?.interactive?.type; // list_reply
                             if (type === 'text' && text === 'Starting conversation' || text === 'joinNow') {
                                 phone = message?.from;
                                 typeMessage = 'joinNow';
@@ -65,10 +67,14 @@ module.exports.API = {
                                 phone = message?.from;
                                 typeMessage = 'join_now_payload';
                             }
-                            if (type === 'location') {
-                                phone = message?.from;
-                                typeMessage = 'location';
-                                params.location = message?.location;
+                            if (type === 'interactive' && typeListReply === 'list_reply') {
+                                const id = message?.interactive?.list_reply?.id;
+                                const decodedToken = JSON.parse(Base64.decode(id));
+                                eventId = decodedToken?.eventId;
+                                typeMessage = decodedToken?.type;
+                                params.latitude = decodedToken?.latitude;
+                                params.longitude = decodedToken?.longitude;
+                                params.eventId = eventId;
                             }
                         });
                     }
@@ -87,8 +93,13 @@ module.exports.API = {
                 await WhatsappHelper.sendMessageLocation({ phone });
             }
             if (typeMessage === 'location') {
-                console.log('location=============================================');
+                console.log('location=======================selectEvent======================');
                 const resData = await WhatsappService.listEvent(params);
+                console.log(util.inspect(resData, false, null, true));
+            }
+            if (typeMessage === 'selectEvent') {
+                console.log('location==========================ecoTravel===================');
+                const resData = await WhatsappService.ecoTravel(params);
                 console.log(util.inspect(resData, false, null, true));
             }
             // Trả về 200 OK để xác nhận đã nhận thông báo
