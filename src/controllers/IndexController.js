@@ -171,10 +171,33 @@ module.exports.DEFAULT = {
     paymentSuccess: async (req, res) => {
         const params = {};
         params.phone = '84974418454';
-        params.amount = 6.14;
-        params.urlImage = 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
-        // params.urlImage = 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/User_icon_2.svg/1200px-User_icon_2.svg.png';
+        params.eventEmission = { value: 2629.943, unit: 'kg co2e' };
+        params.eventImage = 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
+        params.unitAmount = 2629.943;
+        params.currency = '$';
         const resData = await WhatsappService.paymentSuccess(params);
+        return res.json(responseSuccess(10261, resData, 'en'));
+    },
+    paymentFailure: async (req, res) => {
+        const params = {
+            phone: req.body.phone || '84974418454',
+            title: 'carbon receipt',
+            plantImage: 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png',
+            date: '08 August 2024 20:22',
+            eventName: 'Thailand green2026',
+            eventImage: 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png',
+            eventLocation: 'JOHN PARK building',
+            eventEmission: { value: 2629.943, unit: 'kg co2e' },
+            eventCarbonSaved: { value: 0, unit: 'kg co2e' },
+            blockchain: '4HNwtpG6Nvv6ahtsaP54ghPses7YZo7AEse2Wr52hLgzfNSAAgmxPb4por618WMCdZjKe1uriNgRaYrdtGCawHvh',
+            refNumber: 'ASG16A7',
+            verifiedBy: 'TGO CFO Standard',
+            eventId: 230,
+            unitAmount: 2629.943,
+            currency: '$',
+            host: req.headers.host,
+        };
+        const resData = await WhatsappService.paymentFailure(params);
         return res.json(responseSuccess(10261, resData, 'en'));
     },
     selectRegion: async (req, res) => {

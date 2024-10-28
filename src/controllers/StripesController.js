@@ -24,15 +24,10 @@ module.exports.DEFAULT = {
         const name = req.query?.name;
         const amount = req.query?.amount || 0;
         const image = getImageLink(req, '/images/logo_cero.png');
-        const urlImage = req.query?.urlImage || image;
+        const eventImage = req.query?.eventImage || image;
         try {
-            const metadata = {
-                blockchain,
-                phone,
-                name,
-                amount,
-                urlImage,
-            };
+            const metadata = { ...req.query, eventImage };
+            console.log(metadata);
             const session = await stripe.checkout.sessions.create({
                 payment_method_types: ['card'],
                 line_items: [
@@ -98,11 +93,17 @@ module.exports.DEFAULT = {
             if (body?.type === 'payment_intent.canceled') {
                 console.log('-------- START payment_intent.canceled-----');
                 console.log(body);
+                const params = body?.data?.object?.metadata;
+                const resData = await WhatsappService.completed(params);
+                console.log(util.inspect(resData, false, null, true));
                 console.log('--------END payment_intent.canceled-----');
             }
             if (body?.type === 'payment_intent.payment_failed') {
                 console.log('-------- START payment_intent.payment_failed-----');
                 console.log(body);
+                const params = body?.data?.object?.metadata;
+                const resData = await WhatsappService.paymentFailure(params);
+                console.log(util.inspect(resData, false, null, true));
                 console.log('--------END payment_intent.payment_failed-----');
             }
             if (body?.type === 'payment_intent.partially_funded') {
