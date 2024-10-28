@@ -88,7 +88,7 @@ module.exports.API = {
             }
             if (typeMessage === 'location') {
                 console.log('location=============================================');
-                const resData = await WhatsappHelper.listEvent(params);
+                const resData = await WhatsappService.listEvent(params);
                 console.log(util.inspect(resData, false, null, true));
             }
             // Trả về 200 OK để xác nhận đã nhận thông báo
