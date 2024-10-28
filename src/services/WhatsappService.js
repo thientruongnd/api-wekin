@@ -579,12 +579,7 @@ const checkCountry = async (data) => {
         userDetails.name = customerName;
         userDetails.phone_number = phone;
         if (myCountry.country_code !== countryFrom.country_code) {
-            // select different country
-            locationFrom.cCode = countryFrom?.country_code;
-        console.log(util.inspect(countryFrom, false, null, true));
-        const locationFrom = {};
-        if (myCountry.country_code !== countryFrom.country_code) {
-            // select different country
+        // select different country
             locationFrom.lat = latitudeFrom;
             locationFrom.long = longitudeFrom;
             const resData = await DataVekinHelper.transportationList();
@@ -622,7 +617,7 @@ const checkCountry = async (data) => {
                             },
                             body: {
                                 text: 'The amount of CO2 emission is different depended on the type of your transportation.\n'
-                                + 'Please select the transportation for offset receipt .\n',
+                            + 'Please select the transportation for offset receipt .\n',
                             },
                             action: {
                                 button: 'Transportation',

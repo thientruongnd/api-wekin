@@ -3,7 +3,6 @@ Mr : Dang Xuan Truong
 Email: truongdx@runsystem.net
 */
 const util = require('util');
-const moment = require('moment-timezone');
 const axios = require('axios');
 const WhatsappHelper = require('../helpers/WhatsappHelper');
 const DataVekinHelper = require('../helpers/DataVekinHelper');
