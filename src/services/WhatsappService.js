@@ -294,6 +294,33 @@ const paymentSuccess = async (data) => {
         return promiseReject(err);
     }
 };
+const completed = async (data) => {
+    try {
+        const phone = data?.phone || '84902103222';
+        const template = {
+            messaging_product: 'whatsapp',
+            to: phone,
+            type: 'template',
+            template: {
+                name: 'completed',
+                language: {
+                    code: 'en_US',
+                },
+            },
+        };
+        const resData = await WhatsappHelper.sendMessage(template);
+        const response = {};
+        if (resData?.status && resData?.status !== 200) {
+            response.status = resData.status;
+            response.message = resData.message;
+            response.code = resData.code;
+            return promiseResolve(response);
+        }
+        return promiseResolve(resData);
+    } catch (err) {
+        return promiseReject(err);
+    }
+};
 
 const selectRegion = async (data) => {
     try {
@@ -543,4 +570,5 @@ module.exports = {
     selectCountry,
     paymentConfirmation,
     ecoTravel,
+    completed,
 };
