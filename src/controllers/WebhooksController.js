@@ -89,16 +89,13 @@ module.exports.API = {
                                 const decodedToken = JSON.parse(Base64.decode(responseJson?.flow_token));
                                 const customerName = responseJson?.screen_0_TextInput_0;
                                 const regionName = responseJson?.screen_0_Dropdown_1;
-                                console.log('regionName: ', regionName);
-                                console.log('customerName: ', customerName);
-                                console.log(util.inspect(decodedToken, false, null, true));
-                                // console.log('this log =====================decodedToken============');
-                                // console.log(util.inspect(decodedToken, false, null, true));
-                                // eventId = decodedToken?.eventId;
-                                // typeMessage = decodedToken?.type;
-                                // params.latitude = decodedToken?.latitude;
-                                // params.longitude = decodedToken?.longitude;
-                                // params.eventId = eventId;
+                                eventId = decodedToken?.eventId;
+                                typeMessage = decodedToken?.type;
+                                params.latitude = decodedToken?.latitude;
+                                params.longitude = decodedToken?.longitude;
+                                params.eventId = decodedToken?.eventId;
+                                params.regionName = regionName;
+                                params.customerName = customerName;
                             }
                         });
                     }
