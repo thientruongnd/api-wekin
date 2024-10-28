@@ -169,12 +169,13 @@ module.exports.DEFAULT = {
     },
     paymentSuccess: async (req, res) => {
         const params = {};
-        params.phone = '84974418454';
+        params.phone = '84902103222';
         params.eventEmission = { value: 2629.943, unit: 'kg co2e' };
         params.eventImage = 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
         params.unitAmount = 2629.943;
         params.currency = '$';
         const resData = await WhatsappService.paymentSuccess(params);
+        console.log(util.inspect(resData, false, null, true));
         return res.json(responseSuccess(10261, resData, 'en'));
     },
     paymentFailure: async (req, res) => {
