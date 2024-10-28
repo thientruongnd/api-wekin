@@ -59,15 +59,17 @@ module.exports.API = {
                             const type = message?.type;
                             const payload = message?.button?.payload;
                             const typeListReply = message?.interactive?.type; // list_reply
+                            phone = message?.from;
                             if (type === 'text' && text === 'Starting conversation' || text === 'joinNow' || text === 'ok') {
-                                phone = message?.from;
                                 typeMessage = 'joinNow';
                             }
                             if (type === 'button') {
                                 const decodedToken = JSON.parse(Base64.decode(payload));
                                 console.log(util.inspect(decodedToken, false, null, true));
-                                phone = message?.from;
                                 typeMessage = decodedToken?.type;
+                                params.latitude = decodedToken?.latitude;
+                                params.longitude = decodedToken?.longitude;
+                                params.eventId = decodedToken?.eventId;
                             }
                             if (type === 'location') {
                                 typeMessage = type;
@@ -82,6 +84,20 @@ module.exports.API = {
                                 params.latitude = decodedToken?.latitude;
                                 params.longitude = decodedToken?.longitude;
                                 params.eventId = eventId;
+                            }
+                            if (type === 'interactive' && typeListReply === 'nfm_reply') {
+                                const responseJson = message?.interactive?.response_json;
+                                console.log('this log =====================responseJson============');
+                                console.log(util.inspect(responseJson, false, null, true));
+                                const flowToken = responseJson?.flow_token;
+                                const decodedToken = JSON.parse(Base64.decode(flowToken));
+                                console.log('this log =====================decodedToken============');
+                                console.log(util.inspect(decodedToken, false, null, true));
+                                // eventId = decodedToken?.eventId;
+                                // typeMessage = decodedToken?.type;
+                                // params.latitude = decodedToken?.latitude;
+                                // params.longitude = decodedToken?.longitude;
+                                // params.eventId = eventId;
                             }
                         });
                     }
@@ -108,6 +124,17 @@ module.exports.API = {
                 console.log('location==========================ecoTravel===================');
                 const resData = await WhatsappService.ecoTravel(params);
                 console.log(util.inspect(resData, false, null, true));
+            }
+            if (typeMessage === 'sameCountry') {
+                console.log('location==========================sameCountry===================');
+            }
+            if (typeMessage === 'differentCountry') {
+                console.log('location==========================differentCountry===================');
+                await WhatsappService.selectRegion(params);
+            }
+            if (typeMessage === 'region') {
+                console.log('location==========================region===================');
+                // await WhatsappService.selectCountry(params);
             }
             // Trả về 200 OK để xác nhận đã nhận thông báo
             res.status(200).send('EVENT_RECEIVED');

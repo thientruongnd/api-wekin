@@ -291,12 +291,16 @@ const paymentSuccess = async (data) => {
         return promiseReject(err);
     }
 };
+
 const selectRegion = async (data) => {
     try {
         const phone = data?.phone || '84902103222';
         const latitude = data?.latitude || '13.7379374';
         const longitude = data?.longitude || '100.5239999';
-        const flowToken = { latitude, longitude, type: 'region' };
+        const eventId = data?.eventId || 230;
+        const flowToken = {
+            latitude, longitude, eventId, type: 'region',
+        };
         const encodedToken = Base64.encode(JSON.stringify(flowToken));
         const template = {
             messaging_product: 'whatsapp',
@@ -326,6 +330,7 @@ const selectRegion = async (data) => {
         };
         // const decodedToken = JSON.parse(Base64.decode(encodedToken));
         const resData = await WhatsappHelper.sendMessage(template);
+        console.log(util.inspect(resData, false, null, true));
         const response = {};
         if (resData?.status && resData?.status !== 200) {
             response.status = resData.status;
@@ -338,6 +343,7 @@ const selectRegion = async (data) => {
         return promiseReject(err);
     }
 };
+
 const selectCountry = async (data) => {
     try {
         const phone = data?.phone || '84902103222';

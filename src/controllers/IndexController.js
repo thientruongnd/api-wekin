@@ -24,7 +24,7 @@ module.exports.DEFAULT = {
         res.status(200).send('Hello this is webhook setup by GMO');
     },
     joinNow: async (req, res) => {
-        console.log('this log joinNow');
+        console.log('this log ');
         const params = {};
         params.phone = '84902103222';
         params.name = 'Xuan Truong';
