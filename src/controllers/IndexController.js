@@ -27,7 +27,7 @@ module.exports.DEFAULT = {
         params.phone = '84902103222';
         params.name = 'Xuan Truong';
         params.imageId = '439102592147175';
-        const resData = await WhatsappService.message001(params);
+        const resData = await WhatsappService.joinNow(params);
         return res.json(responseSuccess(10261, resData, 'en'));
     },
     sendMessageLocation: async (req, res) => {
