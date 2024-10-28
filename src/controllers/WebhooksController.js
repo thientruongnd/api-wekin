@@ -85,10 +85,10 @@ module.exports.API = {
                             }
                             if (type === 'interactive' && typeInteractive === 'nfm_reply') {
                                 const nfmReply = message?.interactive?.nfm_reply;
-                                const customerName = nfmReply?.screen_0_TextInput_0;
-                                console.log('customerName: ', customerName);
                                 console.log(util.inspect(nfmReply, false, null, true));
-                                const responseJson = nfmReply?.response_json;
+                                const responseJson = JSON.parse(nfmReply?.response_json);
+                                const customerName = responseJson?.screen_0_TextInput_0;
+                                console.log('customerName: ', customerName);
                                 console.log('this responseJson: ', responseJson);
                                 // 
                                 // console.log('customerName==: ', customerName);
