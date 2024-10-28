@@ -59,7 +59,7 @@ module.exports.API = {
                             const type = message?.type;
                             const payload = message?.button?.payload;
                             const typeListReply = message?.interactive?.type; // list_reply
-                            if (type === 'text' && text === 'Starting conversation' || text === 'joinNow') {
+                            if (type === 'text' && text === 'Starting conversation' || text === 'joinNow' || text === 'ok') {
                                 phone = message?.from;
                                 typeMessage = 'joinNow';
                             }
@@ -67,7 +67,7 @@ module.exports.API = {
                                 const decodedToken = JSON.parse(Base64.decode(payload));
                                 console.log(util.inspect(decodedToken, false, null, true));
                                 phone = message?.from;
-                                typeMessage = decodedToken?.text;
+                                typeMessage = decodedToken?.type;
                             }
                             if (type === 'interactive' && typeListReply === 'list_reply') {
                                 const id = message?.interactive?.list_reply?.id;
