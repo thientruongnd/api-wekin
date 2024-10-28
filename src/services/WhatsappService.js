@@ -581,6 +581,10 @@ const checkCountry = async (data) => {
         if (myCountry.country_code !== countryFrom.country_code) {
             // select different country
             locationFrom.cCode = countryFrom?.country_code;
+        console.log(util.inspect(countryFrom, false, null, true));
+        const locationFrom = {};
+        if (myCountry.country_code !== countryFrom.country_code) {
+            // select different country
             locationFrom.lat = latitudeFrom;
             locationFrom.long = longitudeFrom;
             const resData = await DataVekinHelper.transportationList();
