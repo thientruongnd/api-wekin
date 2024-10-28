@@ -6,7 +6,7 @@ const { DEFAULT, API } = require('../../controllers/IndexController');
 
 const indexRoute = (apiRouter) => {
     apiRouter.route('/').get(DEFAULT.index);
-    apiRouter.route('/tests/sendMessage').post(DEFAULT.sendMessage);
+    apiRouter.route('/tests/joinNow').post(DEFAULT.joinNow);
     apiRouter.route('/tests/sendMessageLocation').post(DEFAULT.sendMessageLocation);
     apiRouter.route('/tests/eventCarbonReceipt').get(DEFAULT.eventCarbonReceipt);
     apiRouter.route('/tests/eventLocations').get(DEFAULT.eventLocations);
