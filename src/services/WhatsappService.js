@@ -564,6 +564,9 @@ const selectCountry = async (data) => {
 const checkCountry = async (data) => {
     try {
         const countryName = data?.regionName || '2_United_Arab_Emirates';
+        const customerName = data?.customerName;
+        const eventId = data?.eventId || 230;
+        const phone = data?.phone || '84902103222';
         const myLatitude = data?.latitude || '20.4458553';
         const myLongitude = data?.longitude || '106.1173998';
         const infoCountry = await getCountry(countryName);
@@ -571,30 +574,73 @@ const checkCountry = async (data) => {
         const longitudeFrom = infoCountry?.longitude || '100.5239999';
         const myCountry = await getCountryFromCoordinates(myLatitude, myLongitude);
         const countryFrom = await getCountryFromCoordinates(latitudeFrom, longitudeFrom);
-        console.log(util.inspect(countryFrom, false, null, true));
         const locationFrom = {};
+        const userDetails = {};
+        userDetails.name = customerName;
+        userDetails.phone_number = phone;
         if (myCountry.country_code !== countryFrom.country_code) {
             // select different country
+            locationFrom.cCode = countryFrom?.country_code;
             locationFrom.lat = latitudeFrom;
             locationFrom.long = longitudeFrom;
             const resData = await DataVekinHelper.transportationList();
             const rows = [];
             if (!isEmpty(resData)) {
                 const emissionList = resData?.emission_list || [];
-                // for (let i = 0; i < emissionList.length; i++) {
-                //     const element = {};
-                //     flowToken.eventId = nearestLocations[i].id;
-                //     const encodedToken = Base64.encode(JSON.stringify(flowToken));
-                //     element.id = encodedToken;
-                //     element.title = nearestLocations[i].name;
-                //     // Gán lại giá trị sau khi cắt chuỗi
-                //     element.title = element.title.substring(0, 24);
-                //     element.description = nearestLocations[i].event_code;
-                //     // Kiểm tra số lượng phần tử trong rows
-                //     if (rows.length < 10) {
-                //         rows.push(element);
-                //     }
-                // }
+                for (let i = 0; i < emissionList.length; i++) {
+                    const element = {}; const flowToken = {};
+                    flowToken.id = emissionList[i].id;
+                    flowToken.lf = locationFrom;
+                    flowToken.uds = userDetails;
+                    flowToken.eid = eventId;
+                    const encodedToken = Base64.encode(JSON.stringify(flowToken));
+                    element.id = encodedToken;
+                    element.title = emissionList[i].name;
+                    // Gán lại giá trị sau khi cắt chuỗi
+                    element.title = element.title.substring(0, 24);
+                    // element.description = nearestLocations[i].event_code;
+                    // // Kiểm tra số lượng phần tử trong rows
+                    if (rows.length < 10) {
+                        rows.push(element);
+                    }
+                }
+                let template;
+                if (!isEmpty(rows)) {
+                    template = {
+                        messaging_product: 'whatsapp',
+                        to: phone,
+                        type: 'interactive',
+                        interactive: {
+                            type: 'list',
+                            header: {
+                                type: 'text',
+                                text: 'Transportation',
+                            },
+                            body: {
+                                text: 'The amount of CO2 emission is different depended on the type of your transportation.\n'
+                                + 'Please select the transportation for offset receipt .\n',
+                            },
+                            action: {
+                                button: 'Transportation',
+                                sections: [
+                                    {
+                                        title: 'Options',
+                                        rows,
+                                    },
+                                ],
+                            },
+                        },
+                    };
+                }
+                const resDataWhatsapp = await WhatsappHelper.sendMessage(template);
+                const response = {};
+                if (resData?.status && resDataWhatsapp?.status !== 200) {
+                    response.status = resDataWhatsapp.status;
+                    response.message = resDataWhatsapp.message;
+                    response.code = resDataWhatsapp.code;
+                    return promiseResolve(response);
+                }
+                return false;
             }
         }
 
