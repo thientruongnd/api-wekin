@@ -20,6 +20,8 @@ const {
     getImageLink,
     downloadImage,
     getRandomFileName,
+    convertTemplateName,
+    getCountry,
 } = require('../utils/shared');
 
 const joinNow = async (data) => {
@@ -493,7 +495,6 @@ const selectRegion = async (data) => {
         };
         // const decodedToken = JSON.parse(Base64.decode(encodedToken));
         const resData = await WhatsappHelper.sendMessage(template);
-        console.log(util.inspect(resData, false, null, true));
         const response = {};
         if (resData?.status && resData?.status !== 200) {
             response.status = resData.status;
@@ -508,14 +509,24 @@ const selectRegion = async (data) => {
 };
 
 const selectCountry = async (data) => {
+    const regionName = data?.regionName || '2_South-central_Asia';
+    const customerName = data?.customerName || 'Xuan Truong';
+    const templateName = convertTemplateName(regionName);
+    const phone = data?.phone || '84902103222';
+    const latitude = data?.latitude || '13.7379374';
+    const longitude = data?.longitude || '100.5239999';
+    const eventId = data?.eventId || 230;
+    const flowToken = {
+        latitude, longitude, eventId, customerName, type: 'country',
+    };
+    const encodedToken = Base64.encode(JSON.stringify(flowToken));
     try {
-        const phone = data?.phone || '84902103222';
         const template = {
             messaging_product: 'whatsapp',
             to: phone,
             type: 'template',
             template: {
-                name: data.templateName || 'select_country',
+                name: templateName || 'select_country',
                 language: {
                     code: 'en_US',
                 },
@@ -524,6 +535,14 @@ const selectCountry = async (data) => {
                         type: 'button',
                         sub_type: 'flow',
                         index: 0,
+                        parameters: [
+                            {
+                                type: 'action',
+                                action: {
+                                    flow_token: encodedToken,
+                                },
+                            },
+                        ],
                     },
                 ],
             },
@@ -536,7 +555,7 @@ const selectCountry = async (data) => {
             response.code = resData.code;
             return promiseResolve(response);
         }
-        return promiseResolve(resData);
+        return promiseResolve(data);
     } catch (err) {
         return promiseReject(err);
     }

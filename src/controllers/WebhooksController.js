@@ -85,23 +85,22 @@ module.exports.API = {
                             }
                             if (type === 'interactive' && typeInteractive === 'nfm_reply') {
                                 const nfmReply = message?.interactive?.nfm_reply;
-                                console.log(util.inspect(nfmReply, false, null, true));
-                                // const customerName = nfmReply?.screen_0_TextInput_0;
-                                // console.log('customerName==: ', customerName);
-                                // const responseJson = nfmReply?.response_json;
-                                // const decodedToken = JSON.parse(Base64.decode(responseJson?.flow_token));
-                                // console.log(util.inspect(decodedToken, false, null, true));
-                                // console.log('====responseJson============: ', decodedToken);
-                                // console.log(util.inspect(responseJson, false, null, true));
-                                // const flowToken = responseJson?.flow_token;
-                                // const decodedToken = JSON.parse(Base64.decode(flowToken));
-                                // console.log('this log =====================decodedToken============');
-                                // console.log(util.inspect(decodedToken, false, null, true));
-                                // eventId = decodedToken?.eventId;
-                                // typeMessage = decodedToken?.type;
-                                // params.latitude = decodedToken?.latitude;
-                                // params.longitude = decodedToken?.longitude;
-                                // params.eventId = eventId;
+                                const responseJson = JSON.parse(nfmReply?.response_json);
+                                const decodedToken = JSON.parse(Base64.decode(responseJson?.flow_token));
+                                typeMessage = decodedToken?.type;
+                                if (typeMessage === 'region') {
+                                    const customerName = responseJson?.screen_0_TextInput_0;
+                                    const regionName = responseJson?.screen_0_Dropdown_1;
+                                    params.regionName = regionName;
+                                    params.customerName = customerName;
+                                }
+                                if (typeMessage === 'country') {
+                                    params.countryName = responseJson?.screen_0_Dropdown_0;
+                                }
+                                eventId = decodedToken?.eventId;
+                                params.latitude = decodedToken?.latitude;
+                                params.longitude = decodedToken?.longitude;
+                                params.eventId = decodedToken?.eventId;
                             }
                         });
                     }
@@ -122,23 +121,24 @@ module.exports.API = {
             if (typeMessage === 'location') {
                 console.log('location=======================selectEvent======================');
                 const resData = await WhatsappService.listEvent(params);
-                console.log(util.inspect(resData, false, null, true));
+                console.log(`location==========: ${ resData}`);
             }
             if (typeMessage === 'selectEvent') {
-                console.log('location==========================ecoTravel===================');
                 const resData = await WhatsappService.ecoTravel(params);
-                console.log(util.inspect(resData, false, null, true));
+                console.log('selectEvent============ecoTravel===========: ', resData);
             }
             if (typeMessage === 'sameCountry') {
                 console.log('location==========================sameCountry===================');
             }
             if (typeMessage === 'differentCountry') {
-                console.log('location==========================differentCountry===================');
-                await WhatsappService.selectRegion(params);
+                const resData = await WhatsappService.selectRegion(params);
+                console.log('=differentCountry==============: ', resData);
             }
             if (typeMessage === 'region') {
-                console.log('location==========================region===================');
-                // await WhatsappService.selectCountry(params);
+                await WhatsappService.selectCountry(params);
+            }
+            if (typeMessage === 'country') {
+                console.log('=Country=========: ', params);
             }
             // Trả về 200 OK để xác nhận đã nhận thông báo
             res.status(200).send('EVENT_RECEIVED');
