@@ -89,6 +89,7 @@ module.exports.API = {
                                 const responseJson = JSON.parse(nfmReply?.response_json);
                                 const decodedToken = JSON.parse(Base64.decode(responseJson?.flow_token));
                                 typeMessage = decodedToken?.type;
+                                console.log('this log decodedToken', decodedToken);
                                 if (typeMessage === 'region') {
                                     const customerName = responseJson?.screen_0_TextInput_0;
                                     const regionName = responseJson?.screen_0_Dropdown_1;
