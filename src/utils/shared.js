@@ -2,6 +2,8 @@
  Mr : Dang Xuan Truong
  Email: truongdx@runsystem.net
  */
+const axios = require('axios');
+const fs = require('fs');
 const path = require('path');
 const winston = require('winston');
 const empty = require('is-empty');
@@ -161,7 +163,7 @@ const buildCheckoutSessionURL = (baseURL, params) => {
     // Loại bỏ 'https://' trong kết quả trả về
     return url.toString().replace('https://', '');
 };
-const getImageLink = (req, pathName = '') => `${req.headers.host}${pathName}`;
+const getImageLink = (host, pathName = '') => `${host}${pathName}`;
 const getNearestLocations = (data, latitude, longitude, count = 10) => {
     function haversine(lat1, lon1, lat2, lon2) {
         const R = 6371; // Bán kính của trái đất tính bằng km
@@ -197,6 +199,23 @@ const convertTemplateName = (regionName) => {
         .replace(/-/g, '_'); // Thay dấu '-' bằng '_'
     return templateName;
 };
+const getRandomFileName = (extension = 'png') => `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${extension}`;
+const downloadImage = async (url, outputPath) => {
+    try {
+        const response = await axios({
+            url,
+            responseType: 'stream',
+        });
+        const writer = fs.createWriteStream(outputPath);
+        response.data.pipe(writer);
+        return new Promise((resolve, reject) => {
+            writer.on('finish', resolve);
+            writer.on('error', reject);
+        });
+    } catch (error) {
+        console.error('Lỗi khi tải ảnh:', error.message);
+    }
+};
 module.exports = {
     normalizePort,
     onError,
@@ -224,4 +243,6 @@ module.exports = {
     getNearestLocations,
     getCountry,
     convertTemplateName,
+    downloadImage,
+    getRandomFileName,
 };
