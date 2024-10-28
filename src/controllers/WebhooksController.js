@@ -140,7 +140,7 @@ module.exports.API = {
                 await WhatsappService.selectCountry(params);
             }
             if (typeMessage === 'country') {
-                // await WhatsappService.checkCountry(params);
+                await WhatsappService.checkCountry(params);
                 console.log('=Country=========: ', params);
             }
             // Trả về 200 OK để xác nhận đã nhận thông báo
