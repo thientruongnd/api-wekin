@@ -218,6 +218,74 @@ const paymentSuccess = async (data) => {
         return promiseReject(err);
     }
 };
+const selectRegion = async (data) => {
+    try {
+        const phone = data?.phone || '84902103222';
+        const template = {
+            messaging_product: 'whatsapp',
+            to: phone,
+            type: 'template',
+            template: {
+                name: 'fill_travel_information',
+                language: {
+                    code: 'en_US',
+                },
+                components: [
+                    {
+                        type: 'button',
+                        sub_type: 'flow',
+                        index: 0,
+                    },
+                ],
+            },
+        };
+        const resData = await WhatsappHelper.sendMessage(template);
+        const response = {};
+        if (resData?.status && resData?.status !== 200) {
+            response.status = resData.status;
+            response.message = resData.message;
+            response.code = resData.code;
+            return promiseResolve(response);
+        }
+        return promiseResolve(resData);
+    } catch (err) {
+        return promiseReject(err);
+    }
+};
+const selectCountry = async (data) => {
+    try {
+        const phone = data?.phone || '84902103222';
+        const template = {
+            messaging_product: 'whatsapp',
+            to: phone,
+            type: 'template',
+            template: {
+                name: data.templateName || 'select_country',
+                language: {
+                    code: 'en_US',
+                },
+                components: [
+                    {
+                        type: 'button',
+                        sub_type: 'flow',
+                        index: 0,
+                    },
+                ],
+            },
+        };
+        const resData = await WhatsappHelper.sendMessage(template);
+        const response = {};
+        if (resData?.status && resData?.status !== 200) {
+            response.status = resData.status;
+            response.message = resData.message;
+            response.code = resData.code;
+            return promiseResolve(response);
+        }
+        return promiseResolve(resData);
+    } catch (err) {
+        return promiseReject(err);
+    }
+};
 const paymentConfirmation = async (data) => {
     try {
         const resDataVekin = await DataVekinHelper.eventCarbonReceiptPartner(data);
@@ -311,5 +379,7 @@ module.exports = {
     joinNow,
     listEvent,
     paymentSuccess,
+    selectRegion,
+    selectCountry,
     paymentConfirmation,
 };
