@@ -563,7 +563,7 @@ const selectCountry = async (data) => {
 };
 const checkCountry = async (data) => {
     try {
-        const countryName = data?.regionName || '2_United_Arab_Emirates';
+        const countryName = data?.countryName || '2_United_Arab_Emirates';
         const customerName = data?.customerName;
         const eventId = data?.eventId || 230;
         const phone = data?.phone || '84902103222';
