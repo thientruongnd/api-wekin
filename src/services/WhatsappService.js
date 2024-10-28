@@ -105,30 +105,45 @@ const listEvent = async (data) => {
                     rows.push(element);
                 }
             }
-            const template = {
-                messaging_product: 'whatsapp',
-                to: phone,
-                type: 'interactive',
-                interactive: {
-                    type: 'list',
-                    header: {
-                        type: 'text',
-                        text: 'Explore Sustainable Events',
+            let template;
+            if (!isEmpty(rows)) {
+                template = {
+                    messaging_product: 'whatsapp',
+                    to: phone,
+                    type: 'interactive',
+                    interactive: {
+                        type: 'list',
+                        header: {
+                            type: 'text',
+                            text: 'Explore Sustainable Events',
+                        },
+                        body: {
+                            text: 'BODY_TEXT',
+                        },
+                        action: {
+                            button: 'List events',
+                            sections: [
+                                {
+                                    title: 'Event Options',
+                                    rows,
+                                },
+                            ],
+                        },
                     },
-                    body: {
-                        text: 'BODY_TEXT',
+                };
+            } else {
+                template = {
+                    messaging_product: 'whatsapp',
+                    to: phone,
+                    type: 'template',
+                    template: {
+                        name: 'no_events',
+                        language: {
+                            code: 'en_US',
+                        },
                     },
-                    action: {
-                        button: 'List events',
-                        sections: [
-                            {
-                                title: 'Event Options',
-                                rows,
-                            },
-                        ],
-                    },
-                },
-            };
+                };
+            }
             const resData = await WhatsappHelper.sendMessage(template);
             const response = {};
             if (resData?.status && resData?.status !== 200) {
