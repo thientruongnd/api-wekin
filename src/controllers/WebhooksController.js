@@ -37,6 +37,7 @@ module.exports.API = {
         console.log(util.inspect(req.body, false, null, true));
         console.log('this log============================================');
         // Kiểm tra request có chứa dữ liệu từ WhatsApp
+        const params = {};
         let typeMessage = ''; let phone = ''; let fullName = '';
         if (body.object === 'whatsapp_business_account') {
             body.entry.forEach((entry) => {
@@ -64,22 +65,30 @@ module.exports.API = {
                                 phone = message?.from;
                                 typeMessage = 'join_now_payload';
                             }
+                            if (type === 'location') {
+                                phone = message?.from;
+                                typeMessage = 'location';
+                                params.location = message?.location;
+                            }
                         });
                     }
                 });
             });
+            params.phone = phone;
+            params.name = fullName;
             console.log('typeMessage: ', typeMessage);
             if (typeMessage === 'joinNow') {
-                const params = {};
-                params.phone = phone;
-                params.name = fullName;
+                console.log('joinNow=============================================');
                 params.imageId = '439102592147175';
-                const resData = await WhatsappService.joinNow(params);
-                console.log(util.inspect(resData, false, null, true));
+                await WhatsappService.joinNow(params);
             }
             if (typeMessage === 'join_now_payload') {
-                const resData = await WhatsappHelper.sendMessageLocation({ phone });
-
+                console.log('join_now_payload=============================================');
+                await WhatsappHelper.sendMessageLocation({ phone });
+            }
+            if (typeMessage === 'location') {
+                console.log('location=============================================');
+                const resData = await WhatsappHelper.listEvent(params);
                 console.log(util.inspect(resData, false, null, true));
             }
             // Trả về 200 OK để xác nhận đã nhận thông báo
