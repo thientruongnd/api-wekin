@@ -153,7 +153,7 @@ module.exports.API = {
             }
             if (typeMessage === 'receipt') {
                 console.log('=receipt=====show transf====: ', params);
-                // await WhatsappService.checkCountry(params);
+                await WhatsappService.paymentConfirmation(params);
             }
             // Trả về 200 OK để xác nhận đã nhận thông báo
             res.status(200).send('EVENT_RECEIVED');
