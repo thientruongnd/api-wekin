@@ -24,6 +24,8 @@ const joinNow = async (data) => {
         const phone = data?.phone || '84902103222';
         const name = data?.name || 'Xuan Truong';
         const imageId = data?.imageId || '439102592147175';
+        const payloadParams = { type: 'join_now_payload' };
+        const payloadEncode = Base64.encode(JSON.stringify(payloadParams));
         const template = {
             messaging_product: 'whatsapp',
             to: phone,
@@ -61,7 +63,7 @@ const joinNow = async (data) => {
                         parameters: [
                             {
                                 type: 'payload',
-                                payload: 'join_now_payload', // Thay thế bằng chuỗi payload tùy chọn
+                                payload: payloadEncode, // Thay thế bằng chuỗi payload tùy chọn
                             },
                         ],
                     },

@@ -64,8 +64,10 @@ module.exports.API = {
                                 typeMessage = 'joinNow';
                             }
                             if (type === 'button' && payload === 'join_now_payload') {
+                                const decodedToken = JSON.parse(Base64.decode(payload));
+                                console.log(util.inspect(decodedToken, false, null, true));
                                 phone = message?.from;
-                                typeMessage = 'join_now_payload';
+                                typeMessage = decodedToken?.text;
                             }
                             if (type === 'interactive' && typeListReply === 'list_reply') {
                                 const id = message?.interactive?.list_reply?.id;
