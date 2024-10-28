@@ -58,7 +58,7 @@ module.exports.API = {
                             const text = message?.text?.body;
                             const type = message?.type;
                             const payload = message?.button?.payload;
-                            const typeListReply = message?.interactive?.type; // list_reply
+                            const typeInteractive = message?.interactive?.type; // list_reply
                             phone = message?.from;
                             if (type === 'text' && text === 'Starting conversation' || text === 'joinNow' || text === 'ok') {
                                 typeMessage = 'joinNow';
@@ -76,7 +76,7 @@ module.exports.API = {
                                 params.latitude = message?.location?.latitude;
                                 params.longitude = message?.location?.longitude;
                             }
-                            if (type === 'interactive' && typeListReply === 'list_reply') {
+                            if (type === 'interactive' && typeInteractive === 'list_reply') {
                                 const id = message?.interactive?.list_reply?.id;
                                 const decodedToken = JSON.parse(Base64.decode(id));
                                 eventId = decodedToken?.eventId;
@@ -85,14 +85,17 @@ module.exports.API = {
                                 params.longitude = decodedToken?.longitude;
                                 params.eventId = eventId;
                             }
-                            if (type === 'interactive' && typeListReply === 'nfm_reply') {
-                                const responseJson = message?.interactive?.response_json;
-                                console.log('this log =====================responseJson============');
+                            if (type === 'interactive' && typeInteractive === 'nfm_reply') {
+                                const nfmReply = message?.interactive?.nfm_reply;
+                                console.log(util.inspect(nfmReply, false, null, true));
+                                const responseJson = nfmReply?.response_json;
                                 console.log(util.inspect(responseJson, false, null, true));
-                                const flowToken = responseJson?.flow_token;
-                                const decodedToken = JSON.parse(Base64.decode(flowToken));
-                                console.log('this log =====================decodedToken============');
-                                console.log(util.inspect(decodedToken, false, null, true));
+                                console.log('this log =====================responseJson============');
+                                // console.log(util.inspect(responseJson, false, null, true));
+                                // const flowToken = responseJson?.flow_token;
+                                // const decodedToken = JSON.parse(Base64.decode(flowToken));
+                                // console.log('this log =====================decodedToken============');
+                                // console.log(util.inspect(decodedToken, false, null, true));
                                 // eventId = decodedToken?.eventId;
                                 // typeMessage = decodedToken?.type;
                                 // params.latitude = decodedToken?.latitude;
