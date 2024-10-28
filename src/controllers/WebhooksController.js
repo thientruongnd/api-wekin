@@ -85,6 +85,20 @@ module.exports.API = {
                                 params.longitude = decodedToken?.longitude;
                                 params.eventId = eventId;
                             }
+                            if (type === 'interactive' && typeListReply === 'nfm_reply') {
+                                const responseJson = message?.interactive?.response_json;
+                                console.log('this log =====================responseJson============');
+                                console.log(util.inspect(responseJson, false, null, true));
+                                const flowToken = responseJson?.flow_token;
+                                const decodedToken = JSON.parse(Base64.decode(flowToken));
+                                console.log('this log =====================decodedToken============');
+                                console.log(util.inspect(decodedToken, false, null, true));
+                                // eventId = decodedToken?.eventId;
+                                // typeMessage = decodedToken?.type;
+                                // params.latitude = decodedToken?.latitude;
+                                // params.longitude = decodedToken?.longitude;
+                                // params.eventId = eventId;
+                            }
                         });
                     }
                 });
@@ -117,6 +131,10 @@ module.exports.API = {
             if (typeMessage === 'differentCountry') {
                 console.log('location==========================differentCountry===================');
                 await WhatsappService.selectRegion(params);
+            }
+            if (typeMessage === 'region') {
+                console.log('location==========================region===================');
+                // await WhatsappService.selectCountry(params);
             }
             // Trả về 200 OK để xác nhận đã nhận thông báo
             res.status(200).send('EVENT_RECEIVED');
