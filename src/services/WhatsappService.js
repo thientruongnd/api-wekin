@@ -572,13 +572,15 @@ const checkCountry = async (data) => {
         const infoCountry = await getCountry(countryName);
         const latitudeFrom = infoCountry?.latitude || '13.7379374';
         const longitudeFrom = infoCountry?.longitude || '100.5239999';
-        const myCountry = await getCountryFromCoordinates(myLatitude, myLongitude);
-        const countryFrom = await getCountryFromCoordinates(latitudeFrom, longitudeFrom);
+
+        // const myCountry = await getCountryFromCoordinates(myLatitude, myLongitude);
+        // const countryFrom = await getCountryFromCoordinates(latitudeFrom, longitudeFrom);
         const locationFrom = {};
         const userDetails = {};
         userDetails.name = customerName;
         userDetails.phone_number = phone;
-        if (myCountry.country_code !== countryFrom.country_code) {
+        // if (myCountry.country_code !== countryFrom.country_code) {
+        if ('nd' !== 'na') {
         // select different country
             locationFrom.lat = latitudeFrom;
             locationFrom.long = longitudeFrom;
