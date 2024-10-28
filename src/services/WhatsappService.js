@@ -282,7 +282,9 @@ const paymentSuccess = async (data) => {
                 ],
             },
         };
+        console.log(util.inspect(template, false, null, true));
         const resData = await WhatsappHelper.sendMessage(template);
+        console.log(util.inspect(resData, false, null, true));
         const response = {};
         if (resData?.status && resData?.status !== 200) {
             response.status = resData.status;
