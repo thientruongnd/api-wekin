@@ -100,6 +100,7 @@ module.exports.API = {
                                 }
                                 if (typeMessage === 'country') {
                                     params.countryName = responseJson?.screen_0_Dropdown_0;
+                                    params.customerName = decodedToken.customerName;
                                 }
                                 eventId = decodedToken?.eventId;
                                 params.latitude = decodedToken?.latitude;
