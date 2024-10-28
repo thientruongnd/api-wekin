@@ -179,27 +179,15 @@ module.exports.DEFAULT = {
         return res.json(responseSuccess(10261, resData, 'en'));
     },
     selectCountry: async (req, res) => {
-        const message = {
-            context: {
-                from: '6627142490',
-                id: 'wamid.HBgLODQ5NzQ0MTg0NTQVAgARGBIzOTI3QTVBREI2QzYyNkY5QjkA',
-            },
-            from: '84974418454',
-            id: 'wamid.HBgLODQ5NzQ0MTg0NTQVAgASGCBBNUZENzA0NTg5RjU3OTEyMDUxMzkzMEZFNUVDOEZFOAA=',
-            timestamp: '1730084470',
-            type: 'interactive',
-            interactive: {
-                type: 'nfm_reply',
-                nfm_reply: {
-                    response_json: '{"screen_0_TextInput_0":"Test","screen_0_Dropdown_1":"2_South-eastern_Asia","flow_token":"unused"}',
-                    body: 'Sent',
-                    name: 'flow',
-                },
-            },
-        };
+        const regionName = '2_South-central_Asia';
+        const templateName = regionName
+            .replace(/^\d+_/, '') // Xóa số và ký tự gạch dưới ở đầu
+            .toLowerCase() // Chuyển thành chữ thường
+            .replace(/-/g, '_'); // Thay dấu '-' bằng '_'
         const params = {};
         params.phone = req.body.phone || '84974418454';
-        params.templateName = req.body.templateName || '84974418454';
+        params.templateName = templateName;
+        params.flowToken = 'country';
         const resData = await WhatsappService.selectCountry(params);
         return res.json(responseSuccess(10261, resData, 'en'));
     },

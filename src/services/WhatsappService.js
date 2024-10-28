@@ -260,7 +260,7 @@ const selectCountry = async (data) => {
             to: phone,
             type: 'template',
             template: {
-                name: data.templateName || 'select_country',
+                name: data.templateName || '',
                 language: {
                     code: 'en_US',
                 },
@@ -269,6 +269,14 @@ const selectCountry = async (data) => {
                         type: 'button',
                         sub_type: 'flow',
                         index: 0,
+                        parameters: [
+                            {
+                                type: 'action',
+                                action: {
+                                    flow_token: data.flowToken || '',
+                                },
+                            },
+                        ],
                     },
                 ],
             },
