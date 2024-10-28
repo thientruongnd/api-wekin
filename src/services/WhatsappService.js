@@ -257,6 +257,8 @@ const selectRegion = async (data) => {
                 },
             },
         };
+        const decodedToken = JSON.parse(Base64.decode(encodedToken));
+        console.log('Decoded flowToken:', decodedToken);
         console.log(util.inspect(template, false, null, true));
         const resData = await WhatsappHelper.sendMessage(template);
         console.log(util.inspect(resData, false, null, true));
