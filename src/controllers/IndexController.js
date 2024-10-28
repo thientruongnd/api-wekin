@@ -206,6 +206,11 @@ module.exports.DEFAULT = {
         const resData = await WhatsappService.ecoTravel();
         return res.json(responseSuccess(10261, resData, 'en'));
     },
+    checkCountry: async (req, res) => {
+        const resData = await WhatsappService.checkCountry();
+        return res.json(responseSuccess(10261, resData, 'en'));
+    },
+    
 };
 module.exports.API = {
 

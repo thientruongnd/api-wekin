@@ -22,6 +22,7 @@ const {
     getRandomFileName,
     convertTemplateName,
     getCountry,
+    getCountryFromCoordinates,
 } = require('../utils/shared');
 
 const joinNow = async (data) => {
@@ -427,6 +428,48 @@ const selectCountry = async (data) => {
         return promiseReject(err);
     }
 };
+const checkCountry = async (data) => {
+    try {
+        const countryName = data?.regionName || '2_United_Arab_Emirates';
+        const myLatitude = data?.latitude || '20.4458553';
+        const myLongitude = data?.longitude || '106.1173998';
+        const infoCountry = await getCountry(countryName);
+        const latitudeFrom = infoCountry?.latitude || '13.7379374';
+        const longitudeFrom = infoCountry?.longitude || '100.5239999';
+        const myCountry = await getCountryFromCoordinates(myLatitude, myLongitude);
+        const countryFrom = await getCountryFromCoordinates(latitudeFrom, longitudeFrom);
+        console.log(util.inspect(countryFrom, false, null, true));
+        const locationFrom = {};
+        if (myCountry.country_code !== countryFrom.country_code) {
+            // select different country
+            locationFrom.lat = latitudeFrom;
+            locationFrom.long = longitudeFrom;
+            const resData = await DataVekinHelper.transportationList();
+            const rows = [];
+            if (!isEmpty(resData)) {
+                const emissionList = resData?.emission_list || [];
+                // for (let i = 0; i < emissionList.length; i++) {
+                //     const element = {};
+                //     flowToken.eventId = nearestLocations[i].id;
+                //     const encodedToken = Base64.encode(JSON.stringify(flowToken));
+                //     element.id = encodedToken;
+                //     element.title = nearestLocations[i].name;
+                //     // Gán lại giá trị sau khi cắt chuỗi
+                //     element.title = element.title.substring(0, 24);
+                //     element.description = nearestLocations[i].event_code;
+                //     // Kiểm tra số lượng phần tử trong rows
+                //     if (rows.length < 10) {
+                //         rows.push(element);
+                //     }
+                // }
+            }
+        }
+
+        return promiseResolve(data);
+    } catch (err) {
+        return promiseReject(err);
+    }
+};
 const paymentConfirmation = async (data) => {
     try {
         const resDataVekin = await DataVekinHelper.eventCarbonReceiptPartner(data);
@@ -593,4 +636,5 @@ module.exports = {
     paymentConfirmation,
     ecoTravel,
     completed,
+    checkCountry,
 };
