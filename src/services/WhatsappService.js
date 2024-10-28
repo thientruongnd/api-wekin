@@ -5,6 +5,7 @@
  */
 const util = require('util');
 const moment = require('moment');
+const { Base64 } = require('js-base64');
 const WhatsappHelper = require('../helpers/WhatsappHelper');
 const DataVekinHelper = require('../helpers/DataVekinHelper');
 
@@ -17,6 +18,7 @@ const {
     getNearestLocations,
     getImageLink,
 } = require('../utils/shared');
+const { type } = require('os');
 
 const joinNow = async (data) => {
     try {
@@ -118,7 +120,10 @@ const listEvent = async (data) => {
                             text: 'Explore Sustainable Events',
                         },
                         body: {
-                            text: 'BODY_TEXT',
+                            text: 'Here’s a curated list of Sustainable Events,\n'
+                                + 'brought to you by Vekin Group and our trusted eco-partners.\n'
+                                + 'Join us in making a positive impact on the environment\n'
+                                + 'by attending these events! Please choose an event.',
                         },
                         action: {
                             button: 'List events',
@@ -221,6 +226,10 @@ const paymentSuccess = async (data) => {
 const selectRegion = async (data) => {
     try {
         const phone = data?.phone || '84902103222';
+        const latitude = data?.latitude || '13.7379374';
+        const longitude = data?.longitude || '100.5239999';
+        const flowToken = { latitude, longitude, type: 'region' };
+        const encodedToken = Base64.encode(JSON.stringify(flowToken));
         const template = {
             messaging_product: 'whatsapp',
             to: phone,
@@ -235,10 +244,19 @@ const selectRegion = async (data) => {
                         type: 'button',
                         sub_type: 'flow',
                         index: 0,
+                        parameters: [
+                            {
+                                type: 'action',
+                                action: {
+                                    flow_token: encodedToken,
+                                },
+                            },
+                        ],
                     },
                 ],
             },
         };
+        // const decodedToken = JSON.parse(Base64.decode(encodedToken));
         const resData = await WhatsappHelper.sendMessage(template);
         const response = {};
         if (resData?.status && resData?.status !== 200) {
