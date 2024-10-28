@@ -5,6 +5,7 @@
  */
 const util = require('util');
 const moment = require('moment');
+const { Base64 } = require('js-base64');
 const WhatsappHelper = require('../helpers/WhatsappHelper');
 const DataVekinHelper = require('../helpers/DataVekinHelper');
 
@@ -17,6 +18,7 @@ const {
     getNearestLocations,
     getImageLink,
 } = require('../utils/shared');
+const { type } = require('os');
 
 const joinNow = async (data) => {
     try {
@@ -118,7 +120,10 @@ const listEvent = async (data) => {
                             text: 'Explore Sustainable Events',
                         },
                         body: {
-                            text: 'BODY_TEXT',
+                            text: 'Here’s a curated list of Sustainable Events,\n'
+                                + 'brought to you by Vekin Group and our trusted eco-partners.\n'
+                                + 'Join us in making a positive impact on the environment\n'
+                                + 'by attending these events! Please choose an event.',
                         },
                         action: {
                             button: 'List events',
@@ -220,26 +225,41 @@ const paymentSuccess = async (data) => {
 };
 const selectRegion = async (data) => {
     try {
+        const flowId = data?.flowId || '570243495575706';
         const phone = data?.phone || '84902103222';
+        const screen = data?.screen || 'QUESTION_ONE';
+        const latitude = data?.latitude || '13.7379374';
+        const longitude = data?.longitude || '100.5239999';
+        const flowToken = { latitude, longitude, type: 'region' };
+        const encodedToken = Base64.encode(JSON.stringify(flowToken));
         const template = {
             messaging_product: 'whatsapp',
             to: phone,
-            type: 'template',
-            template: {
-                name: 'fill_travel_information',
-                language: {
-                    code: 'en_US',
+            recipient_type: 'individual',
+            type: 'interactive',
+            interactive: {
+                type: 'flow',
+                body: {
+                    text: 'To better understand your journey and help calculate your carbon footprint, could you tell us where you’ll be traveling from?',
                 },
-                components: [
-                    {
-                        type: 'button',
-                        sub_type: 'flow',
-                        index: 0,
+                action: {
+                    name: 'flow',
+                    parameters: {
+                        flow_message_version: '3',
+                        flow_token: encodedToken,
+                        flow_id: flowId,
+                        flow_cta: 'Sustainable Events',
+                        flow_action: 'navigate',
+                        flow_action_payload: {
+                            screen,
+                        },
                     },
-                ],
+                },
             },
         };
+        console.log(util.inspect(template, false, null, true));
         const resData = await WhatsappHelper.sendMessage(template);
+        console.log(util.inspect(resData, false, null, true));
         const response = {};
         if (resData?.status && resData?.status !== 200) {
             response.status = resData.status;
