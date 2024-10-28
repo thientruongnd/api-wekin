@@ -57,6 +57,7 @@ module.exports.API = {
                             const text = message?.text?.body;
                             const type = message?.type;
                             const payload = message?.button?.payload;
+                            console.log('this log payload: ', payload);
                             const typeInteractive = message?.interactive?.type; // list_reply
                             phone = message?.from;
                             params.phone = phone;
