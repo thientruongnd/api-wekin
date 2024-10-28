@@ -69,6 +69,11 @@ module.exports.API = {
                                 phone = message?.from;
                                 typeMessage = decodedToken?.type;
                             }
+                            if (type === 'location') {
+                                typeMessage = type;
+                                params.latitude = message?.location?.latitude;
+                                params.longitude = message?.location?.longitude;
+                            }
                             if (type === 'interactive' && typeListReply === 'list_reply') {
                                 const id = message?.interactive?.list_reply?.id;
                                 const decodedToken = JSON.parse(Base64.decode(id));
