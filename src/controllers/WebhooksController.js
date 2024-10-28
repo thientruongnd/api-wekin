@@ -63,7 +63,7 @@ module.exports.API = {
                                 phone = message?.from;
                                 typeMessage = 'joinNow';
                             }
-                            if (type === 'button' && payload === 'join_now_payload') {
+                            if (type === 'button') {
                                 const decodedToken = JSON.parse(Base64.decode(payload));
                                 console.log(util.inspect(decodedToken, false, null, true));
                                 phone = message?.from;
