@@ -87,15 +87,20 @@ module.exports.API = {
                                 const nfmReply = message?.interactive?.nfm_reply;
                                 const responseJson = JSON.parse(nfmReply?.response_json);
                                 const decodedToken = JSON.parse(Base64.decode(responseJson?.flow_token));
-                                const customerName = responseJson?.screen_0_TextInput_0;
-                                const regionName = responseJson?.screen_0_Dropdown_1;
-                                eventId = decodedToken?.eventId;
                                 typeMessage = decodedToken?.type;
+                                if (typeMessage === 'region') {
+                                    const customerName = responseJson?.screen_0_TextInput_0;
+                                    const regionName = responseJson?.screen_0_Dropdown_1;
+                                    params.regionName = regionName;
+                                    params.customerName = customerName;
+                                }
+                                if (typeMessage === 'country') {
+                                    params.countryName = responseJson?.screen_0_Dropdown_0;
+                                }
+                                eventId = decodedToken?.eventId;
                                 params.latitude = decodedToken?.latitude;
                                 params.longitude = decodedToken?.longitude;
                                 params.eventId = decodedToken?.eventId;
-                                params.regionName = regionName;
-                                params.customerName = customerName;
                             }
                         });
                     }
@@ -131,6 +136,9 @@ module.exports.API = {
             }
             if (typeMessage === 'region') {
                 await WhatsappService.selectCountry(params);
+            }
+            if (typeMessage === 'country') {
+                console.log('=Country=========: ', params);
             }
             // Trả về 200 OK để xác nhận đã nhận thông báo
             res.status(200).send('EVENT_RECEIVED');
