@@ -206,88 +206,15 @@ const paymentSuccess = async (data) => {
         return promiseReject(err);
     }
 };
-const selectCountry = async (data) => {
+const selectRegion = async (data) => {
     try {
         const phone = data?.phone || '84902103222';
-        const flowJSON = {
-            version: '5.0',
-            screens: [
-                {
-                    id: 'QUESTION_ONE',
-                    title: 'Please choosing your country',
-                    data: {},
-                    terminal: true,
-                    layout: {
-                        type: 'SingleColumnLayout',
-                        children: [
-                            {
-                                type: 'Form',
-                                name: 'flow_path',
-                                children: [
-                                    {
-                                        type: 'Dropdown',
-                                        label: 'Your country',
-                                        required: true,
-                                        name: 'Dropdown_519bd0',
-                                        'data-source': [
-                                            {
-                                                id: '0_China',
-                                                title: 'China',
-                                            },
-                                            {
-                                                id: '1_Taiwan',
-                                                title: 'Taiwan',
-                                            },
-                                            {
-                                                id: '2_Hong_Kong,_China',
-                                                title: 'Hong Kong, China',
-                                            },
-                                            {
-                                                id: '3_Macau',
-                                                title: 'Macau',
-                                            },
-                                            {
-                                                id: "4_Democratic_People's_Republic_of_Korea",
-                                                title: "Democratic People's Republic of Korea",
-                                            },
-                                            {
-                                                id: '5_Japan',
-                                                title: 'Japan',
-                                            },
-                                            {
-                                                id: '6_Mongolia',
-                                                title: 'Mongolia',
-                                            },
-                                            {
-                                                id: '7_Republic_of_Korea',
-                                                title: 'Republic of Korea',
-                                            },
-                                        ],
-                                    },
-                                    {
-                                        type: 'Footer',
-                                        label: 'Send',
-                                        'on-click-action': {
-                                            name: 'complete',
-                                            payload: {
-                                                screen_0_Dropdown_0: '${form.Dropdown_519bd0}',
-                                            },
-                                        },
-                                    },
-                                ],
-                            },
-                        ],
-                    },
-                },
-            ],
-        };
         const template = {
             messaging_product: 'whatsapp',
-            recipient_type: 'individual',
             to: phone,
             type: 'template',
             template: {
-                name: 'select_country',
+                name: 'fill_travel_information',
                 language: {
                     code: 'en_US',
                 },
@@ -295,7 +222,41 @@ const selectCountry = async (data) => {
                     {
                         type: 'button',
                         sub_type: 'flow',
-                        index: '0',
+                        index: 0,
+                    },
+                ],
+            },
+        };
+        const resData = await WhatsappHelper.sendMessage(template);
+        const response = {};
+        if (resData?.status && resData?.status !== 200) {
+            response.status = resData.status;
+            response.message = resData.message;
+            response.code = resData.code;
+            return promiseResolve(response);
+        }
+        return promiseResolve(resData);
+    } catch (err) {
+        return promiseReject(err);
+    }
+};
+const selectCountry = async (data) => {
+    try {
+        const phone = data?.phone || '84902103222';
+        const template = {
+            messaging_product: 'whatsapp',
+            to: phone,
+            type: 'template',
+            template: {
+                name: data.templateName || 'select_country',
+                language: {
+                    code: 'en_US',
+                },
+                components: [
+                    {
+                        type: 'button',
+                        sub_type: 'flow',
+                        index: 0,
                     },
                 ],
             },
@@ -406,6 +367,7 @@ module.exports = {
     joinNow,
     message003,
     paymentSuccess,
+    selectRegion,
     selectCountry,
     paymentConfirmation,
 };
