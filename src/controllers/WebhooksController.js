@@ -59,6 +59,7 @@ module.exports.API = {
                             const payload = message?.button?.payload;
                             const typeInteractive = message?.interactive?.type; // list_reply
                             phone = message?.from;
+                            params.phone = phone;
                             if (type === 'text' && text === 'Starting conversation' || text === 'joinNow' || text === 'ok') {
                                 typeMessage = 'joinNow';
                             }
@@ -138,6 +139,7 @@ module.exports.API = {
                 await WhatsappService.selectCountry(params);
             }
             if (typeMessage === 'country') {
+                await WhatsappService.checkCountry(params);
                 console.log('=Country=========: ', params);
             }
             // Trả về 200 OK để xác nhận đã nhận thông báo

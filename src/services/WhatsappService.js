@@ -241,14 +241,16 @@ const ecoTravel = async (data) => {
 const paymentSuccess = async (data) => {
     try {
         const phone = data?.phone || '84902103222';
-        const amount = data?.amount || '0';
-        const urlImage = data?.urlImage || 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
+        const eventEmission = data?.eventEmission || null;
+        const unitAmount = data?.unitAmount || '0';
+        const currency = data?.currency || '$';
+        const eventImage = data?.eventImage || 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
         const template = {
             messaging_product: 'whatsapp',
             to: phone,
             type: 'template',
             template: {
-                name: 'payment_success_test',
+                name: 'payment_successful',
                 language: {
                     code: 'en_US',
                 },
@@ -259,7 +261,7 @@ const paymentSuccess = async (data) => {
                             {
                                 type: 'image',
                                 image: {
-                                    link: urlImage,
+                                    link: eventImage,
                                 },
                             },
                         ],
@@ -269,21 +271,152 @@ const paymentSuccess = async (data) => {
                         parameters: [
                             {
                                 type: 'text',
-                                text: amount,
+                                text: eventEmission.value + eventEmission.unit,
+                            },
+                            {
+                                type: 'text',
+                                text: `${unitAmount} ${currency}`,
                             },
                         ],
                     },
                 ],
             },
         };
-        // const template = {
-        //     messaging_product: 'whatsapp',
-        //     to: phone,
-        //     type: 'image',
-        //     image: {
-        //         link: urlImage,
-        //     },
-        // };
+        const resData = await WhatsappHelper.sendMessage(template);
+        const response = {};
+        if (resData?.status && resData?.status !== 200) {
+            response.status = resData.status;
+            response.message = resData.message;
+            response.code = resData.code;
+            return promiseResolve(response);
+        }
+        return promiseResolve(resData);
+    } catch (err) {
+        return promiseReject(err);
+    }
+};
+const paymentFailure = async (data) => {
+    try {
+        const phone = data?.phone || '84902103222';
+        const name = data?.name || 'Xuân Trường';
+        const title = data?.title;
+        const date = data?.date;
+        const eventName = data?.eventName;
+        const eventLocation = data?.eventLocation;
+        const eventEmission = data?.eventEmission;
+        const eventCarbonSaved = data?.eventCarbonSaved;
+        const blockchain = data?.blockchain;
+        const refNumber = data?.refNumber;
+        const verifiedBy = data?.verifiedBy;
+        const eventId = data?.eventId;
+        const currency = data.currency;
+        const unitAmount = data.unitAmount;
+        const eventImage = data.eventImage;
+        const paramBody = [
+            {
+                type: 'text',
+                text: title,
+            },
+            {
+                type: 'text',
+                text: date,
+            },
+            {
+                type: 'text',
+                text: eventName,
+            },
+            {
+                type: 'text',
+                text: eventLocation,
+            },
+            {
+                type: 'text',
+                text: eventEmission.value + eventEmission.unit,
+            },
+            {
+                type: 'text',
+                text: eventCarbonSaved.value + eventCarbonSaved.unit,
+            },
+            {
+                type: 'text',
+                text: `${unitAmount} ${currency}`,
+            },
+            {
+                type: 'text',
+                text: blockchain,
+            },
+            {
+                type: 'text',
+                text: verifiedBy,
+            },
+            {
+                type: 'text',
+                text: refNumber,
+            },
+        ];
+        const baseURL = 'stripes/createCheckoutSession';
+        const params = {
+            productName: eventName,
+            unitAmount,
+            blockchain,
+            phone,
+            name,
+            eventEmission,
+            currency,
+            title,
+            date,
+            eventName,
+            eventLocation,
+            eventCarbonSaved,
+            verifiedBy,
+            refNumber,
+            eventImage,
+
+        };
+
+        const checkoutSessionURL = buildCheckoutSessionURL(baseURL, params);
+        const paramButton = [
+            {
+                type: 'text',
+                text: checkoutSessionURL,
+            },
+        ];
+        const payloadParams = { type: 'maybe_later_payload' };
+        const payloadEncode = Base64.encode(JSON.stringify(payloadParams));
+        const template = {
+            messaging_product: 'whatsapp',
+            to: phone,
+            type: 'template',
+            template: {
+                name: 'payment_failure',
+                language: {
+                    code: 'en_US',
+                },
+                components: [
+                    {
+                        type: 'body',
+                        parameters: paramBody,
+                    },
+                    {
+                        type: 'button',
+                        sub_type: 'url',
+                        index: '0',
+                        parameters: paramButton,
+                    },
+                    {
+                        type: 'button',
+                        sub_type: 'quick_reply',
+                        index: '1',
+                        parameters: [
+                            {
+                                type: 'payload',
+                                payload: payloadEncode,
+                            },
+                        ],
+                    },
+                ],
+            },
+        };
         const resData = await WhatsappHelper.sendMessage(template);
         const response = {};
         if (resData?.status && resData?.status !== 200) {
@@ -431,6 +564,9 @@ const selectCountry = async (data) => {
 const checkCountry = async (data) => {
     try {
         const countryName = data?.regionName || '2_United_Arab_Emirates';
+        const customerName = data?.customerName;
+        const eventId = data?.eventId || 230;
+        const phone = data?.phone || '84902103222';
         const myLatitude = data?.latitude || '20.4458553';
         const myLongitude = data?.longitude || '106.1173998';
         const infoCountry = await getCountry(countryName);
@@ -438,6 +574,13 @@ const checkCountry = async (data) => {
         const longitudeFrom = infoCountry?.longitude || '100.5239999';
         const myCountry = await getCountryFromCoordinates(myLatitude, myLongitude);
         const countryFrom = await getCountryFromCoordinates(latitudeFrom, longitudeFrom);
+        const locationFrom = {};
+        const userDetails = {};
+        userDetails.name = customerName;
+        userDetails.phone_number = phone;
+        if (myCountry.country_code !== countryFrom.country_code) {
+            // select different country
+            locationFrom.cCode = countryFrom?.country_code;
         console.log(util.inspect(countryFrom, false, null, true));
         const locationFrom = {};
         if (myCountry.country_code !== countryFrom.country_code) {
@@ -448,20 +591,60 @@ const checkCountry = async (data) => {
             const rows = [];
             if (!isEmpty(resData)) {
                 const emissionList = resData?.emission_list || [];
-                // for (let i = 0; i < emissionList.length; i++) {
-                //     const element = {};
-                //     flowToken.eventId = nearestLocations[i].id;
-                //     const encodedToken = Base64.encode(JSON.stringify(flowToken));
-                //     element.id = encodedToken;
-                //     element.title = nearestLocations[i].name;
-                //     // Gán lại giá trị sau khi cắt chuỗi
-                //     element.title = element.title.substring(0, 24);
-                //     element.description = nearestLocations[i].event_code;
-                //     // Kiểm tra số lượng phần tử trong rows
-                //     if (rows.length < 10) {
-                //         rows.push(element);
-                //     }
-                // }
+                for (let i = 0; i < emissionList.length; i++) {
+                    const element = {}; const flowToken = {};
+                    flowToken.id = emissionList[i].id;
+                    flowToken.lf = locationFrom;
+                    flowToken.uds = userDetails;
+                    flowToken.eid = eventId;
+                    const encodedToken = Base64.encode(JSON.stringify(flowToken));
+                    element.id = encodedToken;
+                    element.title = emissionList[i].name;
+                    // Gán lại giá trị sau khi cắt chuỗi
+                    element.title = element.title.substring(0, 24);
+                    // element.description = nearestLocations[i].event_code;
+                    // // Kiểm tra số lượng phần tử trong rows
+                    if (rows.length < 10) {
+                        rows.push(element);
+                    }
+                }
+                let template;
+                if (!isEmpty(rows)) {
+                    template = {
+                        messaging_product: 'whatsapp',
+                        to: phone,
+                        type: 'interactive',
+                        interactive: {
+                            type: 'list',
+                            header: {
+                                type: 'text',
+                                text: 'Transportation',
+                            },
+                            body: {
+                                text: 'The amount of CO2 emission is different depended on the type of your transportation.\n'
+                                + 'Please select the transportation for offset receipt .\n',
+                            },
+                            action: {
+                                button: 'Transportation',
+                                sections: [
+                                    {
+                                        title: 'Options',
+                                        rows,
+                                    },
+                                ],
+                            },
+                        },
+                    };
+                }
+                const resDataWhatsapp = await WhatsappHelper.sendMessage(template);
+                const response = {};
+                if (resData?.status && resDataWhatsapp?.status !== 200) {
+                    response.status = resDataWhatsapp.status;
+                    response.message = resDataWhatsapp.message;
+                    response.code = resDataWhatsapp.code;
+                    return promiseResolve(response);
+                }
+                return false;
             }
         }
 
@@ -487,7 +670,7 @@ const paymentConfirmation = async (data) => {
             const refNumber = receipt?.ref_number;
             const verifiedBy = receipt?.verified_by;
             const eventId = receipt?.event_id;
-            const currency = '$';
+            const currency = 'thb';
             const formattedDate = moment(date).format('DD MMMM YYYY HH:mm');
             const amount = calculateCost(eventEmission.value);
             const fileName = getRandomFileName('png');
@@ -634,6 +817,7 @@ module.exports = {
     selectRegion,
     selectCountry,
     paymentConfirmation,
+    paymentFailure,
     ecoTravel,
     completed,
     checkCountry,
