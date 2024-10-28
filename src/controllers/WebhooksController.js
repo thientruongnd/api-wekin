@@ -85,20 +85,13 @@ module.exports.API = {
                             }
                             if (type === 'interactive' && typeInteractive === 'nfm_reply') {
                                 const nfmReply = message?.interactive?.nfm_reply;
-                                console.log(util.inspect(nfmReply, false, null, true));
                                 const responseJson = JSON.parse(nfmReply?.response_json);
+                                const decodedToken = JSON.parse(Base64.decode(responseJson?.flow_token));
                                 const customerName = responseJson?.screen_0_TextInput_0;
+                                const regionName = responseJson?.screen_0_Dropdown_1;
+                                console.log('regionName: ', regionName);
                                 console.log('customerName: ', customerName);
-                                console.log('this responseJson: ', responseJson);
-                                // 
-                                // console.log('customerName==: ', customerName);
-                                // const responseJson = nfmReply?.response_json;
-                                // const decodedToken = JSON.parse(Base64.decode(responseJson?.flow_token));
-                                // console.log(util.inspect(decodedToken, false, null, true));
-                                // console.log('====responseJson============: ', decodedToken);
-                                // console.log(util.inspect(responseJson, false, null, true));
-                                // const flowToken = responseJson?.flow_token;
-                                // const decodedToken = JSON.parse(Base64.decode(flowToken));
+                                console.log(util.inspect(decodedToken, false, null, true));
                                 // console.log('this log =====================decodedToken============');
                                 // console.log(util.inspect(decodedToken, false, null, true));
                                 // eventId = decodedToken?.eventId;
