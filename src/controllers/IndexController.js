@@ -62,7 +62,9 @@ module.exports.DEFAULT = {
     },
 
     eventCarbonReceiptPartner: async (req, res) => {
+        const host = req.headers.host;
         const data = req.body;
+        data.host = host;
         const resData = await WhatsappService.paymentConfirmation(data);
         return res.json(responseSuccess(10261, resData, 'en'));
     },
@@ -190,6 +192,12 @@ module.exports.DEFAULT = {
         params.templateName = templateName;
         params.flowToken = 'country';
         const resData = await WhatsappService.selectCountry(params);
+        return res.json(responseSuccess(10261, resData, 'en'));
+    },
+    completed: async (req, res) => {
+        const params = {};
+        params.phone = req.body.phone || '84974418454';
+        const resData = await WhatsappService.completed(params);
         return res.json(responseSuccess(10261, resData, 'en'));
     },
     ecoTravel: async (req, res) => {

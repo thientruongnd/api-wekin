@@ -6,6 +6,7 @@
 const util = require('util');
 const moment = require('moment');
 const { Base64 } = require('js-base64');
+const path = require('path');
 const WhatsappHelper = require('../helpers/WhatsappHelper');
 const DataVekinHelper = require('../helpers/DataVekinHelper');
 
@@ -17,6 +18,8 @@ const {
     buildCheckoutSessionURL,
     getNearestLocations,
     getImageLink,
+    downloadImage,
+    getRandomFileName,
 } = require('../utils/shared');
 
 const joinNow = async (data) => {
@@ -291,6 +294,33 @@ const paymentSuccess = async (data) => {
         return promiseReject(err);
     }
 };
+const completed = async (data) => {
+    try {
+        const phone = data?.phone || '84902103222';
+        const template = {
+            messaging_product: 'whatsapp',
+            to: phone,
+            type: 'template',
+            template: {
+                name: 'completed',
+                language: {
+                    code: 'en_US',
+                },
+            },
+        };
+        const resData = await WhatsappHelper.sendMessage(template);
+        const response = {};
+        if (resData?.status && resData?.status !== 200) {
+            response.status = resData.status;
+            response.message = resData.message;
+            response.code = resData.code;
+            return promiseResolve(response);
+        }
+        return promiseResolve(resData);
+    } catch (err) {
+        return promiseReject(err);
+    }
+};
 
 const selectRegion = async (data) => {
     try {
@@ -385,20 +415,47 @@ const paymentConfirmation = async (data) => {
             const phone = data?.phone || '84902103222';
             const name = data?.name || 'Xuân Trường';
             const receipt = resDataVekin?.receipt;
+            const title = receipt?.title;
             const date = receipt?.date;
             const eventName = receipt?.event_name;
+            const eventLocation = receipt?.event_location;
             const eventEmission = receipt?.event_emission;
             const eventCarbonSaved = receipt?.event_carbon_saved;
             const blockchain = receipt?.blockchain;
             const refNumber = receipt?.ref_number;
             const verifiedBy = receipt?.verified_by;
             const eventId = receipt?.event_id;
+            const currency = '$';
             const formattedDate = moment(date).format('DD MMMM YYYY HH:mm');
             const amount = calculateCost(eventEmission.value);
+            const fileName = getRandomFileName('png');
+            const outputPath = path.join(__dirname, '../public/images', fileName);
+            await downloadImage(receipt?.event_image, outputPath);
+            const eventImage = getImageLink(data.host, `/images/${fileName}`);
+            const paramHeader = [
+                {
+                    type: 'image',
+                    image: {
+                        link: eventImage,
+                    },
+                },
+            ];
             const paramBody = [
                 {
                     type: 'text',
+                    text: title,
+                },
+                {
+                    type: 'text',
                     text: formattedDate,
+                },
+                {
+                    type: 'text',
+                    text: eventName,
+                },
+                {
+                    type: 'text',
+                    text: eventLocation,
                 },
                 {
                     type: 'text',
@@ -410,7 +467,19 @@ const paymentConfirmation = async (data) => {
                 },
                 {
                     type: 'text',
+                    text: `${amount} ${currency}`,
+                },
+                {
+                    type: 'text',
                     text: blockchain,
+                },
+                {
+                    type: 'text',
+                    text: verifiedBy,
+                },
+                {
+                    type: 'text',
+                    text: refNumber,
                 },
             ];
             const baseURL = 'stripes/createCheckoutSession';
@@ -420,6 +489,17 @@ const paymentConfirmation = async (data) => {
                 blockchain,
                 phone,
                 name,
+                eventEmission,
+                currency,
+                title,
+                date: formattedDate,
+                eventName,
+                eventLocation,
+                eventCarbonSaved,
+                verifiedBy,
+                refNumber,
+                eventImage,
+
             };
 
             const checkoutSessionURL = buildCheckoutSessionURL(baseURL, params);
@@ -434,11 +514,15 @@ const paymentConfirmation = async (data) => {
                 to: phone,
                 type: 'template',
                 template: {
-                    name: 'payment_confirmation_1',
+                    name: 'payment_confirmation',
                     language: {
                         code: 'en_US',
                     },
                     components: [
+                        {
+                            type: 'header',
+                            parameters: paramHeader,
+                        },
                         {
                             type: 'body',
                             parameters: paramBody,
@@ -448,6 +532,17 @@ const paymentConfirmation = async (data) => {
                             sub_type: 'url',
                             index: '0',
                             parameters: paramButton,
+                        },
+                        {
+                            type: 'button',
+                            sub_type: 'quick_reply',
+                            index: '1',
+                            parameters: [
+                                {
+                                    type: 'payload',
+                                    payload: 'maybe_later_payload', // Thay thế bằng chuỗi payload tùy chọn
+                                },
+                            ],
                         },
                     ],
                 },
@@ -475,4 +570,5 @@ module.exports = {
     selectCountry,
     paymentConfirmation,
     ecoTravel,
+    completed,
 };

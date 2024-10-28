@@ -1413,7 +1413,7 @@ const countries = [
         country: 'VN',
         latitude: 14.058324,
         longitude: 108.277199,
-        name: 'Vietnam',
+        name: 'Viet Nam',
     },
     {
         country: 'VU',
