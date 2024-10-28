@@ -225,9 +225,7 @@ const paymentSuccess = async (data) => {
 };
 const selectRegion = async (data) => {
     try {
-        const flowId = data?.flowId || '570243495575706';
         const phone = data?.phone || '84902103222';
-        const screen = data?.screen || 'QUESTION_ONE';
         const latitude = data?.latitude || '13.7379374';
         const longitude = data?.longitude || '100.5239999';
         const flowToken = { latitude, longitude, type: 'region' };
@@ -235,33 +233,31 @@ const selectRegion = async (data) => {
         const template = {
             messaging_product: 'whatsapp',
             to: phone,
-            recipient_type: 'individual',
-            type: 'interactive',
-            interactive: {
-                type: 'flow',
-                body: {
-                    text: 'To better understand your journey and help calculate your carbon footprint, could you tell us where you’ll be traveling from?',
+            type: 'template',
+            template: {
+                name: 'fill_travel_information',
+                language: {
+                    code: 'en_US',
                 },
-                action: {
-                    name: 'flow',
-                    parameters: {
-                        flow_message_version: '3',
-                        flow_token: encodedToken,
-                        flow_id: flowId,
-                        flow_cta: 'Sustainable Events',
-                        flow_action: 'navigate',
-                        flow_action_payload: {
-                            screen,
-                        },
+                components: [
+                    {
+                        type: 'button',
+                        sub_type: 'flow',
+                        index: 0,
+                        parameters: [
+                            {
+                                type: 'action',
+                                action: {
+                                    flow_token: encodedToken,
+                                },
+                            },
+                        ],
                     },
-                },
+                ],
             },
         };
-        const decodedToken = JSON.parse(Base64.decode(encodedToken));
-        console.log('Decoded flowToken:', decodedToken);
-        console.log(util.inspect(template, false, null, true));
+        // const decodedToken = JSON.parse(Base64.decode(encodedToken));
         const resData = await WhatsappHelper.sendMessage(template);
-        console.log(util.inspect(resData, false, null, true));
         const response = {};
         if (resData?.status && resData?.status !== 200) {
             response.status = resData.status;
