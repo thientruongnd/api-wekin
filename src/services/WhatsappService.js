@@ -15,6 +15,7 @@ const {
     calculateCost,
     buildCheckoutSessionURL,
     getNearestLocations,
+    getImageLink,
 } = require('../utils/shared');
 
 const joinNow = async (data) => {
@@ -82,15 +83,15 @@ const joinNow = async (data) => {
 /**
  * select Event
  * */
-const message003 = async (data) => {
+const listEvent = async (data) => {
     try {
         const phone = data?.phone || '84902103222';
+        const latitude = data?.latitude || '13.7379374';
+        const longitude = data?.longitude || '100.5239999';
         const resDataVekin = await DataVekinHelper.eventCarbonReceipt();
         const rows = [];
         if (!isEmpty(resDataVekin)) {
             // khi có sự kiện
-            const latitude = 13.7379374;
-            const longitude = 100.5239999;
             const nearestLocations = getNearestLocations(resDataVekin, latitude, longitude);
             for (let i = 0; i < nearestLocations.length; i++) {
                 const element = {};
@@ -104,34 +105,45 @@ const message003 = async (data) => {
                     rows.push(element);
                 }
             }
-            const template = {
-                messaging_product: 'whatsapp',
-                to: phone,
-                type: 'interactive',
-                interactive: {
-                    type: 'list',
-                    header: {
-                        type: 'text',
-                        text: 'Choose an Event:',
+            let template;
+            if (!isEmpty(rows)) {
+                template = {
+                    messaging_product: 'whatsapp',
+                    to: phone,
+                    type: 'interactive',
+                    interactive: {
+                        type: 'list',
+                        header: {
+                            type: 'text',
+                            text: 'Explore Sustainable Events',
+                        },
+                        body: {
+                            text: 'BODY_TEXT',
+                        },
+                        action: {
+                            button: 'List events',
+                            sections: [
+                                {
+                                    title: 'Event Options',
+                                    rows,
+                                },
+                            ],
+                        },
                     },
-                    body: {
-                        text: 'Here’s a curated list of Sustainable Events,\n'
-                            + 'brought to you by Vekin Group and our trusted eco-partners.\n'
-                            + 'Join us in making a positive impact on the environment\n'
-                            + 'by attending these events! Please choose an event.',
+                };
+            } else {
+                template = {
+                    messaging_product: 'whatsapp',
+                    to: phone,
+                    type: 'template',
+                    template: {
+                        name: 'no_events',
+                        language: {
+                            code: 'en_US',
+                        },
                     },
-
-                    action: {
-                        button: 'Select',
-                        sections: [
-                            {
-                                title: 'Section',
-                                rows,
-                            },
-                        ],
-                    },
-                },
-            };
+                };
+            }
             const resData = await WhatsappHelper.sendMessage(template);
             const response = {};
             if (resData?.status && resData?.status !== 200) {
@@ -365,7 +377,7 @@ const paymentConfirmation = async (data) => {
 };
 module.exports = {
     joinNow,
-    message003,
+    listEvent,
     paymentSuccess,
     selectRegion,
     selectCountry,

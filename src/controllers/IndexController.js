@@ -37,7 +37,7 @@ module.exports.DEFAULT = {
     },
     eventCarbonReceipt: async (req, res) => {
         const phone = '84902103222';
-        const resData = await WhatsappService.message003();
+        const resData = await WhatsappService.listEvent(req);
 
         return res.json(responseSuccess(10261, resData, 'en'));
     },
