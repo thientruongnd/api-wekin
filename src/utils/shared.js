@@ -216,6 +216,12 @@ const downloadImage = async (url, outputPath) => {
         console.error('Lỗi khi tải ảnh:', error.message);
     }
 };
+const getCountryFromCoordinates = async (latitude, longitude) => {
+    const url = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`;
+    const response = await axios.get(url);
+    const address = response.data.address;
+    return address;
+};
 module.exports = {
     normalizePort,
     onError,
@@ -245,4 +251,5 @@ module.exports = {
     convertTemplateName,
     downloadImage,
     getRandomFileName,
+    getCountryFromCoordinates,
 };

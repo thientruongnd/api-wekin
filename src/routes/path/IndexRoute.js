@@ -19,6 +19,7 @@ const indexRoute = (apiRouter) => {
     apiRouter.route('/tests/selectCountry').post(DEFAULT.selectCountry);
     apiRouter.route('/tests/completed').post(DEFAULT.completed);
     apiRouter.route('/tests/ecoTravel').get(DEFAULT.ecoTravel);
+    apiRouter.route('/tests/checkCountry').post(DEFAULT.checkCountry);
 };
 
 module.exports = {
