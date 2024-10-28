@@ -18,7 +18,6 @@ const {
     getNearestLocations,
     getImageLink,
 } = require('../utils/shared');
-const { type } = require('os');
 
 const joinNow = async (data) => {
     try {
@@ -91,13 +90,16 @@ const listEvent = async (data) => {
         const latitude = data?.latitude || '13.7379374';
         const longitude = data?.longitude || '100.5239999';
         const resDataVekin = await DataVekinHelper.eventCarbonReceipt();
+        const flowToken = { lat: latitude, long: longitude, type: 'selectEvent' };
         const rows = [];
         if (!isEmpty(resDataVekin)) {
             // khi có sự kiện
             const nearestLocations = getNearestLocations(resDataVekin, latitude, longitude);
             for (let i = 0; i < nearestLocations.length; i++) {
                 const element = {};
-                element.id = nearestLocations[i].id;
+                flowToken.eventId = nearestLocations[i].id;
+                const encodedToken = Base64.encode(JSON.stringify(flowToken));
+                element.id = encodedToken;
                 element.title = nearestLocations[i].name;
                 // Gán lại giá trị sau khi cắt chuỗi
                 element.title = element.title.substring(0, 24);
@@ -160,6 +162,70 @@ const listEvent = async (data) => {
             return promiseResolve(resDataVekin);
         }
         // không có sự kiện nào <- redirect to website "https://www.cero.org/"
+    } catch (err) {
+        return promiseReject(err);
+    }
+};
+const ecoTravel = async (data) => {
+    try {
+        const phone = data?.phone || '84902103222';
+        const latitude = data?.latitude || '13.7379374';
+        const longitude = data?.longitude || '100.5239999';
+        const eventId = data?.eventId;
+        const flowToken = {
+            lat: latitude, long: longitude, eventId, type: 'sameCountry',
+        };
+        const sameCountryEncode = Base64.encode(JSON.stringify(flowToken));
+        const differentCountry = {
+            lat: latitude, long: longitude, eventId, type: 'differentCountry',
+        };
+        const differentCountryEncode = Base64.encode(JSON.stringify(differentCountry));
+        const template = {
+            messaging_product: 'whatsapp',
+            to: phone,
+            type: 'template',
+            template: {
+                name: 'eco_travel',
+                language: {
+                    code: 'en_US',
+                },
+                components: [
+
+                    {
+                        type: 'button',
+                        sub_type: 'quick_reply',
+                        index: 0,
+                        parameters: [
+                            {
+                                type: 'payload',
+                                payload: sameCountryEncode,
+                            },
+                        ],
+                    },
+                    {
+                        type: 'button',
+                        sub_type: 'quick_reply',
+                        index: 1,
+                        parameters: [
+                            {
+                                type: 'payload',
+                                payload: differentCountryEncode,
+                            },
+                        ],
+                    },
+
+                ],
+            },
+        };
+        const resData = await WhatsappHelper.sendMessage(template);
+        const response = {};
+        if (resData?.status && resData?.status !== 200) {
+            response.status = resData.status;
+            response.message = resData.message;
+            response.code = resData.code;
+            return promiseResolve(response);
+        }
+        return false;
     } catch (err) {
         return promiseReject(err);
     }
@@ -278,7 +344,7 @@ const selectCountry = async (data) => {
             to: phone,
             type: 'template',
             template: {
-                name: data.templateName || '',
+                name: data.templateName || 'select_country',
                 language: {
                     code: 'en_US',
                 },
@@ -287,14 +353,6 @@ const selectCountry = async (data) => {
                         type: 'button',
                         sub_type: 'flow',
                         index: 0,
-                        parameters: [
-                            {
-                                type: 'action',
-                                action: {
-                                    flow_token: data.flowToken || '',
-                                },
-                            },
-                        ],
                     },
                 ],
             },
@@ -408,4 +466,5 @@ module.exports = {
     selectRegion,
     selectCountry,
     paymentConfirmation,
+    ecoTravel,
 };
