@@ -73,5 +73,20 @@ class DataVekinHelper {
         const result = await axios(config);
         return result?.data;
     }
+
+    eventOffset = async (data) => {
+        const uri = `${configEvn.BASE_URL_VEKIN}/api/event/carbon-receipt/event/offset/`;
+        const config = {
+            method: 'post',
+            url: uri,
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: `${configEvn.AUTHORIZATION_VEKIN}`,
+            },
+            data: JSON.stringify(data),
+        };
+        const result = await axios(config);
+        return result?.data;
+    }
 }
 module.exports = new DataVekinHelper();
