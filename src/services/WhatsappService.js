@@ -748,9 +748,7 @@ const completed = async (data) => {
 
 const paymentConfirmation = async (data) => {
     try {
-        console.log('this log paymentConfirmation===============');
-        console.log(util.inspect(data, false, null, true));
-        return true;
+        console.log('Message:', data);
         const eventCarbonReceipt = {};
         const resData = await DataVekinHelper.transportationList();
         if (isEmpty(resData)) return false;
@@ -804,9 +802,9 @@ const paymentConfirmation = async (data) => {
             const amount = calculateCost(eventEmission.value);
             const fileName = getRandomFileName('png');
             const outputPath = path.join(__dirname, '../public/images', fileName);
-            // await downloadImage(receipt?.event_image, outputPath);
-            // const eventImage = getImageLink(data.host, `/images/${fileName}`);
-            const eventImage = 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
+            // await downloadImage(receipt?.event_image, outputPath);g
+            const eventImage = getImageLink(data.host, `/images/${fileName}`);
+            // const eventImage = 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
             const paramHeader = [
                 {
                     type: 'image',
@@ -926,15 +924,16 @@ const paymentConfirmation = async (data) => {
                     ],
                 },
             };
-            const resData = await WhatsappHelper.sendMessage(template);
-            const response = {};
-            if (resData?.status && resData?.status !== 200) {
-                response.status = resData.status;
-                response.message = resData.message;
-                response.code = resData.code;
-                return promiseResolve(response);
-            }
-            return promiseResolve(resData);
+            console.log(util.inspect(template, false, null, true));
+            // const resData = await WhatsappHelper.sendMessage(template);
+            // const response = {};
+            // if (resData?.status && resData?.status !== 200) {
+            //     response.status = resData.status;
+            //     response.message = resData.message;
+            //     response.code = resData.code;
+            //     return promiseResolve(response);
+            // }
+            // return promiseResolve(resData);
         }
         return promiseResolve(resDataVekin);
     } catch (err) {
