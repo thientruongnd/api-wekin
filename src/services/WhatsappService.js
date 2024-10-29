@@ -239,7 +239,282 @@ const ecoTravel = async (data) => {
         return promiseReject(err);
     }
 };
+/**
+ * selectDistance
+ * */
+const selectDistance = async (data) => {
+    try {
+        const phone = data?.phone || '84902103222';
+        const latitude = data?.latitude || '13.7379374';
+        const longitude = data?.longitude || '100.5239999';
+        const resDataVekin = await DataVekinHelper.eventCarbonReceipt();
+        const flowToken = { lat: latitude, long: longitude, type: 'selectEvent' };
+        const rows = [];
+        if (!isEmpty(resDataVekin)) {
+            // khi có sự kiện
+            const nearestLocations = getNearestLocations(resDataVekin, latitude, longitude);
+            for (let i = 0; i < nearestLocations.length; i++) {
+                const element = {};
+                flowToken.eventId = nearestLocations[i].id;
+                const encodedToken = Base64.encode(JSON.stringify(flowToken));
+                element.id = encodedToken;
+                element.title = nearestLocations[i].name;
+                // Gán lại giá trị sau khi cắt chuỗi
+                element.title = element.title.substring(0, 24);
+                element.description = nearestLocations[i].event_code;
+                // Kiểm tra số lượng phần tử trong rows
+                if (rows.length < 10) {
+                    rows.push(element);
+                }
+            }
+            let template;
+            if (!isEmpty(rows)) {
+                template = {
+                    messaging_product: 'whatsapp',
+                    to: phone,
+                    type: 'interactive',
+                    interactive: {
+                        type: 'list',
+                        header: {
+                            type: 'text',
+                            text: 'Explore Sustainable Events',
+                        },
+                        body: {
+                            text: 'Here’s a curated list of Sustainable Events,\n'
+                                + 'brought to you by Vekin Group and our trusted eco-partners.\n'
+                                + 'Join us in making a positive impact on the environment\n'
+                                + 'by attending these events! Please choose an event.',
+                        },
+                        action: {
+                            button: 'List events',
+                            sections: [
+                                {
+                                    title: 'Event Options',
+                                    rows,
+                                },
+                            ],
+                        },
+                    },
+                };
+            } else {
+                template = {
+                    messaging_product: 'whatsapp',
+                    to: phone,
+                    type: 'template',
+                    template: {
+                        name: 'no_events',
+                        language: {
+                            code: 'en_US',
+                        },
+                    },
+                };
+            }
+            const resData = await WhatsappHelper.sendMessage(template);
+            const response = {};
+            if (resData?.status && resData?.status !== 200) {
+                response.status = resData.status;
+                response.message = resData.message;
+                response.code = resData.code;
+                return promiseResolve(response);
+            }
+            return promiseResolve(resDataVekin);
+        }
+        // không có sự kiện nào <- redirect to website "https://www.cero.org/"
+    } catch (err) {
+        return promiseReject(err);
+    }
+};
+const selectRegion = async (data) => {
+    try {
+        const phone = data?.phone || '84902103222';
+        const latitude = data?.latitude || '13.7379374';
+        const longitude = data?.longitude || '100.5239999';
+        const eventId = data?.eventId || 230;
+        const flowToken = {
+            latitude, longitude, eventId, type: 'region',
+        };
+        const encodedToken = Base64.encode(JSON.stringify(flowToken));
+        const template = {
+            messaging_product: 'whatsapp',
+            to: phone,
+            type: 'template',
+            template: {
+                name: 'fill_travel_information',
+                language: {
+                    code: 'en_US',
+                },
+                components: [
+                    {
+                        type: 'button',
+                        sub_type: 'flow',
+                        index: 0,
+                        parameters: [
+                            {
+                                type: 'action',
+                                action: {
+                                    flow_token: encodedToken,
+                                },
+                            },
+                        ],
+                    },
+                ],
+            },
+        };
+        // const decodedToken = JSON.parse(Base64.decode(encodedToken));
+        const resData = await WhatsappHelper.sendMessage(template);
+        const response = {};
+        if (resData?.status && resData?.status !== 200) {
+            response.status = resData.status;
+            response.message = resData.message;
+            response.code = resData.code;
+            return promiseResolve(response);
+        }
+        return promiseResolve(resData);
+    } catch (err) {
+        return promiseReject(err);
+    }
+};
 
+const selectCountry = async (data) => {
+    const regionName = data?.regionName || '2_South-central_Asia';
+    const customerName = data?.customerName || 'Xuan Truong';
+    const templateName = convertTemplateName(regionName);
+    const phone = data?.phone || '84902103222';
+    const latitude = data?.latitude || '13.7379374';
+    const longitude = data?.longitude || '100.5239999';
+    const eventId = data?.eventId || 230;
+    const flowToken = {
+        latitude, longitude, eventId, customerName, type: 'country',
+    };
+    const encodedToken = Base64.encode(JSON.stringify(flowToken));
+    try {
+        const template = {
+            messaging_product: 'whatsapp',
+            to: phone,
+            type: 'template',
+            template: {
+                name: templateName || 'select_country',
+                language: {
+                    code: 'en_US',
+                },
+                components: [
+                    {
+                        type: 'button',
+                        sub_type: 'flow',
+                        index: 0,
+                        parameters: [
+                            {
+                                type: 'action',
+                                action: {
+                                    flow_token: encodedToken,
+                                },
+                            },
+                        ],
+                    },
+                ],
+            },
+        };
+        const resData = await WhatsappHelper.sendMessage(template);
+        const response = {};
+        if (resData?.status && resData?.status !== 200) {
+            response.status = resData.status;
+            response.message = resData.message;
+            response.code = resData.code;
+            return promiseResolve(response);
+        }
+        return promiseResolve(data);
+    } catch (err) {
+        return promiseReject(err);
+    }
+};
+const checkCountry = async (data) => {
+    try {
+        const countryName = data?.countryName || '2_United_Arab_Emirates';
+        const customerName = data?.customerName;
+        const eventId = data?.eventId || 230;
+        const phone = data?.phone || '84902103222';
+        const myLatitude = data?.latitude || '20.4458553';
+        const myLongitude = data?.longitude || '106.1173998';
+        const infoCountry = await getCountry(countryName);
+        const latitudeFrom = infoCountry?.latitude || '13.7379374';
+        const longitudeFrom = infoCountry?.longitude || '100.5239999';
+        // const myCountry = await getCountryFromCoordinates(myLatitude, myLongitude);
+        // const countryFrom = await getCountryFromCoordinates(latitudeFrom, longitudeFrom);
+        const locationFrom = {};
+        const userDetails = {};
+        userDetails.name = customerName;
+        userDetails.phone = phone;
+        // if (myCountry.country_code !== countryFrom.country_code) {
+        if ('nd' !== 'na') {
+        // select different country
+            locationFrom.code = infoCountry?.country;
+            const resData = await DataVekinHelper.transportationList();
+            const rows = [];
+            if (!isEmpty(resData)) {
+                const emissionList = resData?.emission_list || [];
+                for (let i = 0; i < emissionList.length; i++) {
+                    const element = {}; const flowToken = {};
+                    flowToken.id = emissionList[i].id;
+                    flowToken.lf = locationFrom;
+                    flowToken.uds = userDetails;
+                    flowToken.eid = eventId;
+                    flowToken.type = 'receipt';
+                    const encodedToken = Base64.encode(JSON.stringify(flowToken));
+                    element.id = encodedToken;
+                    element.title = emissionList[i].name;
+                    // Gán lại giá trị sau khi cắt chuỗi
+                    element.title = element.title.substring(0, 24);
+                    // element.description = nearestLocations[i].event_code;
+                    // // Kiểm tra số lượng phần tử trong rows
+                    if (rows.length < 10) {
+                        rows.push(element);
+                    }
+                }
+                let template;
+                if (!isEmpty(rows)) {
+                    template = {
+                        messaging_product: 'whatsapp',
+                        to: phone,
+                        type: 'interactive',
+                        interactive: {
+                            type: 'list',
+                            header: {
+                                type: 'text',
+                                text: 'Transportation',
+                            },
+                            body: {
+                                text: 'The amount of CO2 emission is different depended on the type of your transportation.\n'
+                            + 'Please select the transportation for offset receipt .\n',
+                            },
+                            action: {
+                                button: 'Transportation',
+                                sections: [
+                                    {
+                                        title: 'Options',
+                                        rows,
+                                    },
+                                ],
+                            },
+                        },
+                    };
+                }
+                const resDataWhatsapp = await WhatsappHelper.sendMessage(template);
+                const response = {};
+                if (resData?.status && resDataWhatsapp?.status !== 200) {
+                    response.status = resDataWhatsapp.status;
+                    response.message = resDataWhatsapp.message;
+                    response.code = resDataWhatsapp.code;
+                    return promiseResolve(response);
+                }
+                return false;
+            }
+        }
+
+        return promiseResolve(data);
+    } catch (err) {
+        return promiseReject(err);
+    }
+};
 const paymentSuccess = async (data) => {
     try {
         const phone = data?.phone || '84902103222';
@@ -462,197 +737,6 @@ const completed = async (data) => {
     }
 };
 
-const selectRegion = async (data) => {
-    try {
-        const phone = data?.phone || '84902103222';
-        const latitude = data?.latitude || '13.7379374';
-        const longitude = data?.longitude || '100.5239999';
-        const eventId = data?.eventId || 230;
-        const flowToken = {
-            latitude, longitude, eventId, type: 'region',
-        };
-        const encodedToken = Base64.encode(JSON.stringify(flowToken));
-        const template = {
-            messaging_product: 'whatsapp',
-            to: phone,
-            type: 'template',
-            template: {
-                name: 'fill_travel_information',
-                language: {
-                    code: 'en_US',
-                },
-                components: [
-                    {
-                        type: 'button',
-                        sub_type: 'flow',
-                        index: 0,
-                        parameters: [
-                            {
-                                type: 'action',
-                                action: {
-                                    flow_token: encodedToken,
-                                },
-                            },
-                        ],
-                    },
-                ],
-            },
-        };
-        // const decodedToken = JSON.parse(Base64.decode(encodedToken));
-        const resData = await WhatsappHelper.sendMessage(template);
-        const response = {};
-        if (resData?.status && resData?.status !== 200) {
-            response.status = resData.status;
-            response.message = resData.message;
-            response.code = resData.code;
-            return promiseResolve(response);
-        }
-        return promiseResolve(resData);
-    } catch (err) {
-        return promiseReject(err);
-    }
-};
-
-const selectCountry = async (data) => {
-    const regionName = data?.regionName || '2_South-central_Asia';
-    const customerName = data?.customerName || 'Xuan Truong';
-    const templateName = convertTemplateName(regionName);
-    const phone = data?.phone || '84902103222';
-    const latitude = data?.latitude || '13.7379374';
-    const longitude = data?.longitude || '100.5239999';
-    const eventId = data?.eventId || 230;
-    const flowToken = {
-        latitude, longitude, eventId, customerName, type: 'country',
-    };
-    const encodedToken = Base64.encode(JSON.stringify(flowToken));
-    try {
-        const template = {
-            messaging_product: 'whatsapp',
-            to: phone,
-            type: 'template',
-            template: {
-                name: templateName || 'select_country',
-                language: {
-                    code: 'en_US',
-                },
-                components: [
-                    {
-                        type: 'button',
-                        sub_type: 'flow',
-                        index: 0,
-                        parameters: [
-                            {
-                                type: 'action',
-                                action: {
-                                    flow_token: encodedToken,
-                                },
-                            },
-                        ],
-                    },
-                ],
-            },
-        };
-        const resData = await WhatsappHelper.sendMessage(template);
-        const response = {};
-        if (resData?.status && resData?.status !== 200) {
-            response.status = resData.status;
-            response.message = resData.message;
-            response.code = resData.code;
-            return promiseResolve(response);
-        }
-        return promiseResolve(data);
-    } catch (err) {
-        return promiseReject(err);
-    }
-};
-const checkCountry = async (data) => {
-    try {
-        const countryName = data?.countryName || '2_United_Arab_Emirates';
-        const customerName = data?.customerName;
-        const eventId = data?.eventId || 230;
-        const phone = data?.phone || '84902103222';
-        const myLatitude = data?.latitude || '20.4458553';
-        const myLongitude = data?.longitude || '106.1173998';
-        const infoCountry = await getCountry(countryName);
-        const latitudeFrom = infoCountry?.latitude || '13.7379374';
-        const longitudeFrom = infoCountry?.longitude || '100.5239999';
-        // const myCountry = await getCountryFromCoordinates(myLatitude, myLongitude);
-        // const countryFrom = await getCountryFromCoordinates(latitudeFrom, longitudeFrom);
-        const locationFrom = {};
-        const userDetails = {};
-        userDetails.name = customerName;
-        userDetails.phone = phone;
-        // if (myCountry.country_code !== countryFrom.country_code) {
-        if ('nd' !== 'na') {
-        // select different country
-            locationFrom.code = infoCountry?.country;
-            const resData = await DataVekinHelper.transportationList();
-            const rows = [];
-            if (!isEmpty(resData)) {
-                const emissionList = resData?.emission_list || [];
-                for (let i = 0; i < emissionList.length; i++) {
-                    const element = {}; const flowToken = {};
-                    flowToken.id = emissionList[i].id;
-                    flowToken.lf = locationFrom;
-                    flowToken.uds = userDetails;
-                    flowToken.eid = eventId;
-                    flowToken.type = 'receipt';
-                    const encodedToken = Base64.encode(JSON.stringify(flowToken));
-                    element.id = encodedToken;
-                    element.title = emissionList[i].name;
-                    // Gán lại giá trị sau khi cắt chuỗi
-                    element.title = element.title.substring(0, 24);
-                    // element.description = nearestLocations[i].event_code;
-                    // // Kiểm tra số lượng phần tử trong rows
-                    if (rows.length < 10) {
-                        rows.push(element);
-                    }
-                }
-                let template;
-                if (!isEmpty(rows)) {
-                    template = {
-                        messaging_product: 'whatsapp',
-                        to: phone,
-                        type: 'interactive',
-                        interactive: {
-                            type: 'list',
-                            header: {
-                                type: 'text',
-                                text: 'Transportation',
-                            },
-                            body: {
-                                text: 'The amount of CO2 emission is different depended on the type of your transportation.\n'
-                            + 'Please select the transportation for offset receipt .\n',
-                            },
-                            action: {
-                                button: 'Transportation',
-                                sections: [
-                                    {
-                                        title: 'Options',
-                                        rows,
-                                    },
-                                ],
-                            },
-                        },
-                    };
-                }
-                const resDataWhatsapp = await WhatsappHelper.sendMessage(template);
-                const response = {};
-                if (resData?.status && resDataWhatsapp?.status !== 200) {
-                    response.status = resDataWhatsapp.status;
-                    response.message = resDataWhatsapp.message;
-                    response.code = resDataWhatsapp.code;
-                    return promiseResolve(response);
-                }
-                return false;
-            }
-        }
-
-        return promiseResolve(data);
-    } catch (err) {
-        return promiseReject(err);
-    }
-};
 const paymentConfirmation = async (data) => {
     try {
         const resData = await DataVekinHelper.transportationList();
@@ -835,12 +919,13 @@ const paymentConfirmation = async (data) => {
 module.exports = {
     joinNow,
     listEvent,
-    paymentSuccess,
+    ecoTravel,
+    selectDistance,
     selectRegion,
     selectCountry,
     paymentConfirmation,
+    paymentSuccess,
     paymentFailure,
-    ecoTravel,
     completed,
     checkCountry,
 };
