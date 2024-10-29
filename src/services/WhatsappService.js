@@ -316,11 +316,11 @@ const selectDistance = async (data) => {
             response.status = resData.status;
             response.message = resData.message;
             response.code = resData.code;
-            return promiseResolve(response);
+            return response;
         }
         return true;
     } catch (err) {
-        return promiseReject(err);
+        return err;
     }
 };
 const selectRegion = async (data) => {
@@ -421,7 +421,7 @@ const selectCountry = async (data) => {
             response.code = resData.code;
             return promiseResolve(response);
         }
-        return promiseResolve(data);
+        return true;
     } catch (err) {
         return promiseReject(err);
     }
@@ -444,9 +444,11 @@ const checkCountry = async (data) => {
             const latitudeFrom = infoCountry?.latitude || '13.7379374';
             const longitudeFrom = infoCountry?.longitude || '100.5239999';
             userDetails.name = customerName;
-            // const myCountry = await getCountryFromCoordinates(myLatitude, myLongitude);
-            // const countryFrom = await getCountryFromCoordinates(latitudeFrom, longitudeFrom);
-            // if (myCountry.country_code !== countryFrom.country_code) {
+            const myCountry = await getCountryFromCoordinates(myLatitude, myLongitude);
+            const countryFrom = await getCountryFromCoordinates(latitudeFrom, longitudeFrom);
+            if (myCountry.short_name === countryFrom.short_name) {
+                return await selectDistance(data);
+            }
         }
         userDetails.phone = phone;
         locationFrom.d = distance;
@@ -749,7 +751,6 @@ const completed = async (data) => {
 
 const paymentConfirmation = async (data) => {
     try {
-        console.log('Message:', data);
         const eventCarbonReceipt = {};
         const resData = await DataVekinHelper.transportationList();
         if (isEmpty(resData)) return false;
@@ -810,7 +811,7 @@ const paymentConfirmation = async (data) => {
             const fileName = getRandomFileName('png');
             const outputPath = path.join(__dirname, '../public/images', fileName);
             // await downloadImage(receipt?.event_image, outputPath);g
-            //const eventImage = getImageLink(data.host, `/images/${fileName}`);
+            // const eventImage = getImageLink(data.host, `/images/${fileName}`);
             const eventImage = 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
             const paramHeader = [
                 {
