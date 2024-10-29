@@ -440,6 +440,7 @@ const checkCountry = async (data) => {
             const myLatitude = data?.latitude || '20.4458553';
             const myLongitude = data?.longitude || '106.1173998';
             const infoCountry = await getCountry(countryName);
+            locationFrom.code = infoCountry?.country;
             const latitudeFrom = infoCountry?.latitude || '13.7379374';
             const longitudeFrom = infoCountry?.longitude || '100.5239999';
             userDetails.name = customerName;
@@ -924,16 +925,15 @@ const paymentConfirmation = async (data) => {
                     ],
                 },
             };
-            console.log(util.inspect(template, false, null, true));
-            // const resData = await WhatsappHelper.sendMessage(template);
-            // const response = {};
-            // if (resData?.status && resData?.status !== 200) {
-            //     response.status = resData.status;
-            //     response.message = resData.message;
-            //     response.code = resData.code;
-            //     return promiseResolve(response);
-            // }
-            // return promiseResolve(resData);
+            const resData = await WhatsappHelper.sendMessage(template);
+            const response = {};
+            if (resData?.status && resData?.status !== 200) {
+                response.status = resData.status;
+                response.message = resData.message;
+                response.code = resData.code;
+                return promiseResolve(response);
+            }
+            return promiseResolve(resData);
         }
         return promiseResolve(resDataVekin);
     } catch (err) {
