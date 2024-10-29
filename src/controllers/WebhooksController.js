@@ -88,6 +88,7 @@ module.exports.API = {
                                 params.lf = decodedToken.lf;
                                 params.uds = decodedToken.uds;
                                 params.eid = decodedToken.eid;
+                                params.distance = decodedToken.d;
                             }
                             if (type === 'interactive' && typeInteractive === 'nfm_reply') {
                                 const nfmReply = message?.interactive?.nfm_reply;
@@ -129,7 +130,6 @@ module.exports.API = {
                 await WhatsappService.ecoTravel(params);
             }
             if (typeMessage === 'sameCountry') {
-                console.log('====sameCountry==========', params);
                 await WhatsappService.selectDistance(params);
             }
             if (typeMessage === 'differentCountry') {
@@ -139,14 +139,16 @@ module.exports.API = {
                 await WhatsappService.selectCountry(params);
             }
             if (typeMessage === 'country') {
+                params.type = 'differentCountry';
                 await WhatsappService.checkCountry(params);
             }
             if (typeMessage === 'receipt') {
                 await WhatsappService.paymentConfirmation(params);
             }
             if (typeMessage === 'distance') {
+                params.type = 'sameCountry';
                 console.log('====distance=====', params);
-                // await WhatsappService.selectDistance(params);
+                await WhatsappService.checkCountry(params);
             }
             // Trả về 200 OK để xác nhận đã nhận thông báo
             res.status(200).send('EVENT_RECEIVED');

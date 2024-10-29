@@ -428,26 +428,28 @@ const selectCountry = async (data) => {
 };
 const checkCountry = async (data) => {
     try {
+        const type = data?.type || 'differentCountry';
         const countryName = data?.countryName || '2_United_Arab_Emirates';
         const customerName = data?.customerName;
         const eventId = data?.eventId || 230;
         const distance = data?.distance || 0;
         const phone = data?.phone || '84902103222';
-        const myLatitude = data?.latitude || '20.4458553';
-        const myLongitude = data?.longitude || '106.1173998';
-        const infoCountry = await getCountry(countryName);
-        const latitudeFrom = infoCountry?.latitude || '13.7379374';
-        const longitudeFrom = infoCountry?.longitude || '100.5239999';
-        // const myCountry = await getCountryFromCoordinates(myLatitude, myLongitude);
-        // const countryFrom = await getCountryFromCoordinates(latitudeFrom, longitudeFrom);
         const locationFrom = {};
         const userDetails = {};
-        userDetails.name = customerName;
+        if (type === 'differentCountry') {
+            const myLatitude = data?.latitude || '20.4458553';
+            const myLongitude = data?.longitude || '106.1173998';
+            const infoCountry = await getCountry(countryName);
+            const latitudeFrom = infoCountry?.latitude || '13.7379374';
+            const longitudeFrom = infoCountry?.longitude || '100.5239999';
+            userDetails.name = customerName;
+        }
+        // const myCountry = await getCountryFromCoordinates(myLatitude, myLongitude);
+        // const countryFrom = await getCountryFromCoordinates(latitudeFrom, longitudeFrom);
         userDetails.phone = phone;
         // if (myCountry.country_code !== countryFrom.country_code) {
         if ('nd' !== 'na') {
         // select different country
-            locationFrom.code = infoCountry?.country;
             locationFrom.d = distance;
             const resData = await DataVekinHelper.transportationList();
             const rows = [];
@@ -745,6 +747,10 @@ const completed = async (data) => {
 
 const paymentConfirmation = async (data) => {
     try {
+        const type = data?.type || 'differentCountry';
+        if (type === 'sameCountry') {
+            const resDataEvent = await DataVekinHelper.eventCarbonReceipt();
+        }
         const resData = await DataVekinHelper.transportationList();
         if (isEmpty(resData)) return false;
         const emissionId = data?.id;
