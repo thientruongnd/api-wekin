@@ -3,23 +3,8 @@
  * truongdx@runsystem.net - Xuan Truong
  * Function Name
  * */
-const util = require('util');
-const path = require('path');
-const fs = require('fs');
 const axios = require('axios');
 const { configEvn } = require('../configs/configEnvSchema');
-
-const {
-    isEmpty,
-    getYearToday,
-    getMonthToday,
-    getDayToday,
-    makeDir,
-    downloadImage,
-    promiseResolve,
-    promiseReject,
-
-} = require('../utils/shared');
 
 class WhatsappHelper {
     sendMessage = async (dataPost) => {
