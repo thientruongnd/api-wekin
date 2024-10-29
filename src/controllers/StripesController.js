@@ -28,7 +28,7 @@ module.exports.DEFAULT = {
                         price_data: {
                             currency: 'thb', // Đơn vị tiền tệ (có thể thay đổi theo nhu cầu của bạn)
                             product_data: {
-                                name: productName, // Tên sản phẩm
+                                name: metadata?.eventName || productName, // Tên sản phẩm
                             },
                             unit_amount: Math.round(unitAmount * 100), // Số tiền bạn muốn truyền vào (5000 là 50.00 USD)
                         },
@@ -73,8 +73,8 @@ module.exports.DEFAULT = {
                 console.log('metadata', metadata);
                 if (paymentStatus === 'paid') {
                     const params = body?.data?.object?.metadata;
-                    // const resData = await WhatsappService.paymentSuccess(params);
-                    // console.log(util.inspect(resData, false, null, true));
+                    const resData = await WhatsappService.paymentSuccess(params);
+                    console.log(util.inspect(resData, false, null, true));
                 }
             }
             if (body?.type === 'checkout.session.expired') {

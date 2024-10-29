@@ -505,7 +505,8 @@ const checkCountry = async (data) => {
 const paymentSuccess = async (data) => {
     try {
         const phone = data?.phone || '84902103222';
-        const eventEmission = data?.eventEmission || null;
+        const eventEmissionValue = data?.eventEmissionValue || null;
+        const eventEmissionUnit = data?.eventEmissionUnit || null;
         const unitAmount = data?.unitAmount || '0';
         const currency = data?.currency || '$';
         const eventImage = data?.eventImage || 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
@@ -535,11 +536,11 @@ const paymentSuccess = async (data) => {
                         parameters: [
                             {
                                 type: 'text',
-                                text: eventEmission.value + eventEmission.unit,
+                                text: eventEmissionValue + eventEmissionUnit,
                             },
                             {
                                 type: 'text',
-                                text: `${unitAmount} ${currency}`,
+                                text: unitAmount + currency,
                             },
                         ],
                     },
@@ -568,8 +569,10 @@ const paymentFailure = async (data) => {
         const date = data?.date;
         const eventName = data?.eventName;
         const eventLocation = data?.eventLocation;
-        const eventEmission = data?.eventEmission;
-        const eventCarbonSaved = data?.eventCarbonSaved;
+        const eventEmissionValue = data?.eventEmissionValue;
+        const eventEmissionUnit = data?.eventEmissionUnit;
+        const eventCarbonSavedValue = data?.eventCarbonSavedValue;
+        const eventCarbonSavedUnit = data?.eventCarbonSavedUnit;
         const blockchain = data?.blockchain;
         const refNumber = data?.refNumber;
         const verifiedBy = data?.verifiedBy;
@@ -596,11 +599,11 @@ const paymentFailure = async (data) => {
             },
             {
                 type: 'text',
-                text: eventEmission.value + eventEmission.unit,
+                text: eventEmissionValue + eventEmissionUnit,
             },
             {
                 type: 'text',
-                text: eventCarbonSaved.value + eventCarbonSaved.unit,
+                text: eventCarbonSavedValue + eventCarbonSavedUnit,
             },
             {
                 type: 'text',
@@ -626,13 +629,15 @@ const paymentFailure = async (data) => {
             blockchain,
             phone,
             name,
-            eventEmission,
+            eventEmissionValue,
+            eventEmissionUnit,
             currency,
             title,
             date,
             eventName,
             eventLocation,
-            eventCarbonSaved,
+            eventCarbonSavedValue,
+            eventCarbonSavedUnit,
             verifiedBy,
             refNumber,
             eventImage,
@@ -768,7 +773,7 @@ const paymentConfirmation = async (data) => {
             const amount = calculateCost(eventEmission.value);
             const fileName = getRandomFileName('png');
             const outputPath = path.join(__dirname, '../public/images', fileName);
-            await downloadImage(receipt?.event_image, outputPath);
+            // await downloadImage(receipt?.event_image, outputPath);
             // const eventImage = getImageLink(data.host, `/images/${fileName}`);
             const eventImage = 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
             const paramHeader = [
@@ -828,13 +833,15 @@ const paymentConfirmation = async (data) => {
                 blockchain,
                 phone,
                 name,
-                eventEmission,
+                eventEmissionValue: eventEmission.value,
+                eventEmissionUnit: eventEmission.unit,
                 currency,
                 title,
                 date: formattedDate,
                 eventName,
                 eventLocation,
-                eventCarbonSaved,
+                eventCarbonSavedValue: eventCarbonSaved.value,
+                eventCarbonSavedUnit: eventCarbonSaved.unit,
                 verifiedBy,
                 refNumber,
                 eventImage,
