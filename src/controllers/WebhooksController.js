@@ -67,7 +67,6 @@ module.exports.API = {
                                 const decodedToken = JSON.parse(Base64.decode(payload));
                                 console.log(util.inspect(decodedToken, false, null, true));
                                 typeMessage = decodedToken?.type;
-                                console.log(util.inspect(typeMessage, false, null, true));
                                 params.latitude = decodedToken?.latitude;
                                 params.longitude = decodedToken?.longitude;
                                 params.eventId = decodedToken?.eventId;
