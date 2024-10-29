@@ -29,53 +29,42 @@ const joinNow = async (data) => {
     try {
         const phone = data?.phone || '84902103222';
         const name = data?.name || 'Xuan Truong';
-        const imageId = data?.imageId || '439102592147175';
-        const payloadParams = { type: 'join_now_payload' };
-        const payloadEncode = Base64.encode(JSON.stringify(payloadParams));
+        const imageId = data?.imageId || '1092387271735133';// 439102592147175
         const template = {
             messaging_product: 'whatsapp',
+            recipient_type: 'individual',
             to: phone,
-            type: 'template',
-            template: {
-                name: 'join_now',
-                language: {
-                    code: 'en_US',
+            type: 'interactive',
+            interactive: {
+                type: 'button',
+                header: {
+                    type: 'image',
+                    image: {
+                        id: imageId,
+                    },
                 },
-                components: [
-                    {
-                        type: 'header',
-                        parameters: [
-                            {
-                                type: 'image',
-                                image: {
-                                    id: imageId,
-                                },
+                body: {
+                    text: 'Welcome to CERO!\n\n'
+                    + `Hi ${name}!\n\n`
+                    + 'We’re thrilled to have you here at CERO, where we focus on creating sustainable, eco-friendly events and experiences.\n\n'
+                    + 'Would you like to join our exclusive Sustainable Events Community?\n\n'
+                    + 'You’ll receive updates on upcoming events, tips for greener living, and opportunities to make a difference!',
+                },
+
+                action: {
+                    buttons: [
+                        {
+                            type: 'reply',
+                            reply: {
+                                id: 'join_now_payload',
+                                title: 'Join now!',
                             },
-                        ],
-                    },
-                    {
-                        type: 'body',
-                        parameters: [
-                            {
-                                type: 'text',
-                                text: name,
-                            },
-                        ],
-                    },
-                    {
-                        type: 'button',
-                        sub_type: 'quick_reply',
-                        index: 0,
-                        parameters: [
-                            {
-                                type: 'payload',
-                                payload: payloadEncode, // Thay thế bằng chuỗi payload tùy chọn
-                            },
-                        ],
-                    },
-                ],
+                        },
+                    ],
+                },
             },
         };
+
         const resData = await WhatsappHelper.sendMessage(template);
         const response = {};
         if (resData?.status && resData?.status !== 200) {
