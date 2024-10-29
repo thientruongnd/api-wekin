@@ -78,6 +78,7 @@ module.exports.API = {
                             if (type === 'interactive' && typeInteractive === 'list_reply') {
                                 const id = message?.interactive?.list_reply?.id;
                                 const decodedToken = JSON.parse(Base64.decode(id));
+                                console.log(util.inspect(decodedToken, false, null, true));
                                 eventId = decodedToken?.eventId;
                                 typeMessage = decodedToken?.type;
                                 params.latitude = decodedToken?.latitude;

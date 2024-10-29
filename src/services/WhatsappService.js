@@ -244,7 +244,7 @@ const ecoTravel = async (data) => {
  * */
 const selectDistance = async (data) => {
     try {
-        const phone = data?.phone || '84987662808';
+        const phone = data?.phone || '84902103222';
         const latitude = data?.latitude || '13.7379374';
         const longitude = data?.longitude || '100.5239999';
         const eventId = data?.eventId || 230;
@@ -578,7 +578,7 @@ const paymentSuccess = async (data) => {
 const paymentFailure = async (data) => {
     try {
         const phone = data?.phone || '84902103222';
-        const name = data?.name || 'Xuân Trường';
+        const name = data?.name || null;
         const title = data?.title;
         const date = data?.date;
         const eventName = data?.eventName;
@@ -775,7 +775,7 @@ const paymentConfirmation = async (data) => {
         eventCarbonReceipt.event_id = eventId;
         const resDataVekin = await DataVekinHelper.eventCarbonReceiptPartner(eventCarbonReceipt);
         if (resDataVekin?.receipt) {
-            const name = data?.name || 'Xuân Trường';
+            const name = data?.name || null;
             const receipt = resDataVekin?.receipt;
             const title = receipt?.title;
             const date = receipt?.date;
