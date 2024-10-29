@@ -63,6 +63,9 @@ module.exports.API = {
                             if (type === 'text' && text === 'Starting conversation' || text === 'joinNow' || text === 'ok') {
                                 typeMessage = 'joinNow';
                             }
+                            if (type === 'interactive' && typeInteractive === 'button_reply') {
+                                typeMessage = message?.interactive?.button_reply?.id;
+                            }
                             if (type === 'button') {
                                 const decodedToken = JSON.parse(Base64.decode(payload));
                                 console.log(util.inspect(decodedToken, false, null, true));

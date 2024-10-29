@@ -12,7 +12,6 @@ const { configEvn } = require('../configs/configEnvSchema');
 const {
     responseError,
     responseSuccess,
-    isEmpty,
     resJsonError,
     getCountry,
     convertTemplateName,
@@ -26,7 +25,7 @@ module.exports.DEFAULT = {
     joinNow: async (req, res) => {
         console.log('this log ');
         const params = {};
-        params.phone = '84902103222';
+        params.phone = req.body.phone || '84902103222';
         params.name = 'Xuan Truong';
         params.imageId = '439102592147175';
         const resData = await WhatsappService.joinNow(params);
@@ -34,7 +33,7 @@ module.exports.DEFAULT = {
         return res.json(responseSuccess(10261, resData, 'en'));
     },
     sendMessageLocation: async (req, res) => {
-        const resData = await WhatsappHelper.sendMessageLocation({ phone: '84902103222' });
+        const resData = await WhatsappHelper.sendMessageLocation({ phone: '84987662808' });
 
         return res.json(responseSuccess(10261, resData, 'en'));
     },
