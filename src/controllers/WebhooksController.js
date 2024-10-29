@@ -64,8 +64,6 @@ module.exports.API = {
                                 typeMessage = 'joinNow';
                             }
                             if (type === 'interactive' && typeInteractive === 'button_reply') {
-                                console.log('this log button_reply', message?.interactive);
-                                console.log(util.inspect(message, false, null, true));
                                 typeMessage = message?.interactive?.button_reply?.id;
                             }
                             if (type === 'button') {
