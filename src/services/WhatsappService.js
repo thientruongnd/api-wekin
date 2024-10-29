@@ -244,82 +244,81 @@ const ecoTravel = async (data) => {
  * */
 const selectDistance = async (data) => {
     try {
-        const phone = data?.phone || '84902103222';
+        const phone = data?.phone || '84987662808';
         const latitude = data?.latitude || '13.7379374';
         const longitude = data?.longitude || '100.5239999';
-        const resDataVekin = await DataVekinHelper.eventCarbonReceipt();
-        const flowToken = { lat: latitude, long: longitude, type: 'selectEvent' };
-        const rows = [];
-        if (!isEmpty(resDataVekin)) {
-            // khi có sự kiện
-            const nearestLocations = getNearestLocations(resDataVekin, latitude, longitude);
-            for (let i = 0; i < nearestLocations.length; i++) {
-                const element = {};
-                flowToken.eventId = nearestLocations[i].id;
-                const encodedToken = Base64.encode(JSON.stringify(flowToken));
-                element.id = encodedToken;
-                element.title = nearestLocations[i].name;
-                // Gán lại giá trị sau khi cắt chuỗi
-                element.title = element.title.substring(0, 24);
-                element.description = nearestLocations[i].event_code;
-                // Kiểm tra số lượng phần tử trong rows
-                if (rows.length < 10) {
-                    rows.push(element);
-                }
-            }
-            let template;
-            if (!isEmpty(rows)) {
-                template = {
-                    messaging_product: 'whatsapp',
-                    to: phone,
-                    type: 'interactive',
-                    interactive: {
-                        type: 'list',
-                        header: {
-                            type: 'text',
-                            text: 'Explore Sustainable Events',
+        const eventId = data?.eventId || 230;
+
+        const flow1Token = {
+            lat: latitude, long: longitude, eventId, d: 3, type: 'distance',
+        };
+        const flow5Token = {
+            lat: latitude, long: longitude, eventId, d: 5, type: 'distance',
+        };
+        const flow10Token = {
+            lat: latitude, long: longitude, eventId, d: 10, type: 'distance',
+        };
+        const flow15Token = {
+            lat: latitude, long: longitude, eventId, d: 15, type: 'distance',
+        };
+        const flow20Token = {
+            lat: latitude, long: longitude, eventId, d: 20, type: 'distance',
+        };
+        const rows = [
+            {
+                id: await Base64.encode(JSON.stringify(flow1Token)),
+                title: 'Less than 5 km',
+            },
+            {
+                id: await Base64.encode(JSON.stringify(flow5Token)),
+                title: '5-10 km',
+            },
+            {
+                id: await Base64.encode(JSON.stringify(flow10Token)),
+                title: '10-15 km',
+            },
+            {
+                id: await Base64.encode(JSON.stringify(flow15Token)),
+                title: '15-20 km',
+            },
+            {
+                id: await Base64.encode(JSON.stringify(flow20Token)),
+                title: 'More than 20 km',
+            },
+        ];
+        const template = {
+            messaging_product: 'whatsapp',
+            to: phone,
+            type: 'interactive',
+            interactive: {
+                type: 'list',
+                header: {
+                    type: 'text',
+                    text: 'Select distance',
+                },
+                body: {
+                    text: 'How far did you travel to attend the event?\n',
+                },
+                action: {
+                    button: 'Select distance',
+                    sections: [
+                        {
+                            title: 'Select distance',
+                            rows,
                         },
-                        body: {
-                            text: 'Here’s a curated list of Sustainable Events,\n'
-                                + 'brought to you by Vekin Group and our trusted eco-partners.\n'
-                                + 'Join us in making a positive impact on the environment\n'
-                                + 'by attending these events! Please choose an event.',
-                        },
-                        action: {
-                            button: 'List events',
-                            sections: [
-                                {
-                                    title: 'Event Options',
-                                    rows,
-                                },
-                            ],
-                        },
-                    },
-                };
-            } else {
-                template = {
-                    messaging_product: 'whatsapp',
-                    to: phone,
-                    type: 'template',
-                    template: {
-                        name: 'no_events',
-                        language: {
-                            code: 'en_US',
-                        },
-                    },
-                };
-            }
-            const resData = await WhatsappHelper.sendMessage(template);
-            const response = {};
-            if (resData?.status && resData?.status !== 200) {
-                response.status = resData.status;
-                response.message = resData.message;
-                response.code = resData.code;
-                return promiseResolve(response);
-            }
-            return promiseResolve(resDataVekin);
+                    ],
+                },
+            },
+        };
+        const resData = await WhatsappHelper.sendMessage(template);
+        const response = {};
+        if (resData?.status && resData?.status !== 200) {
+            response.status = resData.status;
+            response.message = resData.message;
+            response.code = resData.code;
+            return promiseResolve(response);
         }
-        // không có sự kiện nào <- redirect to website "https://www.cero.org/"
+        return true;
     } catch (err) {
         return promiseReject(err);
     }
@@ -432,6 +431,7 @@ const checkCountry = async (data) => {
         const countryName = data?.countryName || '2_United_Arab_Emirates';
         const customerName = data?.customerName;
         const eventId = data?.eventId || 230;
+        const distance = data?.distance || 0;
         const phone = data?.phone || '84902103222';
         const myLatitude = data?.latitude || '20.4458553';
         const myLongitude = data?.longitude || '106.1173998';
@@ -448,6 +448,7 @@ const checkCountry = async (data) => {
         if ('nd' !== 'na') {
         // select different country
             locationFrom.code = infoCountry?.country;
+            locationFrom.d = distance;
             const resData = await DataVekinHelper.transportationList();
             const rows = [];
             if (!isEmpty(resData)) {
@@ -750,9 +751,11 @@ const paymentConfirmation = async (data) => {
         const emissionList = resData?.emission_list || [];
         const transportation = emissionList.find((emission) => emission.id === emissionId);
         const countryCode = data?.lf?.code;
+        const distance = data?.lf?.d || 0;
         const locationFrom = dataCountries.find((country) => country.country === countryCode);
         const customerName = data?.uds?.name;
         const phone = data?.uds?.phone || '84902103222';
+
         const eventId = data?.eid;
         const eventCarbonReceipt = {};
         eventCarbonReceipt.transportation = transportation;
@@ -762,6 +765,9 @@ const paymentConfirmation = async (data) => {
             lat: locationFrom.latitude,
             long: locationFrom.longitude,
         };
+        if (distance > 0) {
+            eventCarbonReceipt.location_from.distance = distance;
+        }
         eventCarbonReceipt.user_details = {
             name: customerName,
             phone_number: phone,
