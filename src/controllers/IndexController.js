@@ -12,10 +12,7 @@ const { configEvn } = require('../configs/configEnvSchema');
 const {
     responseError,
     responseSuccess,
-    isEmpty,
     resJsonError,
-    getCountry,
-    convertTemplateName,
 } = require('../utils/shared');
 
 module.exports.DEFAULT = {
@@ -33,7 +30,7 @@ module.exports.DEFAULT = {
         return res.json(responseSuccess(10261, resData, 'en'));
     },
     sendMessageLocation: async (req, res) => {
-        const resData = await WhatsappHelper.sendMessageLocation({ phone: '84902103222' });
+        const resData = await WhatsappHelper.sendMessageLocation({ phone: '84987662808' });
 
         return res.json(responseSuccess(10261, resData, 'en'));
     },

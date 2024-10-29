@@ -36,7 +36,7 @@ class WhatsappHelper {
             interactive: {
                 type: 'location_request_message',
                 body: {
-                    text: 'Where would you like to be picked up?',
+                    text: 'Let’s start by helping you find upcoming Sustainable Events around your location. Please share your current location to begin!?',
                 },
                 action: {
                     name: 'send_location',
