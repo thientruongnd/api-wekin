@@ -555,7 +555,7 @@ const countries = [
         country: 'HK',
         latitude: 22.396428,
         longitude: 114.109497,
-        name: 'Hong Kong',
+        name: 'Hong Kong, China',
     },
     {
         country: 'HM',
@@ -633,7 +633,7 @@ const countries = [
         country: 'IR',
         latitude: 32.427908,
         longitude: 53.688046,
-        name: 'Iran',
+        name: 'Iran (Islamic Republic of)',
     },
     {
         country: 'IS',
@@ -711,13 +711,13 @@ const countries = [
         country: 'KP',
         latitude: 40.339852,
         longitude: 127.510093,
-        name: 'North Korea',
+        name: 'Democratic People\'s Republic of Korea',
     },
     {
         country: 'KR',
         latitude: 35.907757,
         longitude: 127.766922,
-        name: 'South Korea',
+        name: 'Republic of Korea',
     },
     {
         country: 'KW',
