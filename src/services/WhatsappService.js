@@ -428,90 +428,88 @@ const selectCountry = async (data) => {
 };
 const checkCountry = async (data) => {
     try {
+        const typeCountry = data?.typeCountry || 'differentCountry';
         const countryName = data?.countryName || '2_United_Arab_Emirates';
         const customerName = data?.customerName;
         const eventId = data?.eventId || 230;
         const distance = data?.distance || 0;
         const phone = data?.phone || '84902103222';
-        const myLatitude = data?.latitude || '20.4458553';
-        const myLongitude = data?.longitude || '106.1173998';
-        const infoCountry = await getCountry(countryName);
-        const latitudeFrom = infoCountry?.latitude || '13.7379374';
-        const longitudeFrom = infoCountry?.longitude || '100.5239999';
-        // const myCountry = await getCountryFromCoordinates(myLatitude, myLongitude);
-        // const countryFrom = await getCountryFromCoordinates(latitudeFrom, longitudeFrom);
         const locationFrom = {};
         const userDetails = {};
-        userDetails.name = customerName;
-        userDetails.phone = phone;
-        // if (myCountry.country_code !== countryFrom.country_code) {
-        if ('nd' !== 'na') {
-        // select different country
-            locationFrom.code = infoCountry?.country;
-            locationFrom.d = distance;
-            const resData = await DataVekinHelper.transportationList();
-            const rows = [];
-            if (!isEmpty(resData)) {
-                const emissionList = resData?.emission_list || [];
-                for (let i = 0; i < emissionList.length; i++) {
-                    const element = {}; const flowToken = {};
-                    flowToken.id = emissionList[i].id;
-                    flowToken.lf = locationFrom;
-                    flowToken.uds = userDetails;
-                    flowToken.eid = eventId;
-                    flowToken.type = 'receipt';
-                    const encodedToken = Base64.encode(JSON.stringify(flowToken));
-                    element.id = encodedToken;
-                    element.title = emissionList[i].name;
-                    // Gán lại giá trị sau khi cắt chuỗi
-                    element.title = element.title.substring(0, 24);
-                    // element.description = nearestLocations[i].event_code;
-                    // // Kiểm tra số lượng phần tử trong rows
-                    if (rows.length < 10) {
-                        rows.push(element);
-                    }
-                }
-                let template;
-                if (!isEmpty(rows)) {
-                    template = {
-                        messaging_product: 'whatsapp',
-                        to: phone,
-                        type: 'interactive',
-                        interactive: {
-                            type: 'list',
-                            header: {
-                                type: 'text',
-                                text: 'Transportation',
-                            },
-                            body: {
-                                text: 'The amount of CO2 emission is different depended on the type of your transportation.\n'
-                            + 'Please select the transportation for offset receipt .\n',
-                            },
-                            action: {
-                                button: 'Transportation',
-                                sections: [
-                                    {
-                                        title: 'Options',
-                                        rows,
-                                    },
-                                ],
-                            },
-                        },
-                    };
-                }
-                const resDataWhatsapp = await WhatsappHelper.sendMessage(template);
-                const response = {};
-                if (resData?.status && resDataWhatsapp?.status !== 200) {
-                    response.status = resDataWhatsapp.status;
-                    response.message = resDataWhatsapp.message;
-                    response.code = resDataWhatsapp.code;
-                    return promiseResolve(response);
-                }
-                return false;
-            }
+        if (typeCountry === 'differentCountry') {
+            const myLatitude = data?.latitude || '20.4458553';
+            const myLongitude = data?.longitude || '106.1173998';
+            const infoCountry = await getCountry(countryName);
+            const latitudeFrom = infoCountry?.latitude || '13.7379374';
+            const longitudeFrom = infoCountry?.longitude || '100.5239999';
+            userDetails.name = customerName;
+            // const myCountry = await getCountryFromCoordinates(myLatitude, myLongitude);
+            // const countryFrom = await getCountryFromCoordinates(latitudeFrom, longitudeFrom);
+            // if (myCountry.country_code !== countryFrom.country_code) {
         }
-
-        return promiseResolve(data);
+        userDetails.phone = phone;
+        locationFrom.d = distance;
+        const resData = await DataVekinHelper.transportationList();
+        const rows = [];
+        if (!isEmpty(resData)) {
+            const emissionList = resData?.emission_list || [];
+            for (let i = 0; i < emissionList.length; i++) {
+                const element = {}; const flowToken = {};
+                flowToken.id = emissionList[i].id;
+                flowToken.lf = locationFrom;
+                flowToken.uds = userDetails;
+                flowToken.eid = eventId;
+                flowToken.type = 'receipt';
+                flowToken.typeCountry = typeCountry;
+                const encodedToken = Base64.encode(JSON.stringify(flowToken));
+                element.id = encodedToken;
+                element.title = emissionList[i].name;
+                // Gán lại giá trị sau khi cắt chuỗi
+                element.title = element.title.substring(0, 24);
+                // element.description = nearestLocations[i].event_code;
+                // // Kiểm tra số lượng phần tử trong rows
+                if (rows.length < 10) {
+                    rows.push(element);
+                }
+            }
+            let template;
+            if (!isEmpty(rows)) {
+                template = {
+                    messaging_product: 'whatsapp',
+                    to: phone,
+                    type: 'interactive',
+                    interactive: {
+                        type: 'list',
+                        header: {
+                            type: 'text',
+                            text: 'Transportation',
+                        },
+                        body: {
+                            text: 'The amount of CO2 emission is different depended on the type of your transportation.\n'
+                            + 'Please select the transportation for offset receipt .\n',
+                        },
+                        action: {
+                            button: 'Transportation',
+                            sections: [
+                                {
+                                    title: 'Options',
+                                    rows,
+                                },
+                            ],
+                        },
+                    },
+                };
+            }
+            const resDataWhatsapp = await WhatsappHelper.sendMessage(template);
+            const response = {};
+            if (resData?.status && resDataWhatsapp?.status !== 200) {
+                response.status = resDataWhatsapp.status;
+                response.message = resDataWhatsapp.message;
+                response.code = resDataWhatsapp.code;
+                return promiseResolve(response);
+            }
+            return false;
+        }
     } catch (err) {
         return promiseReject(err);
     }
@@ -750,29 +748,35 @@ const completed = async (data) => {
 
 const paymentConfirmation = async (data) => {
     try {
+        const eventCarbonReceipt = {};
         const resData = await DataVekinHelper.transportationList();
         if (isEmpty(resData)) return false;
         const emissionId = data?.id;
         const emissionList = resData?.emission_list || [];
         const transportation = emissionList.find((emission) => emission.id === emissionId);
-        const countryCode = data?.lf?.code;
-        const distance = data?.lf?.d || 0;
-        const locationFrom = dataCountries.find((country) => country.country === countryCode);
+        eventCarbonReceipt.transportation = transportation;
         const customerName = data?.uds?.name;
         const phone = data?.uds?.phone || '84902103222';
-
+        const typeCountry = data?.typeCountry || 'differentCountry';
+        const distance = data?.lf?.d || 0;
         const eventId = data?.eid;
-        const eventCarbonReceipt = {};
-        eventCarbonReceipt.transportation = transportation;
-        eventCarbonReceipt.location_from = {
-            id: 111,
-            name: locationFrom.name,
-            lat: locationFrom.latitude,
-            long: locationFrom.longitude,
-        };
-        if (distance > 0) {
-            eventCarbonReceipt.location_from.distance = distance;
+        const locationFrom = {};
+        if (typeCountry === 'sameCountry') {
+            const resDataEvent = await DataVekinHelper.eventCarbonReceipt();
+            const event = resDataEvent.find((event) => event.id === eventId);
+            locationFrom.name = event?.country;
+            locationFrom.city = event?.city;
+            locationFrom.lat = event?.latitude;
+            locationFrom.long = event?.longitude;
+            locationFrom.distance = distance;
+        } else {
+            const countryCode = data?.lf?.code;
+            const country = dataCountries.find((country) => country.country === countryCode);
+            locationFrom.name = country?.name;
+            locationFrom.lat = country?.latitude;
+            locationFrom.long = country?.longitude;
         }
+        eventCarbonReceipt.location_from = locationFrom;
         eventCarbonReceipt.user_details = {
             name: customerName,
             phone_number: phone,
