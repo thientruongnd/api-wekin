@@ -16,6 +16,7 @@ const {
     resJsonError,
     getCountry,
     convertTemplateName,
+    convertTextToImage,
 } = require('../utils/shared');
 
 module.exports.DEFAULT = {
@@ -241,6 +242,10 @@ module.exports.DEFAULT = {
     },
     eventOffset: async (req, res) => {
         const resData = await DataVekinHelper.eventOffset(req.body);
+        return res.json(responseSuccess(10261, resData, 'en'));
+    },
+    textToImage: async (req, res) => {
+        const resData = await convertTextToImage(req.body);
         return res.json(responseSuccess(10261, resData, 'en'));
     },
 

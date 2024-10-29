@@ -8,6 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const winston = require('winston');
 const empty = require('is-empty');
+const { createCanvas, loadImage } = require('canvas');
 const { countries: dataCountries } = require('./dataSample/data.countries');
 const { CODES_SUCCESS, CODES_ERROR } = require('./messages');
 const { configEvn } = require('../configs/configEnvSchema');
@@ -217,6 +218,85 @@ const downloadImage = async (url, outputPath) => {
         console.error('Lỗi khi tải ảnh:', error.message);
     }
 };
+
+const convertTextToImage = async (url, outputPath) => {
+    try {
+        // Kích thước canvas (tùy chỉnh cho phù hợp)
+        const width = 600;
+        const height = 700;
+        const canvas = createCanvas(width, height);
+        const ctx = canvas.getContext('2d');
+        // Thiết lập nền trắng
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+        ctx.fillStyle = '#000000'; // Màu chữ
+        // Hàm ngắt dòng tự động (hỗ trợ chuỗi liên tục)
+        function wrapText(ctx, text, x, y, maxWidth = 500, lineHeight = 25, isBold = false, isCenter = false) {
+            ctx.font = `${isBold ? 'bold' : 'normal'} 20px Arial`;
+            let line = '';
+            let currentY = y;
+            // Duyệt từng ký tự nếu không có khoảng trắng
+            for (const char of text) {
+                const testLine = line + char;
+                const { width: testWidth } = ctx.measureText(testLine);
+                if (testWidth > maxWidth) {
+                    ctx.fillText(line, x, currentY);
+                    line = char; // Bắt đầu dòng mới với ký tự hiện tại
+                    currentY += lineHeight;
+                } else {
+                    line = testLine;
+                }
+            }
+            const drawX = isCenter ? ((width - ctx.measureText(line).width) / 2) : x;
+            // Vẽ dòng cuối cùng
+            ctx.fillText(line, drawX, currentY);
+        }
+        // Hàm ngắt dòng và căn giữa mỗi dòng chính xác
+        // Dữ liệu mẫu (thay thế các placeholder {{}} bằng nội dung động)
+        const data = {
+            productName: 'Thailand green2026',
+            unitAmount: 61.786,
+            blockchain: '4GeFxbM8EwjQZF1hcFXaXhrCvZ5v7wwN6mbgHjdnM4F679R56L4hQdEE6XrSiXSTmjyhyUzLyL2wzp3bqfBNzoxZ',
+            phone: '84974418454',
+            name: null,
+            eventEmissionValue: 61.786,
+            eventEmissionUnit: 'kg co2e',
+            currency: 'thb',
+            title: 'carbon receipt',
+            date: '29 October 2024 16:49',
+            eventName: 'Thailand green2026',
+            eventLocation: 'JOHN PARK building',
+            eventCarbonSavedValue: 0,
+            eventCarbonSavedUnit: 'kg co2e',
+            verifiedBy: 'TGO CFO Standard',
+            refNumber: 'ASG16A7',
+            eventImage: 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png',
+            eventId: 230,
+        };
+        // Chèn ảnh đầu tiên
+        const image = await loadImage(data.eventImage);
+        ctx.drawImage(image, (width - 150) / 2, 0, 150, 150); // X, Y, width, height
+        // Vẽ các dòng văn bản
+        wrapText(ctx, data.title, 100, 190, 600, 30, true, true);
+        wrapText(ctx, data.date, 100, 220, 600, 30, false, true);
+        wrapText(ctx, data.eventName, 5, 250, 600, 30, true);
+        wrapText(ctx, data.eventLocation, 5, 280, 600, 30);
+        wrapText(ctx, `Your Emission                                       ${data.eventEmissionValue} ${data.eventEmissionUnit}`, 5, 310, 600, 30, true);
+        wrapText(ctx, `Carbon Saved                                        ${data.eventCarbonSavedValue} ${data.eventCarbonSavedUnit}`, 5, 340, 600, 30, true);
+        wrapText(ctx, `Total cost                                               ${data.unitAmount} ${data.currency}`, 5, 370, 600, 30, true);
+        wrapText(ctx, 'Verified blockchain address:', 5, 400, 600, 25);
+        wrapText(ctx, data.blockchain, 5, 430, 600, 30, true);
+        wrapText(ctx, `Verified by: ${data.verifiedBy}`, 5, 520, 600, 30, true);
+        wrapText(ctx, `Receipt NO.: ${data.refNumber}`, 5, 550, 600, 30);
+        wrapText(ctx, 'Would you like us to donate on behalf of your attendance', 5, 580, 600, 30);
+        // Lưu hình ảnh dưới dạng PNG
+        const buffer = canvas.toBuffer('image/png');
+        fs.writeFileSync('./text-image.png', buffer);
+        console.log('Image created: text-image.png');
+    } catch (error) {
+        console.error('Lỗi khi tạo ảnh:', error.message);
+    }
+};
 const getCountryFromCoordinates = async (latitude, longitude) => {
     const apiKey = configEvn.GOOGLE_MAP_KEY; // Replace with your actual API key
     const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`;
@@ -268,4 +348,5 @@ module.exports = {
     downloadImage,
     getRandomFileName,
     getCountryFromCoordinates,
+    convertTextToImage,
 };
