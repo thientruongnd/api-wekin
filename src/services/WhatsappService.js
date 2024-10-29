@@ -802,7 +802,7 @@ const paymentConfirmation = async (data) => {
             const amount = calculateCost(eventEmission.value);
             const fileName = getRandomFileName('png');
             const outputPath = path.join(__dirname, '../public/images', fileName);
-            // await downloadImage(receipt?.event_image, outputPath);
+            // await downloadImage(receipt?.event_image, outputPath);g
             const eventImage = getImageLink(data.host, `/images/${fileName}`);
             // const eventImage = 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
             const paramHeader = [
