@@ -21,6 +21,7 @@ const indexRoute = (apiRouter) => {
     apiRouter.route('/tests/ecoTravel').get(DEFAULT.ecoTravel);
     apiRouter.route('/tests/checkCountry').post(DEFAULT.checkCountry);
     apiRouter.route('/tests/eventOffset').post(DEFAULT.eventOffset);
+    apiRouter.route('/tests/selectDistance').post(DEFAULT.selectDistance);
 };
 
 module.exports = {

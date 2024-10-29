@@ -78,6 +78,7 @@ module.exports.API = {
                             if (type === 'interactive' && typeInteractive === 'list_reply') {
                                 const id = message?.interactive?.list_reply?.id;
                                 const decodedToken = JSON.parse(Base64.decode(id));
+                                console.log(util.inspect(decodedToken, false, null, true));
                                 eventId = decodedToken?.eventId;
                                 typeMessage = decodedToken?.type;
                                 params.latitude = decodedToken?.latitude;
@@ -86,7 +87,6 @@ module.exports.API = {
                                 params.id = decodedToken.id;
                                 params.lf = decodedToken.lf;
                                 params.uds = decodedToken.uds;
-                                params.eid = decodedToken.eid;
                                 params.eid = decodedToken.eid;
                             }
                             if (type === 'interactive' && typeInteractive === 'nfm_reply') {
@@ -129,7 +129,8 @@ module.exports.API = {
                 await WhatsappService.ecoTravel(params);
             }
             if (typeMessage === 'sameCountry') {
-                console.log('location====================sameCountry===================');
+                console.log('====sameCountry==========', params);
+                await WhatsappService.selectDistance(params);
             }
             if (typeMessage === 'differentCountry') {
                 await WhatsappService.selectRegion(params);
@@ -142,6 +143,10 @@ module.exports.API = {
             }
             if (typeMessage === 'receipt') {
                 await WhatsappService.paymentConfirmation(params);
+            }
+            if (typeMessage === 'distance') {
+                console.log('====distance=====', params);
+                // await WhatsappService.selectDistance(params);
             }
             // Trả về 200 OK để xác nhận đã nhận thông báo
             res.status(200).send('EVENT_RECEIVED');
