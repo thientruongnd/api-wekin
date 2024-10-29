@@ -5,7 +5,7 @@ Email: truongdx@runsystem.net
 const util = require('util');
 const events = require('events');
 const cors = require('cors');
-
+const path = require('path');
 const express = require('express');
 
 const app = express();
@@ -27,6 +27,7 @@ const corsOptions = {
     optionsSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
+app.use(express.static(path.join(__dirname, 'public')));
 require('./configs/configInit')(app);
 require('./configs/configRoutes')(app);
 require('./configs/configError')(app);

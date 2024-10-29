@@ -23,6 +23,7 @@ const {
     convertTemplateName,
     getCountry,
     getCountryFromCoordinates,
+    convertTextToImage,
 } = require('../utils/shared');
 
 const joinNow = async (data) => {
@@ -797,19 +798,13 @@ const paymentConfirmation = async (data) => {
             const currency = 'thb';
             const formattedDate = moment(date).format('DD MMMM YYYY HH:mm');
             const amount = calculateCost(eventEmission.value);
-            const fileName = getRandomFileName('png');
-            const outputPath = path.join(__dirname, '../public/images', fileName);
+            const eventImageUrl = receipt?.event_image;
+            // const fileName = getRandomFileName('png');
+            // const outputPath = path.join(__dirname, '../public/images', fileName);
             // await downloadImage(receipt?.event_image, outputPath);g
             // const eventImage = getImageLink(data.host, `/images/${fileName}`);
-            const eventImage = 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
-            const paramHeader = [
-                {
-                    type: 'image',
-                    image: {
-                        link: eventImage,
-                    },
-                },
-            ];
+            // const eventImage = 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
+
             const paramBody = [
                 {
                     type: 'text',
@@ -870,65 +865,83 @@ const paymentConfirmation = async (data) => {
                 eventCarbonSavedUnit: eventCarbonSaved.unit,
                 verifiedBy,
                 refNumber,
-                eventImage,
+                eventImageUrl,
                 eventId,
+                // host: 'https://api-wekin-5300daa06a95.herokuapp.com' || data.host,
+                host: data.host,
             };
-            const checkoutSessionURL = buildCheckoutSessionURL(baseURL, params);
-            const paramButton = [
-                {
-                    type: 'text',
-                    text: checkoutSessionURL,
-                },
-            ];
-            const payloadParams = { type: 'maybe_later_payload' };
-            const payloadEncode = Base64.encode(JSON.stringify(payloadParams));
-            const template = {
-                messaging_product: 'whatsapp',
-                to: phone,
-                type: 'template',
-                template: {
-                    name: 'payment_confirmation',
-                    language: {
-                        code: 'en_US',
+            const eventImage = await convertTextToImage(params);
+            if (eventImage) {
+                const eventImage = 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
+                console.log(eventImage);
+                const paramHeader = [
+                    {
+                        type: 'image',
+                        image: {
+                            link: eventImage,
+                        },
                     },
-                    components: [
-                        {
-                            type: 'header',
-                            parameters: paramHeader,
+                ];
+                params.eventImage = eventImage;
+                const checkoutSessionURL = buildCheckoutSessionURL(baseURL, params);
+                const paramButton = [
+                    {
+                        type: 'text',
+                        text: checkoutSessionURL,
+                    },
+                ];
+                const payloadParams = { type: 'maybe_later_payload' };
+                const payloadEncode = Base64.encode(JSON.stringify(payloadParams));
+                const template = {
+                    messaging_product: 'whatsapp',
+                    to: phone,
+                    recipient_type: 'individual',
+                    type: 'template',
+                    template: {
+                        name: 'payment_confirm',
+                        language: {
+                            code: 'en_US',
                         },
-                        {
-                            type: 'body',
-                            parameters: paramBody,
-                        },
-                        {
-                            type: 'button',
-                            sub_type: 'url',
-                            index: '0',
-                            parameters: paramButton,
-                        },
-                        {
-                            type: 'button',
-                            sub_type: 'quick_reply',
-                            index: '1',
-                            parameters: [
-                                {
-                                    type: 'payload',
-                                    payload: payloadEncode,
-                                },
-                            ],
-                        },
-                    ],
-                },
-            };
-            const resData = await WhatsappHelper.sendMessage(template);
-            const response = {};
-            if (resData?.status && resData?.status !== 200) {
-                response.status = resData.status;
-                response.message = resData.message;
-                response.code = resData.code;
-                return promiseResolve(response);
+                        components: [
+                            {
+                                type: 'header',
+                                parameters: paramHeader,
+                            },
+                            // {
+                            //     type: 'body',
+                            //     parameters: paramBody,
+                            // },
+                            {
+                                type: 'button',
+                                sub_type: 'url',
+                                index: '0',
+                                parameters: paramButton,
+                            },
+                            {
+                                type: 'button',
+                                sub_type: 'quick_reply',
+                                index: '1',
+                                parameters: [
+                                    {
+                                        type: 'payload',
+                                        payload: payloadEncode,
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                };
+                const resData = await WhatsappHelper.sendMessage(template);
+                const response = {};
+                if (resData?.status && resData?.status !== 200) {
+                    response.status = resData.status;
+                    response.message = resData.message;
+                    response.code = resData.code;
+                    return promiseResolve(response);
+                }
+                return promiseResolve(resData);
             }
-            return promiseResolve(resData);
+            return promiseResolve(resDataVekin);
         }
         return promiseResolve(resDataVekin);
     } catch (err) {
