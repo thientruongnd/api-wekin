@@ -727,7 +727,7 @@ const completed = async (data) => {
             to: phone,
             type: 'template',
             template: {
-                name: 'completed',
+                name: 'maybe_later',
                 language: {
                     code: 'en_US',
                 },
