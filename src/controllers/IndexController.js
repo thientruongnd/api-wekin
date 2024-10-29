@@ -176,7 +176,6 @@ module.exports.DEFAULT = {
         params.unitAmount = 2629.943;
         params.currency = '$';
         const resData = await WhatsappService.paymentSuccess(params);
-        console.log(util.inspect(resData, false, null, true));
         return res.json(responseSuccess(10261, resData, 'en'));
     },
     paymentFailure: async (req, res) => {
