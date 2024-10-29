@@ -89,6 +89,7 @@ module.exports.API = {
                                 params.uds = decodedToken.uds;
                                 params.eid = decodedToken.eid;
                                 params.distance = decodedToken.d;
+                                params.typeCountry = decodedToken?.typeCountry;
                             }
                             if (type === 'interactive' && typeInteractive === 'nfm_reply') {
                                 const nfmReply = message?.interactive?.nfm_reply;
@@ -139,14 +140,14 @@ module.exports.API = {
                 await WhatsappService.selectCountry(params);
             }
             if (typeMessage === 'country') {
-                params.type = 'differentCountry';
+                params.typeCountry = 'differentCountry';
                 await WhatsappService.checkCountry(params);
             }
             if (typeMessage === 'receipt') {
                 await WhatsappService.paymentConfirmation(params);
             }
             if (typeMessage === 'distance') {
-                params.type = 'sameCountry';
+                params.typeCountry = 'sameCountry';
                 console.log('====distance=====', params);
                 await WhatsappService.checkCountry(params);
             }
