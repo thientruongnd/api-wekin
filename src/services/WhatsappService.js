@@ -748,6 +748,8 @@ const completed = async (data) => {
 
 const paymentConfirmation = async (data) => {
     try {
+        console.log('this log paymentConfirmation===============');
+        console.log(util.inspect(data, false, null, true));
         const eventCarbonReceipt = {};
         const resData = await DataVekinHelper.transportationList();
         if (isEmpty(resData)) return false;
