@@ -518,39 +518,47 @@ const paymentSuccess = async (data) => {
         const template = {
             messaging_product: 'whatsapp',
             to: phone,
-            type: 'template',
-            template: {
-                name: 'payment_successful',
-                language: {
-                    code: 'en_US',
-                },
-                components: [
-                    {
-                        type: 'header',
-                        parameters: [
-                            {
-                                type: 'image',
-                                image: {
-                                    link: eventImage,
-                                },
-                            },
-                        ],
-                    },
-                    {
-                        type: 'body',
-                        parameters: [
-                            {
-                                type: 'text',
-                                text: eventEmissionValue + eventEmissionUnit,
-                            },
-                            {
-                                type: 'text',
-                                text: unitAmount + currency,
-                            },
-                        ],
-                    },
-                ],
+            recipient_type: 'individual',
+            type: 'image',
+            image: {
+                link: eventImage,
+                caption: 'Thank you for offsetting your carbon footprint of\n\n'
+                  + `${`${eventEmissionValue } ${ eventEmissionUnit}`}\n\n`
+                  + `${`${unitAmount } ${ currency}`}\n\n`,
             },
+            // type: 'template',
+            // template: {
+            //     name: 'payment_successful',
+            //     language: {
+            //         code: 'en_US',
+            //     },
+            //     components: [
+            //         {
+            //             type: 'header',
+            //             parameters: [
+            //                 {
+            //                     type: 'image',
+            //                     image: {
+            //                         link: eventImage,
+            //                     },
+            //                 },
+            //             ],
+            //         },
+            //         {
+            //             type: 'body',
+            //             parameters: [
+            //                 {
+            //                     type: 'text',
+            //                     text: eventEmissionValue + eventEmissionUnit,
+            //                 },
+            //                 {
+            //                     type: 'text',
+            //                     text: unitAmount + currency,
+            //                 },
+            //             ],
+            //         },
+            //     ],
+            // },
         };
         const resData = await WhatsappHelper.sendMessage(template);
         const paramEvent = {
