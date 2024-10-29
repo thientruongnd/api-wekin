@@ -153,6 +153,9 @@ module.exports.API = {
                 console.log('====distance=====', params);
                 await WhatsappService.checkCountry(params);
             }
+            if (typeMessage === 'maybe_later_payload') {
+                await WhatsappService.completed(params);
+            }
             // Trả về 200 OK để xác nhận đã nhận thông báo
             res.status(200).send('EVENT_RECEIVED');
         } else {
