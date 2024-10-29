@@ -561,6 +561,11 @@ const paymentSuccess = async (data) => {
             },
         };
         const resData = await WhatsappHelper.sendMessage(template);
+        const paramEvent = {
+            event_id: data.eventId,
+            total_offset: data.eventEmissionValue,
+        };
+        const resEventOffset = await DataVekinHelper.eventOffset(paramEvent);
         const response = {};
         if (resData?.status && resData?.status !== 200) {
             response.status = resData.status;
@@ -654,7 +659,7 @@ const paymentFailure = async (data) => {
             verifiedBy,
             refNumber,
             eventImage,
-
+            eventId,
         };
 
         const checkoutSessionURL = buildCheckoutSessionURL(baseURL, params);
@@ -858,7 +863,7 @@ const paymentConfirmation = async (data) => {
                 verifiedBy,
                 refNumber,
                 eventImage,
-
+                eventId,
             };
 
             const checkoutSessionURL = buildCheckoutSessionURL(baseURL, params);

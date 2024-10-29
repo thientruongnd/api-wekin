@@ -236,6 +236,10 @@ module.exports.DEFAULT = {
         const resData = await WhatsappService.checkCountry();
         return res.json(responseSuccess(10261, resData, 'en'));
     },
+    eventOffset: async (req, res) => {
+        const resData = await DataVekinHelper.eventOffset(req.body);
+        return res.json(responseSuccess(10261, resData, 'en'));
+    },
 
 };
 module.exports.API = {
