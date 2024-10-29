@@ -174,6 +174,7 @@ const listEvent = async (data) => {
         return promiseReject(err);
     }
 };
+
 const ecoTravel = async (data) => {
     try {
         const phone = data?.phone || '84902103222';
@@ -238,6 +239,7 @@ const ecoTravel = async (data) => {
         return promiseReject(err);
     }
 };
+
 const paymentSuccess = async (data) => {
     try {
         const phone = data?.phone || '84902103222';
@@ -283,9 +285,7 @@ const paymentSuccess = async (data) => {
                 ],
             },
         };
-        console.log(util.inspect(template, false, null, true));
         const resData = await WhatsappHelper.sendMessage(template);
-        console.log(util.inspect(resData, false, null, true));
         const response = {};
         if (resData?.status && resData?.status !== 200) {
             response.status = resData.status;
@@ -298,6 +298,7 @@ const paymentSuccess = async (data) => {
         return promiseReject(err);
     }
 };
+
 const paymentFailure = async (data) => {
     try {
         const phone = data?.phone || '84902103222';
@@ -437,6 +438,7 @@ const paymentFailure = async (data) => {
         return promiseReject(err);
     }
 };
+
 const completed = async (data) => {
     try {
         const phone = data?.phone || '84902103222';
