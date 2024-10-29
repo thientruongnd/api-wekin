@@ -25,7 +25,7 @@ module.exports.DEFAULT = {
     joinNow: async (req, res) => {
         console.log('this log ');
         const params = {};
-        params.phone = '84902103222';
+        params.phone = req.body.phone || '84902103222';
         params.name = 'Xuan Truong';
         params.imageId = '439102592147175';
         const resData = await WhatsappService.joinNow(params);
