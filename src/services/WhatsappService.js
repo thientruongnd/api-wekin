@@ -756,7 +756,13 @@ const paymentConfirmation = async (data) => {
         const emissionId = data?.id;
         const emissionList = resData?.emission_list || [];
         const transportation = emissionList.find((emission) => emission.id === emissionId);
-        eventCarbonReceipt.transportation = transportation;
+        eventCarbonReceipt.transportation = {
+            id: transportation.id,
+            unit: transportation.unit,
+            name: transportation.name,
+            total_co2: transportation.total_co2,
+            unit_converter: [],
+        };
         const customerName = data?.uds?.name;
         const phone = data?.uds?.phone || '84902103222';
         const typeCountry = data?.typeCountry || 'differentCountry';
@@ -877,7 +883,6 @@ const paymentConfirmation = async (data) => {
                 eventImage,
                 eventId,
             };
-
             const checkoutSessionURL = buildCheckoutSessionURL(baseURL, params);
             const paramButton = [
                 {
