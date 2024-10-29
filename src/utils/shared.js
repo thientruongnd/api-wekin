@@ -2,6 +2,7 @@
  Mr : Dang Xuan Truong
  Email: truongdx@runsystem.net
  */
+const util = require('util');
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
@@ -9,7 +10,7 @@ const winston = require('winston');
 const empty = require('is-empty');
 const { countries: dataCountries } = require('./dataSample/data.countries');
 const { CODES_SUCCESS, CODES_ERROR } = require('./messages');
-
+const { configEvn } = require('../configs/configEnvSchema');
 /**
  * Normalize a port into a number, string, or false.
  */
@@ -217,10 +218,25 @@ const downloadImage = async (url, outputPath) => {
     }
 };
 const getCountryFromCoordinates = async (latitude, longitude) => {
-    const url = `https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`;
-    const response = await axios.get(url);
-    const address = response.data.address;
-    return address;
+    const apiKey = configEvn.GOOGLE_MAP_KEY; // Replace with your actual API key
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`;
+
+    try {
+        const response = await axios.get(url);
+        const results = response.data.results;
+
+        if (results.length > 0) {
+            // Look for the country in the address components
+            const addressComponents = results[0].address_components;
+            const country = addressComponents.find((component) => component.types.includes('country'));
+            return country ? { country_code: country.short_name, country: country.long_name } : null; // country.short_name : country.long_name : null;
+        }
+
+        return null;
+    } catch (error) {
+        console.error('Error fetching location data:', error);
+        return null;
+    }
 };
 module.exports = {
     normalizePort,
