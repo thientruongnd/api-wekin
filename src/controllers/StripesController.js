@@ -57,24 +57,10 @@ module.exports.DEFAULT = {
         try {
             if (body?.type === 'checkout.session.completed') {
                 console.log('--------checkout.session.completed-----');
-                const sessionId = body?.data?.object?.id;
-                const amountTotal = body?.data?.object?.amount_total;
-                const currency = body?.data?.object?.currency;
-                const customer = body?.data?.object?.customer_details;
-                const paymentIntentId = body?.data?.object?.payment_intent;
-                const metadata = body?.data?.object.metadata;
                 const paymentStatus = body?.data?.object.payment_status;
-                console.log('sessionId', sessionId);
-                console.log('customer', customer);
-                console.log('amountTotal', amountTotal);
-                console.log('currency', currency);
-                console.log('paymentIntentId', paymentIntentId);
-                console.log('payment_status', paymentStatus);
-                console.log('metadata', metadata);
                 if (paymentStatus === 'paid') {
                     const params = body?.data?.object?.metadata;
-                    const resData = await WhatsappService.paymentSuccess(params);
-                    console.log(util.inspect(resData, false, null, true));
+                    await WhatsappService.paymentSuccess(params);
                 }
             }
             if (body?.type === 'checkout.session.expired') {
@@ -83,12 +69,8 @@ module.exports.DEFAULT = {
                 console.log('--------END checkout.session.expired-----');
             }
             if (body?.type === 'payment_intent.canceled') {
-                console.log('-------- START payment_intent.canceled-----');
-                console.log(body);
                 const params = body?.data?.object?.metadata;
-                const resData = await WhatsappService.completed(params);
-                console.log(util.inspect(resData, false, null, true));
-                console.log('--------END payment_intent.canceled-----');
+                await WhatsappService.completed(params);
             }
             if (body?.type === 'payment_intent.payment_failed') {
                 console.log('-------- START payment_intent.payment_failed-----');
