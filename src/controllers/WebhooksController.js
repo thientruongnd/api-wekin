@@ -57,7 +57,6 @@ module.exports.API = {
                             const text = message?.text?.body;
                             const type = message?.type;
                             const payload = message?.button?.payload;
-                            console.log('this log payload: ', payload);
                             const typeInteractive = message?.interactive?.type; // list_reply
                             phone = message?.from;
                             params.phone = phone;
@@ -79,7 +78,6 @@ module.exports.API = {
                             if (type === 'interactive' && typeInteractive === 'list_reply') {
                                 const id = message?.interactive?.list_reply?.id;
                                 const decodedToken = JSON.parse(Base64.decode(id));
-                                console.log('this log  list_reply decodedToken', decodedToken);
                                 eventId = decodedToken?.eventId;
                                 typeMessage = decodedToken?.type;
                                 params.latitude = decodedToken?.latitude;
@@ -96,7 +94,6 @@ module.exports.API = {
                                 const responseJson = JSON.parse(nfmReply?.response_json);
                                 const decodedToken = JSON.parse(Base64.decode(responseJson?.flow_token));
                                 typeMessage = decodedToken?.type;
-                                console.log('this log decodedToken', decodedToken);
                                 if (typeMessage === 'region') {
                                     const customerName = responseJson?.screen_0_TextInput_0;
                                     const regionName = responseJson?.screen_0_Dropdown_1;
@@ -118,41 +115,32 @@ module.exports.API = {
             });
             params.phone = phone;
             params.name = fullName;
-            console.log('typeMessage: ', typeMessage);
             if (typeMessage === 'joinNow') {
-                console.log('joinNow=============================================');
                 params.imageId = '439102592147175';
                 await WhatsappService.joinNow(params);
             }
             if (typeMessage === 'join_now_payload') {
-                console.log('join_now_payload======================================');
                 await WhatsappHelper.sendMessageLocation({ phone });
             }
             if (typeMessage === 'location') {
-                console.log('location=======================selectEvent====================');
-                const resData = await WhatsappService.listEvent(params);
-                console.log(`location==========: ${ resData}`);
+                await WhatsappService.listEvent(params);
             }
             if (typeMessage === 'selectEvent') {
-                const resData = await WhatsappService.ecoTravel(params);
-                console.log('selectEvent============ecoTravel===========: ', resData);
+                await WhatsappService.ecoTravel(params);
             }
             if (typeMessage === 'sameCountry') {
                 console.log('location====================sameCountry===================');
             }
             if (typeMessage === 'differentCountry') {
-                const resData = await WhatsappService.selectRegion(params);
-                console.log('=differentCountry==============: ', resData);
+                await WhatsappService.selectRegion(params);
             }
             if (typeMessage === 'region') {
                 await WhatsappService.selectCountry(params);
             }
             if (typeMessage === 'country') {
-                console.log('=Country=====show transf====: ', params);
                 await WhatsappService.checkCountry(params);
             }
             if (typeMessage === 'receipt') {
-                console.log('=receipt=====show transf====: ', params);
                 await WhatsappService.paymentConfirmation(params);
             }
             // Trả về 200 OK để xác nhận đã nhận thông báo
