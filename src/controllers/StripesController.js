@@ -8,9 +8,7 @@ const { configEvn } = require('../configs/configEnvSchema');
 const stripe = require('stripe')(configEvn.KEY_STRIPE);
 const WhatsappService = require('../services/WhatsappService');
 const {
-    responseError,
     responseSuccess,
-    isEmpty,
     resJsonError,
     getImageLink,
 } = require('../utils/shared');
@@ -50,7 +48,6 @@ module.exports.DEFAULT = {
             });
             res.redirect(303, session.url);
         } catch (errors) {
-            console.log(util.inspect(errors, false, null, true));
             return resJsonError(res, errors);
         }
         // return res.json(responseSuccess(10261, resData, 'en'));
@@ -76,8 +73,8 @@ module.exports.DEFAULT = {
                 console.log('metadata', metadata);
                 if (paymentStatus === 'paid') {
                     const params = body?.data?.object?.metadata;
-                    const resData = await WhatsappService.paymentSuccess(params);
-                    console.log(util.inspect(resData, false, null, true));
+                    // const resData = await WhatsappService.paymentSuccess(params);
+                    // console.log(util.inspect(resData, false, null, true));
                 }
             }
             if (body?.type === 'checkout.session.expired') {
