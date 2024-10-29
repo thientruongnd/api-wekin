@@ -170,7 +170,8 @@ module.exports.DEFAULT = {
     paymentSuccess: async (req, res) => {
         const params = {};
         params.phone = '84902103222';
-        params.eventEmission = { value: 2629.943, unit: 'kg co2e' };
+        params.eventEmissionValue = 2629.943;
+        params.eventEmissionUnit = 'kg co2e';
         params.eventImage = 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
         params.unitAmount = 2629.943;
         params.currency = '$';
@@ -187,8 +188,10 @@ module.exports.DEFAULT = {
             eventName: 'Thailand green2026',
             eventImage: 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png',
             eventLocation: 'JOHN PARK building',
-            eventEmission: { value: 2629.943, unit: 'kg co2e' },
-            eventCarbonSaved: { value: 0, unit: 'kg co2e' },
+            eventEmissionValue: 2629.943,
+            eventEmissionUnit: 'kg co2e',
+            eventCarbonSavedValue: 0,
+            eventCarbonSavedUnit: 'kg co2e',
             blockchain: '4HNwtpG6Nvv6ahtsaP54ghPses7YZo7AEse2Wr52hLgzfNSAAgmxPb4por618WMCdZjKe1uriNgRaYrdtGCawHvh',
             refNumber: 'ASG16A7',
             verifiedBy: 'TGO CFO Standard',
