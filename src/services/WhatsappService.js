@@ -83,7 +83,7 @@ const joinNow = async (data) => {
  * */
 const listEvent = async (data) => {
     try {
-        const phone = data?.phone || '84902103222';
+        const phone = data?.phone || '84987662808';
         const latitude = data?.latitude || '13.7379374';
         const longitude = data?.longitude || '100.5239999';
         const resDataVekin = await DataVekinHelper.eventCarbonReceipt();
@@ -119,10 +119,9 @@ const listEvent = async (data) => {
                             text: 'Explore Sustainable Events',
                         },
                         body: {
-                            text: 'Here’s a curated list of Sustainable Events,\n'
-                                + 'brought to you by Vekin Group and our trusted eco-partners.\n'
-                                + 'Join us in making a positive impact on the environment\n'
-                                + 'by attending these events! Please choose an event.',
+                            text: 'Here’s a curated list of Sustainable Events, brought to you by CERO and our trusted eco-partners.'
+                                + ' Join us in making a positive impact on the environment by attending these events!\n'
+                                + 'Please choose an event.',
                         },
                         action: {
                             button: 'List events',
