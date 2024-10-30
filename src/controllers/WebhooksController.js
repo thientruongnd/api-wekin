@@ -2,6 +2,7 @@
 Mr : Dang Xuan Truong
 Email: truongdx@runsystem.net
 */
+const util = require('util');
 const { Base64 } = require('js-base64');
 const WhatsappService = require('../services/WhatsappService');
 const WhatsappHelper = require('../helpers/WhatsappHelper');
@@ -34,7 +35,7 @@ module.exports.API = {
     },
     postWebhook: async (req, res) => {
         const body = req.body;
-        console.log('body: ', body);
+        console.log(util.inspect(body, false, null, true));
         // Kiểm tra request có chứa dữ liệu từ WhatsApp
         const params = {};
         let typeMessage = ''; let phone = ''; let fullName = ''; let eventId;
