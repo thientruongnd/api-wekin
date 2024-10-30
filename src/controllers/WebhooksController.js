@@ -35,7 +35,6 @@ module.exports.API = {
     },
     postWebhook: async (req, res) => {
         const body = req.body;
-        console.log(util.inspect(body, false, null, true));
         // Kiểm tra request có chứa dữ liệu từ WhatsApp
         const params = {};
         let typeMessage = ''; let phone = ''; let fullName = ''; let eventId;
@@ -44,8 +43,7 @@ module.exports.API = {
                 const changes = entry.changes;
                 changes.forEach((change) => {
                     const messageData = change?.value?.messages;
-                    console.log('value: ', change?.value);
-                    const statuses = change.statuses;
+                    const statuses = change?.value?.statuses;
                     console.log('statuses: ', statuses);
                     const contacts = change?.value?.contacts;
                     if (contacts) {
