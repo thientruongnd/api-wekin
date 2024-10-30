@@ -66,6 +66,10 @@ module.exports.API = {
                             if (type === 'interactive' && typeInteractive === 'button_reply') {
                                 const buttonReply = message?.interactive?.button_reply?.id;
                                 const decodedToken = JSON.parse(Base64.decode(buttonReply));
+                                typeMessage = decodedToken?.type;
+                                params.latitude = decodedToken?.latitude;
+                                params.longitude = decodedToken?.longitude;
+                                params.eventId = decodedToken?.eventId;
                                 console.log(util.inspect(decodedToken, false, null, true));
                                 // const responseJson = JSON.parse(nfmReply?.response_json);
                                 //
