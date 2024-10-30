@@ -44,7 +44,7 @@ module.exports.API = {
                 changes.forEach((change) => {
                     const messageData = change?.value?.messages;
                     const statuses = change?.value?.statuses;
-                    console.log('statuses: ', statuses);
+                    console.log(util.inspect(statuses, false, null, true));
                     const contacts = change?.value?.contacts;
                     if (contacts) {
                         contacts.forEach((contact) => {
