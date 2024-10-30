@@ -7,14 +7,11 @@ const axios = require('axios');
 const WhatsappHelper = require('../helpers/WhatsappHelper');
 const DataVekinHelper = require('../helpers/DataVekinHelper');
 const WhatsappService = require('../services/WhatsappService');
-const { configEvn } = require('../configs/configEnvSchema');
 
 const {
     responseError,
     responseSuccess,
     resJsonError,
-    getCountry,
-    convertTemplateName,
     convertTextToImage,
 } = require('../utils/shared');
 
@@ -39,7 +36,7 @@ module.exports.DEFAULT = {
     },
     eventCarbonReceipt: async (req, res) => {
         const phone = '84902103222';
-        const resData = await WhatsappService.listEvent(req);
+        const resData = await WhatsappService.listEvent(req.body);
 
         return res.json(responseSuccess(10261, resData, 'en'));
     },
@@ -67,7 +64,7 @@ module.exports.DEFAULT = {
         const resData = await WhatsappService.paymentConfirmation(data);
         return res.json(responseSuccess(10261, resData, 'en'));
     },
-    
+
     paymentSuccess: async (req, res) => {
         const params = {};
         params.phone = '84974418454';

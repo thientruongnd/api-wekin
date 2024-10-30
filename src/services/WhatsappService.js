@@ -3,11 +3,13 @@
  * Email: truongdx@runsystem.net
  * Common
  */
+const util = require('util');
 const moment = require('moment');
 const { Base64 } = require('js-base64');
 const WhatsappHelper = require('../helpers/WhatsappHelper');
 const DataVekinHelper = require('../helpers/DataVekinHelper');
 const { countries: dataCountries } = require('../utils/dataSample/data.countries');
+const { configEvn } = require('../configs/configEnvSchema');
 const {
     promiseReject,
     promiseResolve,
@@ -769,7 +771,10 @@ const paymentConfirmation = async (data) => {
             const eventId = receipt?.event_id;
             const currency = 'thb';
             const formattedDate = moment(date).format('DD MMMM YYYY HH:mm');
-            const amount = calculateCost(eventEmission.value);
+            let amount = calculateCost(eventEmission.value);
+            if (amount < 20) {
+                amount = 20;
+            }
             const eventImageUrl = receipt?.event_image;
             const baseURL = 'stripes/createCheckoutSession';
             const params = {
@@ -791,7 +796,7 @@ const paymentConfirmation = async (data) => {
                 refNumber,
                 eventImageUrl,
                 eventId,
-                host: 'https://api-wekin-5300daa06a95.herokuapp.com',
+                host: configEvn.URL,
             };
             const eventImage = await convertTextToImage(params);
             if (eventImage) {
