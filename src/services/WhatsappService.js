@@ -23,6 +23,7 @@ const {
     convertTemplateName,
     getCountry,
     getCountryFromCoordinates,
+    convertTextToImage,
 } = require('../utils/shared');
 
 const joinNow = async (data) => {
@@ -30,6 +31,8 @@ const joinNow = async (data) => {
         const phone = data?.phone || '84902103222';
         const name = data?.name || 'Xuan Truong';
         const imageId = data?.imageId || '1092387271735133';// 439102592147175
+        const joinNowPayload = { type: 'join_now_payload' };
+        const joinNowPayloadId = Base64.encode(JSON.stringify(joinNowPayload));
         const template = {
             messaging_product: 'whatsapp',
             recipient_type: 'individual',
@@ -56,7 +59,7 @@ const joinNow = async (data) => {
                         {
                             type: 'reply',
                             reply: {
-                                id: 'join_now_payload',
+                                id: joinNowPayloadId,
                                 title: 'Join now!',
                             },
                         },
@@ -214,7 +217,39 @@ const ecoTravel = async (data) => {
                 ],
             },
         };
-        const resData = await WhatsappHelper.sendMessage(template);
+        const template2 = {
+            messaging_product: 'whatsapp',
+            to: phone,
+            type: 'interactive',
+            interactive: {
+                type: 'button',
+                body: {
+                    text: 'To better understand your journey and help us calculate your'
+                    + ' carbon footprint, could you let us know if you traveled to the event'
+                    + ' from within the same country or from a different country?',
+                },
+                action: {
+                    buttons: [
+                        {
+                            type: 'reply',
+                            reply: {
+                                id: sameCountryEncode,
+                                title: 'Same Country',
+                            },
+                        },
+                        {
+                            type: 'reply',
+                            reply: {
+                                id: differentCountryEncode,
+                                title: 'Different Country',
+                            },
+                        },
+                    ],
+                },
+            },
+        };
+        const resData = await WhatsappHelper.sendMessage(template2);
+        console.log(util.inspect(resData, false, null, true));
         const response = {};
         if (resData?.status && resData?.status !== 200) {
             response.status = resData.status;
@@ -433,7 +468,6 @@ const checkCountry = async (data) => {
             const longitudeFrom = infoCountry?.longitude || '100.5239999';
             userDetails.name = customerName;
             const myCountry = await getCountryFromCoordinates(myLatitude, myLongitude);
-            console.log(util.inspect(myCountry, false, null, true));
             const countryFrom = await getCountryFromCoordinates(latitudeFrom, longitudeFrom);
             if (myCountry?.country_code === countryFrom?.country_code) {
                 return await selectDistance(data);
@@ -517,38 +551,13 @@ const paymentSuccess = async (data) => {
         const template = {
             messaging_product: 'whatsapp',
             to: phone,
-            type: 'template',
-            template: {
-                name: 'payment_successful',
-                language: {
-                    code: 'en_US',
-                },
-                components: [
-                    {
-                        type: 'header',
-                        parameters: [
-                            {
-                                type: 'image',
-                                image: {
-                                    link: eventImage,
-                                },
-                            },
-                        ],
-                    },
-                    {
-                        type: 'body',
-                        parameters: [
-                            {
-                                type: 'text',
-                                text: eventEmissionValue + eventEmissionUnit,
-                            },
-                            {
-                                type: 'text',
-                                text: unitAmount + currency,
-                            },
-                        ],
-                    },
-                ],
+            recipient_type: 'individual',
+            type: 'image',
+            image: {
+                link: eventImage,
+                caption: 'Thank you for offsetting your carbon footprint of\n\n'
+                  + `${`${eventEmissionValue } ${ eventEmissionUnit}`}\n\n`
+                  + `${`${unitAmount } ${ currency}`}\n\n`,
             },
         };
         const resData = await WhatsappHelper.sendMessage(template);
@@ -556,7 +565,7 @@ const paymentSuccess = async (data) => {
             event_id: data.eventId,
             total_offset: data.eventEmissionValue,
         };
-        const resEventOffset = await DataVekinHelper.eventOffset(paramEvent);
+        await DataVekinHelper.eventOffset(paramEvent);
         const response = {};
         if (resData?.status && resData?.status !== 200) {
             response.status = resData.status;
@@ -718,7 +727,7 @@ const completed = async (data) => {
             to: phone,
             type: 'template',
             template: {
-                name: 'completed',
+                name: 'maybe_later',
                 language: {
                     code: 'en_US',
                 },
@@ -797,19 +806,13 @@ const paymentConfirmation = async (data) => {
             const currency = 'thb';
             const formattedDate = moment(date).format('DD MMMM YYYY HH:mm');
             const amount = calculateCost(eventEmission.value);
-            const fileName = getRandomFileName('png');
-            const outputPath = path.join(__dirname, '../public/images', fileName);
+            const eventImageUrl = receipt?.event_image;
+            // const fileName = getRandomFileName('png');
+            // const outputPath = path.join(__dirname, '../public/images', fileName);
             // await downloadImage(receipt?.event_image, outputPath);g
             // const eventImage = getImageLink(data.host, `/images/${fileName}`);
-            const eventImage = 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
-            const paramHeader = [
-                {
-                    type: 'image',
-                    image: {
-                        link: eventImage,
-                    },
-                },
-            ];
+            // const eventImage = 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
+
             const paramBody = [
                 {
                     type: 'text',
@@ -870,65 +873,84 @@ const paymentConfirmation = async (data) => {
                 eventCarbonSavedUnit: eventCarbonSaved.unit,
                 verifiedBy,
                 refNumber,
-                eventImage,
+                eventImageUrl,
                 eventId,
+                host: 'https://api-wekin-5300daa06a95.herokuapp.com',
             };
-            const checkoutSessionURL = buildCheckoutSessionURL(baseURL, params);
-            const paramButton = [
-                {
-                    type: 'text',
-                    text: checkoutSessionURL,
-                },
-            ];
-            const payloadParams = { type: 'maybe_later_payload' };
-            const payloadEncode = Base64.encode(JSON.stringify(payloadParams));
-            const template = {
-                messaging_product: 'whatsapp',
-                to: phone,
-                type: 'template',
-                template: {
-                    name: 'payment_confirmation',
-                    language: {
-                        code: 'en_US',
+            // host: 'https://api-wekin-5300daa06a95.herokuapp.com' || data.host,
+            const eventImage = await convertTextToImage(params);
+            if (eventImage) {
+                // const eventImage = 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
+                console.log(eventImage);
+                const paramHeader = [
+                    {
+                        type: 'image',
+                        image: {
+                            link: eventImage,
+                        },
                     },
-                    components: [
-                        {
-                            type: 'header',
-                            parameters: paramHeader,
+                ];
+                params.eventImage = eventImage;
+                const checkoutSessionURL = buildCheckoutSessionURL(baseURL, params);
+                const paramButton = [
+                    {
+                        type: 'text',
+                        text: checkoutSessionURL,
+                    },
+                ];
+                console.log(checkoutSessionURL);
+                const payloadParams = { type: 'maybe_later_payload' };
+                const payloadEncode = Base64.encode(JSON.stringify(payloadParams));
+                const template = {
+                    messaging_product: 'whatsapp',
+                    to: phone,
+                    recipient_type: 'individual',
+                    type: 'template',
+                    template: {
+                        name: 'confirm_payment',
+                        language: {
+                            code: 'en_US',
                         },
-                        {
-                            type: 'body',
-                            parameters: paramBody,
-                        },
-                        {
-                            type: 'button',
-                            sub_type: 'url',
-                            index: '0',
-                            parameters: paramButton,
-                        },
-                        {
-                            type: 'button',
-                            sub_type: 'quick_reply',
-                            index: '1',
-                            parameters: [
-                                {
-                                    type: 'payload',
-                                    payload: payloadEncode,
-                                },
-                            ],
-                        },
-                    ],
-                },
-            };
-            const resData = await WhatsappHelper.sendMessage(template);
-            const response = {};
-            if (resData?.status && resData?.status !== 200) {
-                response.status = resData.status;
-                response.message = resData.message;
-                response.code = resData.code;
-                return promiseResolve(response);
+                        components: [
+                            {
+                                type: 'header',
+                                parameters: paramHeader,
+                            },
+                            // {
+                            //     type: 'body',
+                            //     parameters: paramBody,
+                            // },
+                            {
+                                type: 'button',
+                                sub_type: 'url',
+                                index: '0',
+                                parameters: paramButton,
+                            },
+                            {
+                                type: 'button',
+                                sub_type: 'quick_reply',
+                                index: '1',
+                                parameters: [
+                                    {
+                                        type: 'payload',
+                                        payload: payloadEncode,
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                };
+                const resData = await WhatsappHelper.sendMessage(template);
+                const response = {};
+                if (resData?.status && resData?.status !== 200) {
+                    response.status = resData.status;
+                    response.message = resData.message;
+                    response.code = resData.code;
+                    return promiseResolve(response);
+                }
+                return promiseResolve(resData);
             }
-            return promiseResolve(resData);
+            return promiseResolve(resDataVekin);
         }
         return promiseResolve(resDataVekin);
     } catch (err) {
