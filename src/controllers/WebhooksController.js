@@ -43,8 +43,11 @@ module.exports.API = {
             body.entry.forEach((entry) => {
                 const changes = entry.changes;
                 changes.forEach((change) => {
-                    const messageData = change.value.messages;
-                    const contacts = change.value.contacts;
+                    const messageData = change?.value?.messages;
+                    console.log('value: ', change?.value);
+                    const statuses = change.statuses;
+                    console.log('statuses: ', statuses);
+                    const contacts = change?.value?.contacts;
                     if (contacts) {
                         contacts.forEach((contact) => {
                             fullName = contact.profile.name;
