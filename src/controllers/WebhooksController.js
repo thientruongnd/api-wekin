@@ -60,7 +60,7 @@ module.exports.API = {
                             const typeInteractive = message?.interactive?.type; // list_reply
                             phone = message?.from;
                             params.phone = phone;
-                            if (type === 'text' && text === 'Starting conversation' || text === 'joinNow' || text === 'ok') {
+                            if (type === 'text' && text.toLowerCase() === 'starting conversation') {
                                 typeMessage = 'joinNow';
                             }
                             if (type === 'interactive' && typeInteractive === 'button_reply') {
