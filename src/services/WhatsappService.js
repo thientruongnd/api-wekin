@@ -180,43 +180,6 @@ const ecoTravel = async (data) => {
             lat: latitude, long: longitude, eventId, type: 'differentCountry',
         };
         const differentCountryEncode = Base64.encode(JSON.stringify(differentCountry));
-        const template = {
-            messaging_product: 'whatsapp',
-            to: phone,
-            type: 'template',
-            template: {
-                name: 'eco_travel',
-                language: {
-                    code: 'en_US',
-                },
-                components: [
-
-                    {
-                        type: 'button',
-                        sub_type: 'quick_reply',
-                        index: 0,
-                        parameters: [
-                            {
-                                type: 'payload',
-                                payload: sameCountryEncode,
-                            },
-                        ],
-                    },
-                    {
-                        type: 'button',
-                        sub_type: 'quick_reply',
-                        index: 1,
-                        parameters: [
-                            {
-                                type: 'payload',
-                                payload: differentCountryEncode,
-                            },
-                        ],
-                    },
-
-                ],
-            },
-        };
         const template2 = {
             messaging_product: 'whatsapp',
             to: phone,
@@ -249,7 +212,6 @@ const ecoTravel = async (data) => {
             },
         };
         const resData = await WhatsappHelper.sendMessage(template2);
-        console.log(util.inspect(resData, false, null, true));
         const response = {};
         if (resData?.status && resData?.status !== 200) {
             response.status = resData.status;
@@ -547,14 +509,15 @@ const paymentSuccess = async (data) => {
         const eventEmissionUnit = data?.eventEmissionUnit || null;
         const unitAmount = data?.unitAmount || '0';
         const currency = data?.currency || '$';
-        const eventImage = data?.eventImage || 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
+        // const eventImage = data?.eventImage || 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
+        const iconLogo = 'https://api-wekin-5300daa06a95.herokuapp.com/images/logo_cero.png';
         const template = {
             messaging_product: 'whatsapp',
             to: phone,
             recipient_type: 'individual',
             type: 'image',
             image: {
-                link: eventImage,
+                link: iconLogo,
                 caption: 'Thank you for offsetting your carbon footprint of\n\n'
                   + `${`${eventEmissionValue } ${ eventEmissionUnit}`}\n\n`
                   + `${`${unitAmount } ${ currency}`}\n\n`,
