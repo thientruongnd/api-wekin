@@ -81,7 +81,7 @@ const joinNow = async (data) => {
  * */
 const listEvent = async (data) => {
     try {
-        const phone = data?.phone || '84987662808';
+        const phone = data?.phone || '84912038102';
         const latitude = data?.latitude || '13.7379374';
         const longitude = data?.longitude || '100.5239999';
         const resDataVekin = await DataVekinHelper.eventCarbonReceipt();
@@ -136,11 +136,19 @@ const listEvent = async (data) => {
                 template = {
                     messaging_product: 'whatsapp',
                     to: phone,
-                    type: 'template',
-                    template: {
-                        name: 'no_events',
-                        language: {
-                            code: 'en_US',
+                    type: 'interactive',
+                    interactive: {
+                        type: 'cta_url',
+                        body: {
+                            text: 'Unfortunately, there are no events currently taking place at the selected location.'
+                             + ' We encourage you to explore options in other place.',
+                        },
+                        action: {
+                            name: 'cta_url',
+                            parameters: {
+                                display_text: 'More information',
+                                url: 'https://www.cero.org/',
+                            },
                         },
                     },
                 };
@@ -153,7 +161,7 @@ const listEvent = async (data) => {
                 response.code = resData.code;
                 return promiseResolve(response);
             }
-            return promiseResolve(resDataVekin);
+            return true;
         }
         // không có sự kiện nào <- redirect to website "https://www.cero.org/"
     } catch (err) {
@@ -175,7 +183,7 @@ const ecoTravel = async (data) => {
             lat: latitude, long: longitude, eventId, type: 'differentCountry',
         };
         const differentCountryEncode = Base64.encode(JSON.stringify(differentCountry));
-        const template2 = {
+        const template = {
             messaging_product: 'whatsapp',
             to: phone,
             type: 'interactive',
@@ -206,7 +214,7 @@ const ecoTravel = async (data) => {
                 },
             },
         };
-        const resData = await WhatsappHelper.sendMessage(template2);
+        const resData = await WhatsappHelper.sendMessage(template);
         const response = {};
         if (resData?.status && resData?.status !== 200) {
             response.status = resData.status;
@@ -356,7 +364,7 @@ const selectRegion = async (data) => {
 
 const selectCountry = async (data) => {
     const regionName = data?.regionName || '2_South-central_Asia';
-    const customerName = data?.customerName || 'Xuan Truong';
+    const customerName = data?.customerName || null;
     const templateName = convertTemplateName(regionName);
     const phone = data?.phone || '84902103222';
     const latitude = data?.latitude || '13.7379374';
@@ -450,7 +458,6 @@ const checkCountry = async (data) => {
                 // Gán lại giá trị sau khi cắt chuỗi
                 element.title = element.title.substring(0, 24);
                 // element.description = nearestLocations[i].event_code;
-                // // Kiểm tra số lượng phần tử trong rows
                 if (rows.length < 10) {
                     rows.push(element);
                 }
@@ -504,15 +511,14 @@ const paymentSuccess = async (data) => {
         const eventEmissionUnit = data?.eventEmissionUnit || null;
         const unitAmount = data?.unitAmount || '0';
         const currency = data?.currency || '$';
-        // const eventImage = data?.eventImage || 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
-        const iconLogo = 'https://api-wekin-5300daa06a95.herokuapp.com/images/logo_cero.png';
+        const eventImage = data?.eventImage || 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
         const template = {
             messaging_product: 'whatsapp',
             to: phone,
             recipient_type: 'individual',
             type: 'image',
             image: {
-                link: iconLogo,
+                link: eventImage,
                 caption: 'Thank you for offsetting your carbon footprint of\n\n'
                   + `${`${eventEmissionValue } ${ eventEmissionUnit}`}\n\n`
                   + `${`${unitAmount } ${ currency}`}\n\n`,
