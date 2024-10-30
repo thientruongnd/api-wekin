@@ -8,6 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const winston = require('winston');
 const empty = require('is-empty');
+const { createCanvas, loadImage } = require('canvas');
 const { countries: dataCountries } = require('./dataSample/data.countries');
 const { CODES_SUCCESS, CODES_ERROR } = require('./messages');
 const { configEvn } = require('../configs/configEnvSchema');
@@ -200,7 +201,7 @@ const convertTemplateName = (regionName) => {
         .replace(/-/g, '_'); // Thay dấu '-' bằng '_'
     return templateName;
 };
-const getRandomFileName = (extension = 'png') => `${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${extension}`;
+const getRandomFileName = (extension = 'png') => `${Date.now()}_${Math.random().toString(36).substring(2, 8)}.${extension}`;
 const downloadImage = async (url, outputPath) => {
     try {
         const response = await axios({
@@ -215,6 +216,59 @@ const downloadImage = async (url, outputPath) => {
         });
     } catch (error) {
         console.error('Lỗi khi tải ảnh:', error.message);
+    }
+};
+
+const convertTextToImage = async (data) => {
+    try {
+        const width = 600;
+        const height = 700;
+        const canvas = createCanvas(width, height);
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+        ctx.fillStyle = '#000000';
+        function wrapText(ctx, text, x, y, maxWidth = 500, lineHeight = 25, isBold = false, isCenter = false) {
+            ctx.font = `${isBold ? 'bold' : 'normal'} 20px Arial`;
+            let line = '';
+            let currentY = y;
+            for (const char of text) {
+                const testLine = line + char;
+                const { width: testWidth } = ctx.measureText(testLine);
+                if (testWidth > maxWidth) {
+                    ctx.fillText(line, x, currentY);
+                    line = char;
+                    currentY += lineHeight;
+                } else {
+                    line = testLine;
+                }
+            }
+            const drawX = isCenter ? ((width - ctx.measureText(line).width) / 2) : x;
+            ctx.fillText(line, drawX, currentY);
+        }
+        const image = await loadImage(data.eventImageUrl);
+        ctx.drawImage(image, (width - 150) / 2, 0, 150, 150); // X, Y, width, height
+        wrapText(ctx, data.title, 100, 190, 600, 30, true, true);
+        wrapText(ctx, data.date, 100, 220, 600, 30, false, true);
+        wrapText(ctx, data.eventName, 5, 250, 600, 30, true);
+        wrapText(ctx, data.eventLocation, 5, 280, 600, 30);
+        wrapText(ctx, `Your Emission                                       ${data.eventEmissionValue} ${data.eventEmissionUnit}`, 5, 310, 600, 30, true);
+        wrapText(ctx, `Carbon Saved                                        ${data.eventCarbonSavedValue} ${data.eventCarbonSavedUnit}`, 5, 340, 600, 30, true);
+        wrapText(ctx, `Total cost                                               ${data.unitAmount} ${data.currency}`, 5, 370, 600, 30, true);
+        wrapText(ctx, 'Verified blockchain address:', 5, 400, 600, 25);
+        wrapText(ctx, data.blockchain, 5, 430, 580, 30, true);
+        wrapText(ctx, `Verified by: ${data.verifiedBy}`, 5, 520, 600, 30, true);
+        wrapText(ctx, `Receipt NO.: ${data.refNumber}`, 5, 550, 600, 30);
+        // wrapText(ctx, 'Would you like us to donate on behalf of your attendance', 5, 580, 600, 30);
+        const buffer = canvas.toBuffer('image/png');
+        const fileName = getRandomFileName('png');
+        const outputPath = path.join(__dirname, '../public/images', fileName);
+        await fs.writeFileSync(outputPath, buffer);
+        const eventImage = `${data.host}/images/${fileName}`;
+        console.log('Image created');
+        return eventImage;
+    } catch (error) {
+        console.error('error create image:', error.message);
     }
 };
 const getCountryFromCoordinates = async (latitude, longitude) => {
@@ -268,4 +322,5 @@ module.exports = {
     downloadImage,
     getRandomFileName,
     getCountryFromCoordinates,
+    convertTextToImage,
 };
