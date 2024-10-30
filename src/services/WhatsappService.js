@@ -509,14 +509,15 @@ const paymentSuccess = async (data) => {
         const eventEmissionUnit = data?.eventEmissionUnit || null;
         const unitAmount = data?.unitAmount || '0';
         const currency = data?.currency || '$';
-        const eventImage = data?.eventImage || 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
+        // const eventImage = data?.eventImage || 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
+        const iconLogo = 'https://api-wekin-5300daa06a95.herokuapp.com/images/logo_cero.png';
         const template = {
             messaging_product: 'whatsapp',
             to: phone,
             recipient_type: 'individual',
             type: 'image',
             image: {
-                link: eventImage,
+                link: iconLogo,
                 caption: 'Thank you for offsetting your carbon footprint of\n\n'
                   + `${`${eventEmissionValue } ${ eventEmissionUnit}`}\n\n`
                   + `${`${unitAmount } ${ currency}`}\n\n`,
