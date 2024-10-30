@@ -772,8 +772,8 @@ const paymentConfirmation = async (data) => {
             const currency = 'thb';
             const formattedDate = moment(date).format('DD MMMM YYYY HH:mm');
             let amount = calculateCost(eventEmission.value);
-            if (amount < 10) {
-                amount = 10;
+            if (amount < 20) {
+                amount = 20;
             }
             const eventImageUrl = receipt?.event_image;
             const baseURL = 'stripes/createCheckoutSession';

@@ -34,6 +34,7 @@ module.exports.API = {
     },
     postWebhook: async (req, res) => {
         const body = req.body;
+        console.log('body: ', body);
         // Kiểm tra request có chứa dữ liệu từ WhatsApp
         const params = {};
         let typeMessage = ''; let phone = ''; let fullName = ''; let eventId;
@@ -51,7 +52,7 @@ module.exports.API = {
                     if (messageData) {
                         messageData.forEach((message) => {
                         // Xử lý tin nhắn từ người dùng tại đây
-                            console.log('Message:', message);
+                            console.log('Message: ', message);
                             const text = message?.text?.body;
                             const type = message?.type;
                             const payload = message?.button?.payload;
