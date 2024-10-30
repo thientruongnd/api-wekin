@@ -50,7 +50,6 @@ module.exports.DEFAULT = {
         } catch (errors) {
             return resJsonError(res, errors);
         }
-        // return res.json(responseSuccess(10261, resData, 'en'));
     },
     webhook: async (req, res) => {
         const body = req.body;
@@ -63,39 +62,23 @@ module.exports.DEFAULT = {
                     await WhatsappService.paymentSuccess(params);
                 }
             }
-            if (body?.type === 'checkout.session.expired') {
-                console.log('--------START checkout.session.expired-----');
-                console.log(body);
-                console.log('--------END checkout.session.expired-----');
-            }
             if (body?.type === 'payment_intent.canceled') {
                 const params = body?.data?.object?.metadata;
                 await WhatsappService.completed(params);
             }
             if (body?.type === 'payment_intent.payment_failed') {
                 console.log('-------- START payment_intent.payment_failed-----');
-                console.log(body);
                 const params = body?.data?.object?.metadata;
-                const resData = await WhatsappService.paymentFailure(params);
-                console.log(util.inspect(resData, false, null, true));
-                console.log('--------END payment_intent.payment_failed-----');
+                await WhatsappService.paymentFailure(params);
             }
-            if (body?.type === 'payment_intent.partially_funded') {
-                console.log('-------- START payment_intent.partially_funded-----');
-                console.log(body);
-                console.log('--------END payment_intent.partially_funded-----');
-            }
-
             res.status(200).send('EVENT_RECEIVED');
         } catch (errors) {
             console.log(util.inspect(errors, false, null, true));
             res.status(404).send('Not Found');
         }
-        // return res.json(responseSuccess(10261, resData, 'en'));
     },
     info: async (req, res) => {
         try {
-            // const sessionId = 'cs_test_a1fmJD4JxnJciLU49x6f2rtKjChqKBRdJpnjJfy0ZL94ql0EfWN7ajS9Cd'
             const sessionId = req.query.sessionId;
             const infoSession = await stripe.checkout.sessions.retrieve(sessionId, {
                 expand: ['line_items', 'payment_intent'],

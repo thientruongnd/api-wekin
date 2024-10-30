@@ -3,10 +3,8 @@
  * Email: truongdx@runsystem.net
  * Common
  */
-const util = require('util');
 const moment = require('moment');
 const { Base64 } = require('js-base64');
-const path = require('path');
 const WhatsappHelper = require('../helpers/WhatsappHelper');
 const DataVekinHelper = require('../helpers/DataVekinHelper');
 const { countries: dataCountries } = require('../utils/dataSample/data.countries');
@@ -17,9 +15,6 @@ const {
     calculateCost,
     buildCheckoutSessionURL,
     getNearestLocations,
-    getImageLink,
-    downloadImage,
-    getRandomFileName,
     convertTemplateName,
     getCountry,
     getCountryFromCoordinates,
@@ -770,54 +765,6 @@ const paymentConfirmation = async (data) => {
             const formattedDate = moment(date).format('DD MMMM YYYY HH:mm');
             const amount = calculateCost(eventEmission.value);
             const eventImageUrl = receipt?.event_image;
-            // const fileName = getRandomFileName('png');
-            // const outputPath = path.join(__dirname, '../public/images', fileName);
-            // await downloadImage(receipt?.event_image, outputPath);g
-            // const eventImage = getImageLink(data.host, `/images/${fileName}`);
-            // const eventImage = 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
-
-            const paramBody = [
-                {
-                    type: 'text',
-                    text: title,
-                },
-                {
-                    type: 'text',
-                    text: formattedDate,
-                },
-                {
-                    type: 'text',
-                    text: eventName,
-                },
-                {
-                    type: 'text',
-                    text: eventLocation,
-                },
-                {
-                    type: 'text',
-                    text: eventEmission.value + eventEmission.unit,
-                },
-                {
-                    type: 'text',
-                    text: eventCarbonSaved.value + eventCarbonSaved.unit,
-                },
-                {
-                    type: 'text',
-                    text: `${amount} ${currency}`,
-                },
-                {
-                    type: 'text',
-                    text: blockchain,
-                },
-                {
-                    type: 'text',
-                    text: verifiedBy,
-                },
-                {
-                    type: 'text',
-                    text: refNumber,
-                },
-            ];
             const baseURL = 'stripes/createCheckoutSession';
             const params = {
                 productName: eventName,
@@ -840,11 +787,8 @@ const paymentConfirmation = async (data) => {
                 eventId,
                 host: 'https://api-wekin-5300daa06a95.herokuapp.com',
             };
-            // host: 'https://api-wekin-5300daa06a95.herokuapp.com' || data.host,
             const eventImage = await convertTextToImage(params);
             if (eventImage) {
-                // const eventImage = 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
-                console.log(eventImage);
                 const paramHeader = [
                     {
                         type: 'image',
@@ -861,7 +805,6 @@ const paymentConfirmation = async (data) => {
                         text: checkoutSessionURL,
                     },
                 ];
-                console.log(checkoutSessionURL);
                 const payloadParams = { type: 'maybe_later_payload' };
                 const payloadEncode = Base64.encode(JSON.stringify(payloadParams));
                 const template = {
@@ -879,10 +822,6 @@ const paymentConfirmation = async (data) => {
                                 type: 'header',
                                 parameters: paramHeader,
                             },
-                            // {
-                            //     type: 'body',
-                            //     parameters: paramBody,
-                            // },
                             {
                                 type: 'button',
                                 sub_type: 'url',
