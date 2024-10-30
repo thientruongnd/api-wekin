@@ -13,6 +13,9 @@ const {
     responseError,
     responseSuccess,
     resJsonError,
+    getCountry,
+    convertTemplateName,
+    convertTextToImage,
 } = require('../utils/shared');
 
 module.exports.DEFAULT = {
@@ -166,12 +169,13 @@ module.exports.DEFAULT = {
     },
     paymentSuccess: async (req, res) => {
         const params = {};
-        params.phone = '84902103222';
+        params.phone = '84974418454';
         params.eventEmissionValue = 2629.943;
         params.eventEmissionUnit = 'kg co2e';
         params.eventImage = 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
         params.unitAmount = 2629.943;
-        params.currency = '$';
+        params.currency = 'thb';
+        params.eventId = 230;
         const resData = await WhatsappService.paymentSuccess(params);
         return res.json(responseSuccess(10261, resData, 'en'));
     },
@@ -238,6 +242,10 @@ module.exports.DEFAULT = {
     },
     eventOffset: async (req, res) => {
         const resData = await DataVekinHelper.eventOffset(req.body);
+        return res.json(responseSuccess(10261, resData, 'en'));
+    },
+    textToImage: async (req, res) => {
+        const resData = await convertTextToImage(req.body);
         return res.json(responseSuccess(10261, resData, 'en'));
     },
 
