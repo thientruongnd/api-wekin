@@ -468,7 +468,6 @@ const checkCountry = async (data) => {
             const longitudeFrom = infoCountry?.longitude || '100.5239999';
             userDetails.name = customerName;
             const myCountry = await getCountryFromCoordinates(myLatitude, myLongitude);
-            console.log(util.inspect(myCountry, false, null, true));
             const countryFrom = await getCountryFromCoordinates(latitudeFrom, longitudeFrom);
             if (myCountry?.country_code === countryFrom?.country_code) {
                 return await selectDistance(data);
@@ -566,7 +565,7 @@ const paymentSuccess = async (data) => {
             event_id: data.eventId,
             total_offset: data.eventEmissionValue,
         };
-        const resEventOffset = await DataVekinHelper.eventOffset(paramEvent);
+        await DataVekinHelper.eventOffset(paramEvent);
         const response = {};
         if (resData?.status && resData?.status !== 200) {
             response.status = resData.status;
