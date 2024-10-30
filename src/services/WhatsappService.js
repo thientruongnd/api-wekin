@@ -30,6 +30,8 @@ const joinNow = async (data) => {
         const phone = data?.phone || '84902103222';
         const name = data?.name || 'Xuan Truong';
         const imageId = data?.imageId || '1092387271735133';// 439102592147175
+        const joinNowPayload = { type: 'join_now_payload' };
+        const joinNowPayloadId = Base64.encode(JSON.stringify(joinNowPayload));
         const template = {
             messaging_product: 'whatsapp',
             recipient_type: 'individual',
@@ -56,7 +58,7 @@ const joinNow = async (data) => {
                         {
                             type: 'reply',
                             reply: {
-                                id: 'join_now_payload',
+                                id: joinNowPayloadId,
                                 title: 'Join now!',
                             },
                         },
@@ -214,7 +216,39 @@ const ecoTravel = async (data) => {
                 ],
             },
         };
-        const resData = await WhatsappHelper.sendMessage(template);
+        const template2 = {
+            messaging_product: 'whatsapp',
+            to: phone,
+            type: 'interactive',
+            interactive: {
+                type: 'button',
+                body: {
+                    text: 'To better understand your journey and help us calculate your'
+                    + ' carbon footprint, could you let us know if you traveled to the event'
+                    + ' from within the same country or from a different country?',
+                },
+                action: {
+                    buttons: [
+                        {
+                            type: 'reply',
+                            reply: {
+                                id: sameCountryEncode,
+                                title: 'Same Country',
+                            },
+                        },
+                        {
+                            type: 'reply',
+                            reply: {
+                                id: differentCountryEncode,
+                                title: 'Different Country',
+                            },
+                        },
+                    ],
+                },
+            },
+        };
+        const resData = await WhatsappHelper.sendMessage(template2);
+        console.log(util.inspect(resData, false, null, true));
         const response = {};
         if (resData?.status && resData?.status !== 200) {
             response.status = resData.status;

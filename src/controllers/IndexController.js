@@ -225,7 +225,7 @@ module.exports.DEFAULT = {
         return res.json(responseSuccess(10261, resData, 'en'));
     },
     ecoTravel: async (req, res) => {
-        const resData = await WhatsappService.ecoTravel();
+        const resData = await WhatsappService.ecoTravel(req.body);
         return res.json(responseSuccess(10261, resData, 'en'));
     },
     selectDistance: async (req, res) => {

@@ -64,7 +64,11 @@ module.exports.API = {
                                 typeMessage = 'joinNow';
                             }
                             if (type === 'interactive' && typeInteractive === 'button_reply') {
-                                typeMessage = message?.interactive?.button_reply?.id;
+                                const buttonReply = message?.interactive?.button_reply?.id;
+                                const decodedToken = JSON.parse(Base64.decode(buttonReply));
+                                console.log(util.inspect(decodedToken, false, null, true));
+                                // const responseJson = JSON.parse(nfmReply?.response_json);
+                                //
                             }
                             if (type === 'button') {
                                 const decodedToken = JSON.parse(Base64.decode(payload));
