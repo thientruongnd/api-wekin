@@ -2,7 +2,6 @@
 Mr : Dang Xuan Truong
 Email: truongdx@runsystem.net
 */
-const util = require('util');
 const { Base64 } = require('js-base64');
 const WhatsappService = require('../services/WhatsappService');
 const WhatsappHelper = require('../helpers/WhatsappHelper');
@@ -35,7 +34,6 @@ module.exports.API = {
     },
     postWebhook: async (req, res) => {
         const body = req.body;
-        console.log(util.inspect(req.body, false, null, true));
         // Kiểm tra request có chứa dữ liệu từ WhatsApp
         const params = {};
         let typeMessage = ''; let phone = ''; let fullName = ''; let eventId;
@@ -70,13 +68,9 @@ module.exports.API = {
                                 params.latitude = decodedToken?.latitude;
                                 params.longitude = decodedToken?.longitude;
                                 params.eventId = decodedToken?.eventId;
-                                console.log(util.inspect(decodedToken, false, null, true));
-                                // const responseJson = JSON.parse(nfmReply?.response_json);
-                                //
                             }
                             if (type === 'button') {
                                 const decodedToken = JSON.parse(Base64.decode(payload));
-                                console.log(util.inspect(decodedToken, false, null, true));
                                 typeMessage = decodedToken?.type;
                                 params.latitude = decodedToken?.latitude;
                                 params.longitude = decodedToken?.longitude;
@@ -90,7 +84,6 @@ module.exports.API = {
                             if (type === 'interactive' && typeInteractive === 'list_reply') {
                                 const id = message?.interactive?.list_reply?.id;
                                 const decodedToken = JSON.parse(Base64.decode(id));
-                                console.log(util.inspect(decodedToken, false, null, true));
                                 eventId = decodedToken?.eventId;
                                 typeMessage = decodedToken?.type;
                                 params.latitude = decodedToken?.latitude;

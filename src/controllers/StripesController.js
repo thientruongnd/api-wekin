@@ -48,6 +48,7 @@ module.exports.DEFAULT = {
             });
             res.redirect(303, session.url);
         } catch (errors) {
+            console.log(util.inspect(errors, false, null, true));
             return resJsonError(res, errors);
         }
     },
