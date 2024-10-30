@@ -154,8 +154,11 @@ const regExpSearch = (string = '') => {
 const notSpaceAllow = (value) => /^\S*$/.test(value);
 const regexSpace = (value) => /^(?!\s)(?!.*\s$).+$/.test(value);
 const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + string.slice(1);
-const calculateCost = (kgCO2) => {
-    const ratePerKg = 1; // 1 kg CO2 = 1 THB
+const calculateCost = (kgCO2, countryCode) => {
+    let ratePerKg = 1;// 1 kg CO2 = 1 THB
+    if (countryCode === 'Singapore') {
+        ratePerKg = 0.5; // 1 kg CO2 = 0.5 SGD
+    }
     return kgCO2 * ratePerKg;
 };
 const buildCheckoutSessionURL = (baseURL, params) => {

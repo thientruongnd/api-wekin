@@ -22,6 +22,7 @@ const indexRoute = (apiRouter) => {
     apiRouter.route('/tests/eventOffset').post(DEFAULT.eventOffset);
     apiRouter.route('/tests/textToImage').post(DEFAULT.textToImage);
     apiRouter.route('/tests/selectDistance').post(DEFAULT.selectDistance);
+    apiRouter.route('/tests/fillAddress').post(DEFAULT.fillAddress);
 };
 
 module.exports = {
