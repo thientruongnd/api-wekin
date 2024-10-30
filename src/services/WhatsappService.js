@@ -3,6 +3,7 @@
  * Email: truongdx@runsystem.net
  * Common
  */
+const util = require('util');
 const moment = require('moment');
 const { Base64 } = require('js-base64');
 const WhatsappHelper = require('../helpers/WhatsappHelper');
@@ -771,8 +772,8 @@ const paymentConfirmation = async (data) => {
             const currency = 'thb';
             const formattedDate = moment(date).format('DD MMMM YYYY HH:mm');
             let amount = calculateCost(eventEmission.value);
-            if (amount < 5) {
-                amount = 5;
+            if (amount < 10) {
+                amount = 10;
             }
             const eventImageUrl = receipt?.event_image;
             const baseURL = 'stripes/createCheckoutSession';
