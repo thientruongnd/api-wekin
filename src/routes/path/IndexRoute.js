@@ -2,7 +2,7 @@
 Mr : Dang Xuan Truong
 Email: truongdx@runsystem.net
 */
-const { DEFAULT} = require('../../controllers/IndexController');
+const { DEFAULT } = require('../../controllers/IndexController');
 
 const indexRoute = (apiRouter) => {
     apiRouter.route('/').get(DEFAULT.index);
