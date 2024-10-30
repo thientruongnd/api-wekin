@@ -526,39 +526,6 @@ const paymentSuccess = async (data) => {
                   + `${`${eventEmissionValue } ${ eventEmissionUnit}`}\n\n`
                   + `${`${unitAmount } ${ currency}`}\n\n`,
             },
-            // type: 'template',
-            // template: {
-            //     name: 'payment_successful',
-            //     language: {
-            //         code: 'en_US',
-            //     },
-            //     components: [
-            //         {
-            //             type: 'header',
-            //             parameters: [
-            //                 {
-            //                     type: 'image',
-            //                     image: {
-            //                         link: eventImage,
-            //                     },
-            //                 },
-            //             ],
-            //         },
-            //         {
-            //             type: 'body',
-            //             parameters: [
-            //                 {
-            //                     type: 'text',
-            //                     text: eventEmissionValue + eventEmissionUnit,
-            //                 },
-            //                 {
-            //                     type: 'text',
-            //                     text: unitAmount + currency,
-            //                 },
-            //             ],
-            //         },
-            //     ],
-            // },
         };
         const resData = await WhatsappHelper.sendMessage(template);
         const paramEvent = {
@@ -875,12 +842,12 @@ const paymentConfirmation = async (data) => {
                 refNumber,
                 eventImageUrl,
                 eventId,
-                // host: 'https://api-wekin-5300daa06a95.herokuapp.com' || data.host,
-                host: data.host,
+                host: 'https://api-wekin-5300daa06a95.herokuapp.com',
             };
+            // host: 'https://api-wekin-5300daa06a95.herokuapp.com' || data.host,
             const eventImage = await convertTextToImage(params);
             if (eventImage) {
-                const eventImage = 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
+                // const eventImage = 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
                 console.log(eventImage);
                 const paramHeader = [
                     {
@@ -898,6 +865,7 @@ const paymentConfirmation = async (data) => {
                         text: checkoutSessionURL,
                     },
                 ];
+                console.log(checkoutSessionURL);
                 const payloadParams = { type: 'maybe_later_payload' };
                 const payloadEncode = Base64.encode(JSON.stringify(payloadParams));
                 const template = {
@@ -906,7 +874,7 @@ const paymentConfirmation = async (data) => {
                     recipient_type: 'individual',
                     type: 'template',
                     template: {
-                        name: 'payment_confirm',
+                        name: 'confirm_payment',
                         language: {
                             code: 'en_US',
                         },
