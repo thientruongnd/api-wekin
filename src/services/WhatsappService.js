@@ -415,56 +415,57 @@ const selectRegion = async (data) => {
 };
 
 const selectCountry = async (data) => {
-    const regionName = data?.regionName || '2_South-central_Asia';
-    const customerName = data?.customerName || null;
-    const templateName = convertTemplateName(regionName);
-    const phone = data?.phone || '84902103222';
-    const latitude = data?.latitude || '13.7379374';
-    const longitude = data?.longitude || '100.5239999';
-    const eventId = data?.eventId || 230;
-    const flowToken = {
-        latitude, longitude, eventId, customerName, type: 'country',
-    };
-    const encodedToken = Base64.encode(JSON.stringify(flowToken));
-    try {
-        const template = {
-            messaging_product: 'whatsapp',
-            to: phone,
-            type: 'template',
-            template: {
-                name: templateName || 'select_country',
-                language: {
-                    code: 'en_US',
-                },
-                components: [
-                    {
-                        type: 'button',
-                        sub_type: 'flow',
-                        index: 0,
-                        parameters: [
-                            {
-                                type: 'action',
-                                action: {
-                                    flow_token: encodedToken,
-                                },
-                            },
-                        ],
-                    },
-                ],
-            },
-        };
-        const resData = await WhatsappHelper.sendMessage(template);
-        const response = {};
-        if (resData?.status && resData?.status !== 200) {
-            response.status = resData.status;
-            response.message = resData.message;
-            response.code = resData.code;
-            return promiseResolve(response);
-        }
-        return true;
-    } catch (err) {
-        return promiseReject(err);
-    }
+    console.log(util.inspect(data, false, null, true));
+    // const regionName = data?.regionName || '2_South-central_Asia';
+    // const customerName = data?.customerName || null;
+    // const templateName = convertTemplateName(regionName);
+    // const phone = data?.phone || '84902103222';
+    // const latitude = data?.latitude || '13.7379374';
+    // const longitude = data?.longitude || '100.5239999';
+    // const eventId = data?.eventId || 230;
+    // const flowToken = {
+    //     latitude, longitude, eventId, customerName, type: 'country',
+    // };
+    // const encodedToken = Base64.encode(JSON.stringify(flowToken));
+    // try {
+    //     const template = {
+    //         messaging_product: 'whatsapp',
+    //         to: phone,
+    //         type: 'template',
+    //         template: {
+    //             name: templateName || 'select_country',
+    //             language: {
+    //                 code: 'en_US',
+    //             },
+    //             components: [
+    //                 {
+    //                     type: 'button',
+    //                     sub_type: 'flow',
+    //                     index: 0,
+    //                     parameters: [
+    //                         {
+    //                             type: 'action',
+    //                             action: {
+    //                                 flow_token: encodedToken,
+    //                             },
+    //                         },
+    //                     ],
+    //                 },
+    //             ],
+    //         },
+    //     };
+    //     const resData = await WhatsappHelper.sendMessage(template);
+    //     const response = {};
+    //     if (resData?.status && resData?.status !== 200) {
+    //         response.status = resData.status;
+    //         response.message = resData.message;
+    //         response.code = resData.code;
+    //         return promiseResolve(response);
+    //     }
+    //     return true;
+    // } catch (err) {
+    //     return promiseReject(err);
+    // }
 };
 const checkCountry = async (data) => {
     try {

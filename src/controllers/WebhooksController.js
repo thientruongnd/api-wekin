@@ -102,6 +102,7 @@ module.exports.API = {
                             if (type === 'interactive' && typeInteractive === 'nfm_reply') {
                                 const nfmReply = message?.interactive?.nfm_reply;
                                 const responseJson = JSON.parse(nfmReply?.response_json);
+                                console.log('this log responseJson: ', responseJson);
                                 const decodedToken = JSON.parse(Base64.decode(responseJson?.flow_token));
                                 typeMessage = decodedToken?.type;
                                 if (typeMessage === 'region') {
