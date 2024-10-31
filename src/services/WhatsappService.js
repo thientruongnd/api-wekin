@@ -81,6 +81,7 @@ const joinNow = async (data) => {
  * */
 const listEvent = async (data) => {
     try {
+        console.log(util.inspect(data, false, null, true));
         const phone = data?.phone || '84902103222';
         const latitude = data?.latitude || '13.7379374';
         const longitude = data?.longitude || '100.5239999';
