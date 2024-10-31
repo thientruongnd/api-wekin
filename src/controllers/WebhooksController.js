@@ -145,12 +145,10 @@ module.exports.API = {
                 await WhatsappService.checkCountry(params);
             }
             if (typeMessage === 'receipt') {
-                console.log('this log paymentConfirmation: ', params);
                 await WhatsappService.paymentConfirmation(params);
             }
             if (typeMessage === 'distance') {
                 params.typeCountry = 'sC';
-                console.log('====distance=====', params);
                 await WhatsappService.checkCountry(params);
             }
             if (typeMessage === 'maybe_later_payload') {
