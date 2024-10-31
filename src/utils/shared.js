@@ -302,11 +302,9 @@ const getLocationData = async (data) => {
     const apiKey = configEvn.GOOGLE_MAP_KEY; // Replace with your actual API key
     const address = data?.address;
     const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
-
     try {
         const response = await axios.get(url);
         const data = response.data;
-
         if (data.status === 'OK') {
             const result = data.results[0];
             const location = result.geometry.location;
@@ -320,7 +318,6 @@ const getLocationData = async (data) => {
                 city: city ? city.long_name : 'Not found',
             };
         }
-        console.error('Geocoding API error:', data.status);
         return null;
     } catch (error) {
         console.error('Error fetching data:', error);

@@ -138,18 +138,18 @@ module.exports.API = {
             if (typeMessage === 'selectEvent') {
                 await WhatsappService.ecoTravel(params);
             }
-            if (typeMessage === 'sameCountry') {
+            if (typeMessage === 'sC') {
                 await WhatsappService.selectDistance(params);
             }
-            if (typeMessage === 'differentCountry') {
+            if (typeMessage === 'dC') {
                 await WhatsappService.fillAddress(params);
             }
             if (typeMessage === 'region') {
-                params.typeCountry = 'differentCountry';
+                params.typeCountry = 'dC';
                 await WhatsappService.checkCountry(params);
             }
             // if (typeMessage === 'country') {
-            //     params.typeCountry = 'differentCountry';
+            //     params.typeCountry = 'dC';
             //     await WhatsappService.checkCountry(params);
             // }
             if (typeMessage === 'receipt') {
@@ -157,7 +157,7 @@ module.exports.API = {
                 await WhatsappService.paymentConfirmation(params);
             }
             if (typeMessage === 'distance') {
-                params.typeCountry = 'sameCountry';
+                params.typeCountry = 'sC';
                 console.log('====distance=====', params);
                 await WhatsappService.checkCountry(params);
             }
