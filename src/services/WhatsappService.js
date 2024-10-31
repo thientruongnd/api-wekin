@@ -306,13 +306,13 @@ const selectDistance = async (data) => {
 
 const fillAddress = async (data) => {
     try {
-        console.log(util.inspect(fillAddress, false, null, true));
+        console.log('this log fillAddress: ', fillAddress);
         const phone = data?.phone || '84902103222';
         const latitude = data?.latitude || '13.7379374';
         const longitude = data?.longitude || '100.5239999';
         const eventId = data?.eventId || 230;
         const flowToken = {
-            latitude, longitude, eventId, type: 'checkCountry',
+            lat: latitude, long: longitude, eventId, type: 'checkCountry',
         };
         const encodedToken = Base64.encode(JSON.stringify(flowToken));
         const template = {
@@ -421,7 +421,7 @@ const checkCountry = async (data) => {
                             button: 'Transportation',
                             sections: [
                                 {
-                                    title: 'Choose your',
+                                    title: 'Choose',
                                     rows,
                                 },
                             ],
@@ -430,7 +430,6 @@ const checkCountry = async (data) => {
                 };
             }
             const resDataWhatsapp = await WhatsappHelper.sendMessage(template);
-            console.log(util.inspect(resDataWhatsapp, false, null, true));
             const response = {};
             if (resData?.status && resDataWhatsapp?.status !== 200) {
                 response.status = resDataWhatsapp.status;
