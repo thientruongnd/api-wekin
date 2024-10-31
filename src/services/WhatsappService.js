@@ -356,7 +356,7 @@ const fillAddress = async (data) => {
 
 const checkCountry = async (data) => {
     try {
-        console.log('checkCountry: ', checkCountry);
+        console.log('checkCountry: ', data);
         const customerName = data?.customerName || ' Damg xian truong';
         const customerAddress = data?.customerAddress || 'Thai lan';
         const resGetLocationData = await getLocationData({ address: customerAddress });
