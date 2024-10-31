@@ -145,6 +145,7 @@ module.exports.API = {
                 await WhatsappService.fillAddress(params);
             }
             if (typeMessage === 'region') {
+                params.typeCountry = 'differentCountry';
                 await WhatsappService.checkCountry(params);
             }
             // if (typeMessage === 'country') {
