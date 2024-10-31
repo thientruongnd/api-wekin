@@ -471,6 +471,7 @@ const selectCountry = async (data) => {
 };
 const checkCountry = async (data) => {
     try {
+        console.log('this log checkCountry: ', data);
         const customerName = data?.customerName || ' Damg xian truong ơi';
         const customerAddress = data?.customerAddress || 'Thai lan';
         const resGetLocationData = await getLocationData({ address: customerAddress });
@@ -478,7 +479,7 @@ const checkCountry = async (data) => {
             // gui ti nhăn lại khong tim thay địa chỉ
             return false;
         }
-        const typeCountry = data?.typeCountry || 'dCountry';
+        const typeCountry = data?.typeCountry || 'dC';
         const eventId = data?.eventId || 230;
         const distance = data?.distance || 0;
         const phone = data?.phone || '84902103222';
@@ -486,7 +487,8 @@ const checkCountry = async (data) => {
         const userDetails = {};
         locationFrom.lat = resGetLocationData?.latitude || '21.0058166';
         locationFrom.long = resGetLocationData?.longitude || '105.8473071';
-        if (typeCountry === 'dCountry') {
+        locationFrom.name = resGetLocationData?.country || null;
+        if (typeCountry === 'dC') {
             const myLatitude = data?.latitude || '20.4458553';
             const myLongitude = data?.longitude || '106.1173998';
             userDetails.name = customerName;
@@ -789,7 +791,7 @@ const paymentConfirmation = async (data) => {
         const typeCountry = data?.typeCountry || 'dC';
         const distance = data?.lf?.d || 0;
         const eventId = data?.eid;
-        const locationFrom = {};
+        const locationFrom = data?.lf || {};
         let countryEvent = 'Thailand';
         const resDataEvent = await DataVekinHelper.eventCarbonReceipt();
         const event = resDataEvent.find((event) => event.id === eventId);
@@ -800,12 +802,6 @@ const paymentConfirmation = async (data) => {
             locationFrom.lat = event?.latitude;
             locationFrom.long = event?.longitude;
             locationFrom.distance = distance;
-        } else {
-            const countryCode = data?.lf?.code;
-            const country = dataCountries.find((country) => country.country === countryCode);
-            locationFrom.name = country?.name;
-            locationFrom.lat = country?.latitude;
-            locationFrom.long = country?.longitude;
         }
         eventCarbonReceipt.location_from = locationFrom;
         eventCarbonReceipt.user_details = {
