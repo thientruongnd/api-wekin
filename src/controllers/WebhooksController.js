@@ -69,9 +69,10 @@ module.exports.API = {
                             if (type === 'interactive' && typeInteractive === 'button_reply') {
                                 const buttonReply = message?.interactive?.button_reply?.id;
                                 const decodedToken = JSON.parse(Base64.decode(buttonReply));
+                                console.log('this log button_reply:', decodedToken);
                                 typeMessage = decodedToken?.type;
-                                params.latitude = decodedToken?.latitude;
-                                params.longitude = decodedToken?.longitude;
+                                params.latitude = decodedToken?.lat;
+                                params.longitude = decodedToken?.long;
                                 params.eventId = decodedToken?.eventId;
                             }
                             if (type === 'button') {
@@ -90,7 +91,6 @@ module.exports.API = {
                                 const id = message?.interactive?.list_reply?.id;
                                 const decodedToken = JSON.parse(Base64.decode(id));
                                 console.log('this log list_reply: ', decodedToken);
-                                console.log('this log decodedToken: ', decodedToken);
                                 eventId = decodedToken?.eventId;
                                 typeMessage = decodedToken?.type;
                                 params.latitude = decodedToken?.lat;

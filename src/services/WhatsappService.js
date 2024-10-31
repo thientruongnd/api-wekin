@@ -111,6 +111,8 @@ const listEvent = async (data) => {
             for (let i = 0; i < nearestLocations.length; i++) {
                 const element = {};
                 flowToken.eventId = nearestLocations[i].id;
+                flowToken.lat = nearestLocations[i].latitude;
+                flowToken.long = nearestLocations[i].longitude;
                 const encodedToken = Base64.encode(JSON.stringify(flowToken));
                 element.id = encodedToken;
                 element.title = nearestLocations[i].name;
@@ -304,12 +306,13 @@ const selectDistance = async (data) => {
 
 const fillAddress = async (data) => {
     try {
+        console.log('this log fillAddress: ', fillAddress);
         const phone = data?.phone || '84902103222';
         const latitude = data?.latitude || '13.7379374';
         const longitude = data?.longitude || '100.5239999';
         const eventId = data?.eventId || 230;
         const flowToken = {
-            latitude, longitude, eventId, type: 'checkCountry',
+            lat: latitude, long: longitude, eventId, type: 'checkCountry',
         };
         const encodedToken = Base64.encode(JSON.stringify(flowToken));
         const template = {
@@ -317,7 +320,7 @@ const fillAddress = async (data) => {
             to: phone,
             type: 'template',
             template: {
-                name: 'your_address_final',
+                name: 'your_address_complate',
                 language: {
                     code: 'en_US',
                 },
@@ -418,7 +421,7 @@ const checkCountry = async (data) => {
                             button: 'Transportation',
                             sections: [
                                 {
-                                    title: 'Choose your',
+                                    title: 'Choose',
                                     rows,
                                 },
                             ],
@@ -427,7 +430,6 @@ const checkCountry = async (data) => {
                 };
             }
             const resDataWhatsapp = await WhatsappHelper.sendMessage(template);
-            console.log(util.inspect(resDataWhatsapp, false, null, true));
             const response = {};
             if (resData?.status && resDataWhatsapp?.status !== 200) {
                 response.status = resDataWhatsapp.status;
