@@ -313,6 +313,58 @@ const selectDistance = async (data) => {
         return err;
     }
 };
+
+const fillAddress = async (data) => {
+    try {
+        const phone = data?.phone || '84902103222';
+        const latitude = data?.latitude || '13.7379374';
+        const longitude = data?.longitude || '100.5239999';
+        const eventId = data?.eventId || 230;
+        const flowToken = {
+            latitude, longitude, eventId, type: 'region',
+        };
+        const encodedToken = Base64.encode(JSON.stringify(flowToken));
+        const template = {
+            messaging_product: 'whatsapp',
+            to: phone,
+            type: 'template',
+            template: {
+                name: 'your_address',
+                language: {
+                    code: 'en_US',
+                },
+                components: [
+                    {
+                        type: 'button',
+                        sub_type: 'flow',
+                        index: 0,
+                        parameters: [
+                            {
+                                type: 'action',
+                                action: {
+                                    flow_token: encodedToken,
+                                },
+                            },
+                        ],
+                    },
+                ],
+            },
+        };
+        // const decodedToken = JSON.parse(Base64.decode(encodedToken));
+        const resData = await WhatsappHelper.sendMessage(template);
+        const response = {};
+        if (resData?.status && resData?.status !== 200) {
+            response.status = resData.status;
+            response.message = resData.message;
+            response.code = resData.code;
+            return promiseResolve(response);
+        }
+        return promiseResolve(resData);
+    } catch (err) {
+        return promiseReject(err);
+    }
+};
+
 const selectRegion = async (data) => {
     try {
         const phone = data?.phone || '84902103222';
@@ -427,6 +479,7 @@ const checkCountry = async (data) => {
         const locationFrom = {};
         const userDetails = {};
         if (typeCountry === 'differentCountry') {
+            /// https://maps.googleapis.com/maps/api/geocode/json?address=bang%20coc&key=AIzaSyC0maeFBMYF2Lp4OoD5rq263nRaEgkdb9E
             const myLatitude = data?.latitude || '20.4458553';
             const myLongitude = data?.longitude || '106.1173998';
             const infoCountry = await getCountry(countryName);
@@ -478,7 +531,7 @@ const checkCountry = async (data) => {
                         },
                         body: {
                             text: 'The amount of CO2 emission is different depended on the type of your transportation.\n'
-                            + 'Please select the transportation for offset receipt .\n',
+                            + 'Please select the transportation for offset receipt.\n',
                         },
                         action: {
                             button: 'Transportation',
@@ -734,9 +787,11 @@ const paymentConfirmation = async (data) => {
         const distance = data?.lf?.d || 0;
         const eventId = data?.eid;
         const locationFrom = {};
+        let countryEvent = 'Thailand';
+        const resDataEvent = await DataVekinHelper.eventCarbonReceipt();
+        const event = resDataEvent.find((event) => event.id === eventId);
+        countryEvent = event?.country;
         if (typeCountry === 'sameCountry') {
-            const resDataEvent = await DataVekinHelper.eventCarbonReceipt();
-            const event = resDataEvent.find((event) => event.id === eventId);
             locationFrom.name = event?.country;
             locationFrom.city = event?.city;
             locationFrom.lat = event?.latitude;
@@ -769,11 +824,14 @@ const paymentConfirmation = async (data) => {
             const refNumber = receipt?.ref_number;
             const verifiedBy = receipt?.verified_by;
             const eventId = receipt?.event_id;
-            const currency = 'thb';
             const formattedDate = moment(date).format('DD MMMM YYYY HH:mm');
-            let amount = calculateCost(eventEmission.value);
-            if (amount < 20) {
-                amount = 20;
+            let amount = calculateCost(eventEmission.value, countryEvent);
+            const currency = countryEvent === 'Singapore' ? 'sgd' : 'thb';
+            if (currency === 'thb' && amount < 18) {
+                amount = 18;
+            }
+            if (currency === 'sgd' && amount < 0.7) {
+                amount = 0.7;
             }
             const eventImageUrl = receipt?.event_image;
             const baseURL = 'stripes/createCheckoutSession';
@@ -875,6 +933,7 @@ module.exports = {
     listEvent,
     ecoTravel,
     selectDistance,
+    fillAddress,
     selectRegion,
     selectCountry,
     paymentConfirmation,

@@ -142,7 +142,7 @@ module.exports.API = {
                 await WhatsappService.selectDistance(params);
             }
             if (typeMessage === 'differentCountry') {
-                await WhatsappService.selectRegion(params);
+                await WhatsappService.fillAddress(params);
             }
             if (typeMessage === 'region') {
                 await WhatsappService.selectCountry(params);
