@@ -231,8 +231,8 @@ const convertTextToImage = async (data) => {
         ctx.fillStyle = '#ffffff';
         ctx.fillRect(0, 0, width, height);
         ctx.fillStyle = '#000000';
-        function wrapText(ctx, text, x, y, maxWidth = 500, lineHeight = 25, isBold = false, isCenter = false) {
-            ctx.font = `${isBold ? 'bold' : 'normal'} 20px Arial`;
+        function wrapText(ctx, text, x, y, maxWidth = 500, lineHeight = 25, isBold = false, isCenter = false, fontSize = 18) {
+            ctx.font = `${isBold ? 'bold' : 'normal'} ${fontSize}px Arial`;
             let line = '';
             let currentY = y;
             for (const char of text) {
@@ -249,20 +249,25 @@ const convertTextToImage = async (data) => {
             const drawX = isCenter ? ((width - ctx.measureText(line).width) / 2) : x;
             ctx.fillText(line, drawX, currentY);
         }
+        function drawTextLeftRight(ctx, text1, text2, y, maxWidth, isBold = false) {
+            ctx.font = `${isBold ? 'bold' : 'normal'} 18px Arial`;
+            ctx.fillText(text1, 20, y);
+            const text2Width = ctx.measureText(text2).width;
+            const xText2 = maxWidth - text2Width - 20;
+            ctx.fillText(text2, xText2, y);
+        }
         const image = await loadImage(data.eventImageUrl);
-        ctx.drawImage(image, (width - 150) / 2, 0, 150, 150); // X, Y, width, height
-        wrapText(ctx, data.title, 100, 190, 600, 30, true, true);
-        wrapText(ctx, data.date, 100, 220, 600, 30, false, true);
-        wrapText(ctx, data.eventName, 5, 250, 600, 30, true);
-        wrapText(ctx, data.eventLocation, 5, 280, 600, 30);
-        wrapText(ctx, `Your Emission:                                       ${data.eventEmissionValue} ${data.eventEmissionUnit}`, 5, 310, 600, 30, true);
-        wrapText(ctx, `Carbon Saved:                                        ${data.eventCarbonSavedValue} ${data.eventCarbonSavedUnit}`, 5, 340, 600, 30, true);
-        wrapText(ctx, `Total cost:                                               ${data.unitAmount} ${data.currency}`, 5, 370, 600, 30, true);
-        wrapText(ctx, 'Verified blockchain address:', 5, 400, 600, 25);
-        wrapText(ctx, data.blockchain, 5, 430, 580, 30, true);
-        wrapText(ctx, `Verified by: ${data.verifiedBy}`, 5, 520, 600, 30, true);
-        wrapText(ctx, `Receipt NO.: ${data.refNumber}`, 5, 550, 600, 30);
-        // wrapText(ctx, 'Would you like us to donate on behalf of your attendance', 5, 580, 600, 30);
+        ctx.drawImage(image, (width - 200) / 2, 40, 200, 200); // X, Y, width, height
+        wrapText(ctx, String(data.title).toUpperCase(), 0, 280, 600, 30, true, true, 22);
+        wrapText(ctx, data.date, 0, 310, 600, 30, false, true, 16);
+        wrapText(ctx, data.eventName, 0, 340, 600, 30, true, true, 20);
+        wrapText(ctx, data.eventLocation, 0, 370, 600, 30, false, true);
+        drawTextLeftRight(ctx, 'Your Emission:', `${data.eventEmissionValue} ${data.eventEmissionUnit}`, 440, 600, true);
+        drawTextLeftRight(ctx, 'Carbon Saved:', `${data.eventCarbonSavedValue} ${data.eventCarbonSavedUnit}`, 470, 600, true);
+        drawTextLeftRight(ctx, 'Total cost:', `${data.unitAmount} ${data.currency}`, 500, 600, true);
+        drawTextLeftRight(ctx, 'Verified blockchain address:', `${String(data.blockchain).substring(0, 15) }...`, 530, 600, true);
+        drawTextLeftRight(ctx, 'Verified by:', `${data.verifiedBy}`, 560, 600, true);
+        drawTextLeftRight(ctx, 'Receipt NO.:', `${data.refNumber}`, 590, 600, false);
         const buffer = canvas.toBuffer('image/png');
         const fileName = getRandomFileName('png');
         const outputPath = path.join(__dirname, '../public/images', fileName);

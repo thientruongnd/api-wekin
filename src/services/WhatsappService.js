@@ -111,6 +111,8 @@ const listEvent = async (data) => {
             for (let i = 0; i < nearestLocations.length; i++) {
                 const element = {};
                 flowToken.eventId = nearestLocations[i].id;
+                flowToken.lat = nearestLocations[i].latitude;
+                flowToken.long = nearestLocations[i].longitude;
                 const encodedToken = Base64.encode(JSON.stringify(flowToken));
                 element.id = encodedToken;
                 element.title = nearestLocations[i].name;
@@ -304,6 +306,7 @@ const selectDistance = async (data) => {
 
 const fillAddress = async (data) => {
     try {
+        console.log(util.inspect(fillAddress, false, null, true));
         const phone = data?.phone || '84902103222';
         const latitude = data?.latitude || '13.7379374';
         const longitude = data?.longitude || '100.5239999';
