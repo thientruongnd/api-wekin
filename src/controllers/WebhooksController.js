@@ -62,7 +62,8 @@ module.exports.API = {
                             const typeInteractive = message?.interactive?.type; // list_reply
                             phone = message?.from;
                             params.phone = phone;
-                            if (type === 'text' && text.toLowerCase() === 'starting conversation') {
+                            const targetString = 'We\'re excited to hear from you! If you\'re ready to explore sustainable events, simply press "Send"';
+                            if (type === 'text' && text.toLowerCase() === targetString.toLowerCase()) {
                                 typeMessage = 'joinNow';
                             }
                             if (type === 'interactive' && typeInteractive === 'button_reply') {
