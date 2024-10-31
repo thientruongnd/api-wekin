@@ -385,7 +385,7 @@ const checkCountry = async (data) => {
             }
         }
         locationFrom.d = distance;
-        console.log('this log có vot xuong day khong');
+        console.log('this log có vot xuong day khdfdfong');
         return true;
         const resData = await DataVekinHelper.transportationList();
         const rows = [];
