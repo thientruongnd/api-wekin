@@ -255,9 +255,9 @@ const convertTextToImage = async (data) => {
         wrapText(ctx, data.date, 100, 220, 600, 30, false, true);
         wrapText(ctx, data.eventName, 5, 250, 600, 30, true);
         wrapText(ctx, data.eventLocation, 5, 280, 600, 30);
-        wrapText(ctx, `Your Emission                                       ${data.eventEmissionValue} ${data.eventEmissionUnit}`, 5, 310, 600, 30, true);
-        wrapText(ctx, `Carbon Saved                                        ${data.eventCarbonSavedValue} ${data.eventCarbonSavedUnit}`, 5, 340, 600, 30, true);
-        wrapText(ctx, `Total cost                                               ${data.unitAmount} ${data.currency}`, 5, 370, 600, 30, true);
+        wrapText(ctx, `Your Emission:                                       ${data.eventEmissionValue} ${data.eventEmissionUnit}`, 5, 310, 600, 30, true);
+        wrapText(ctx, `Carbon Saved:                                        ${data.eventCarbonSavedValue} ${data.eventCarbonSavedUnit}`, 5, 340, 600, 30, true);
+        wrapText(ctx, `Total cost:                                               ${data.unitAmount} ${data.currency}`, 5, 370, 600, 30, true);
         wrapText(ctx, 'Verified blockchain address:', 5, 400, 600, 25);
         wrapText(ctx, data.blockchain, 5, 430, 580, 30, true);
         wrapText(ctx, `Verified by: ${data.verifiedBy}`, 5, 520, 600, 30, true);

@@ -8,7 +8,6 @@ const moment = require('moment');
 const { Base64 } = require('js-base64');
 const WhatsappHelper = require('../helpers/WhatsappHelper');
 const DataVekinHelper = require('../helpers/DataVekinHelper');
-const { countries: dataCountries } = require('../utils/dataSample/data.countries');
 const { configEvn } = require('../configs/configEnvSchema');
 const {
     promiseReject,
@@ -17,8 +16,6 @@ const {
     calculateCost,
     buildCheckoutSessionURL,
     getNearestLocations,
-    convertTemplateName,
-    getCountry,
     getCountryFromCoordinates,
     convertTextToImage,
     getLocationData,
@@ -239,7 +236,7 @@ const selectDistance = async (data) => {
         const eventId = data?.eventId || 230;
 
         const flow1Token = {
-            lat: latitude, long: longitude, eventId, d: 3, type: 'distance',
+            lat: latitude, long: longitude, eventId, d: 1, type: 'distance',
         };
         const flow5Token = {
             lat: latitude, long: longitude, eventId, d: 5, type: 'distance',
@@ -677,8 +674,8 @@ const paymentConfirmation = async (data) => {
             total_co2: transportation.total_co2,
             unit_converter: [],
         };
+        const phone = data?.phone || '84902103222';
         const customerName = data?.uds?.name;
-        const phone = data?.uds?.phone || '84902103222';
         const typeCountry = data?.typeCountry || 'dC';
         const distance = data?.lf?.d || 0;
         const eventId = data?.eid;
