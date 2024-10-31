@@ -415,7 +415,7 @@ const checkCountry = async (data) => {
                         type: 'list',
                         body: {
                             text: 'The amount of CO2 emission is different depended on the type of your transportation.'
-                            + ' Please select the transportation to display your CO2 emission..\n',
+                            + ' Please select the transportation to display your CO2 emission.\n',
                         },
                         action: {
                             button: 'Transportation',
@@ -460,7 +460,7 @@ const paymentSuccess = async (data) => {
                 link: eventImage,
                 caption: 'Thank you for offsetting your carbon footprint of\n\n'
                   + `${`${eventEmissionValue } ${ eventEmissionUnit}`}\n\n`
-                  + `${`${unitAmount } ${ currency}`}\n\n`,
+                  + `${`(${unitAmount } ${String(currency).toUpperCase()})`}\n\n`,
             },
         };
         const resData = await WhatsappHelper.sendMessage(template);
