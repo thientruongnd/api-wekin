@@ -318,7 +318,7 @@ const fillAddress = async (data) => {
             to: phone,
             type: 'template',
             template: {
-                name: 'your_address_new',
+                name: 'your_address_confirm',
                 language: {
                     code: 'en_US',
                 },
