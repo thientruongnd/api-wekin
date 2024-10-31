@@ -475,7 +475,7 @@ const checkCountry = async (data) => {
         const customerName = data?.customerName || null;
         const customerAddress = data?.customerAddress || null;
         const resGetLocationData = await getLocationData({ address: customerAddress });
-        console.log(util.inspect(resGetLocationData, false, null, true));
+        console.log('resGetLocationData:', resGetLocationData);
         
         const typeCountry = data?.typeCountry || 'differentCountry';
         const countryName = data?.countryName || '2_United_Arab_Emirates';
@@ -484,6 +484,7 @@ const checkCountry = async (data) => {
         const phone = data?.phone || '84902103222';
         const locationFrom = {};
         const userDetails = {};
+        return true;
         if (typeCountry === 'differentCountry') {
             const myLatitude = data?.latitude || '20.4458553';
             const myLongitude = data?.longitude || '106.1173998';
