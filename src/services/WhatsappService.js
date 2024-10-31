@@ -767,7 +767,7 @@ const completed = async (data) => {
 
 const paymentConfirmation = async (data) => {
     try {
-        console.log(util.inspect(data, false, null, true));
+        console.log('paymentConfirmation data: ', data);
         const eventCarbonReceipt = {};
         const resData = await DataVekinHelper.transportationList();
         if (isEmpty(resData)) return false;
@@ -791,7 +791,6 @@ const paymentConfirmation = async (data) => {
         const resDataEvent = await DataVekinHelper.eventCarbonReceipt();
         const event = resDataEvent.find((event) => event.id === eventId);
         countryEvent = event?.country;
-       
         if (typeCountry === 'sameCountry') {
             locationFrom.name = event?.country;
             locationFrom.city = event?.city;
@@ -811,7 +810,7 @@ const paymentConfirmation = async (data) => {
             phone_number: phone,
         };
         eventCarbonReceipt.event_id = eventId;
-        console.log(util.inspect(eventCarbonReceipt, false, null, true));
+        console.log('this log eventCarbonReceipt: ', eventCarbonReceipt);
         return true;
         const resDataVekin = await DataVekinHelper.eventCarbonReceiptPartner(eventCarbonReceipt);
         if (resDataVekin?.receipt) {
