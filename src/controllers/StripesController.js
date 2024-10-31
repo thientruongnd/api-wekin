@@ -2,7 +2,6 @@
 Mr : Dang Xuan Truong
 Email: truongdx@runsystem.net
 */
-const util = require('util');
 const { configEvn } = require('../configs/configEnvSchema');
 // eslint-disable-next-line import/order
 const stripe = require('stripe')(configEvn.KEY_STRIPE);
@@ -74,7 +73,6 @@ module.exports.DEFAULT = {
             }
             res.status(200).send('EVENT_RECEIVED');
         } catch (errors) {
-            console.log(util.inspect(errors, false, null, true));
             res.status(404).send('Not Found');
         }
     },
