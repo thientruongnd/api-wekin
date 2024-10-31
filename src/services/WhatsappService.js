@@ -476,30 +476,23 @@ const checkCountry = async (data) => {
         const customerAddress = data?.customerAddress || null;
         const resGetLocationData = await getLocationData({ address: customerAddress });
         console.log('resGetLocationData:', resGetLocationData);
-        
         const typeCountry = data?.typeCountry || 'differentCountry';
-        const countryName = data?.countryName || '2_United_Arab_Emirates';
         const eventId = data?.eventId || 230;
         const distance = data?.distance || 0;
         const phone = data?.phone || '84902103222';
         const locationFrom = {};
         const userDetails = {};
-        return true;
         if (typeCountry === 'differentCountry') {
             const myLatitude = data?.latitude || '20.4458553';
             const myLongitude = data?.longitude || '106.1173998';
-            const infoCountry = await getCountry(countryName);
-            locationFrom.code = infoCountry?.country;
-            const latitudeFrom = infoCountry?.latitude || '13.7379374';
-            const longitudeFrom = infoCountry?.longitude || '100.5239999';
+            // const latitudeFrom = resGetLocationData?.latitude || '13.7379374';
+            // const longitudeFrom = resGetLocationData?.longitude || '100.5239999';
             userDetails.name = customerName;
             const myCountry = await getCountryFromCoordinates(myLatitude, myLongitude);
-            const countryFrom = await getCountryFromCoordinates(latitudeFrom, longitudeFrom);
-            if (myCountry?.country_code === countryFrom?.country_code) {
+            if (myCountry?.country_code === resGetLocationData?.country_code) {
                 return await selectDistance(data);
             }
         }
-        return true;
         userDetails.phone = phone;
         locationFrom.d = distance;
         const resData = await DataVekinHelper.transportationList();
