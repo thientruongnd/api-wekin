@@ -88,10 +88,11 @@ module.exports.API = {
                             if (type === 'interactive' && typeInteractive === 'list_reply') {
                                 const id = message?.interactive?.list_reply?.id;
                                 const decodedToken = JSON.parse(Base64.decode(id));
+                                console.log('this log list_reply: ', decodedToken);
                                 eventId = decodedToken?.eventId;
                                 typeMessage = decodedToken?.type;
-                                params.latitude = decodedToken?.latitude || decodedToken?.lf?.lat;
-                                params.longitude = decodedToken?.longitude || decodedToken?.lf?.long;
+                                params.latitude = decodedToken?.lat;
+                                params.longitude = decodedToken?.long;
                                 params.id = decodedToken?.id;
                                 params.lf = decodedToken?.lf;
                                 params.uds = decodedToken.uds;
@@ -104,6 +105,7 @@ module.exports.API = {
                                 const nfmReply = message?.interactive?.nfm_reply;
                                 const responseJson = JSON.parse(nfmReply?.response_json);
                                 const decodedToken = JSON.parse(Base64.decode(responseJson?.flow_token));
+                                console.log('this log nfm_reply: ', decodedToken);
                                 typeMessage = decodedToken?.type;
                                 if (typeMessage === 'checkCountry') {
                                     const customerName = responseJson?.screen_0_name_0;
@@ -112,8 +114,8 @@ module.exports.API = {
                                     params.customerName = customerName;
                                 }
                                 eventId = decodedToken?.eventId;
-                                params.latitude = decodedToken?.latitude;
-                                params.longitude = decodedToken?.longitude;
+                                params.latitude = decodedToken?.lat;
+                                params.longitude = decodedToken?.long;
                                 params.eventId = decodedToken?.eventId;
                             }
                         });
