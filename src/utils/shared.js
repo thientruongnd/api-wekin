@@ -311,11 +311,13 @@ const getLocationData = async (data) => {
             const result = data.results[0];
             const location = result.geometry.location;
             const country = result.address_components.find((component) => component.types.includes('country'));
+            const city = result.address_components.find((component) => component.types.includes('locality') || component.types.includes('administrative_area_level_1'));
             return {
                 latitude: location?.lat,
                 longitude: location.lng,
                 country_code: country ? country.short_name : 'Not found',
                 country: country ? country.long_name : 'Not found',
+                city: city ? city.long_name : 'Not found',
             };
         }
         console.error('Geocoding API error:', data.status);

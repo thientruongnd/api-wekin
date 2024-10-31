@@ -153,6 +153,7 @@ module.exports.API = {
             //     await WhatsappService.checkCountry(params);
             // }
             if (typeMessage === 'receipt') {
+                console.log('this log paymentConfirmation: ', params);
                 await WhatsappService.paymentConfirmation(params);
             }
             if (typeMessage === 'distance') {
