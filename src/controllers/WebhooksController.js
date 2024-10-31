@@ -35,6 +35,7 @@ module.exports.API = {
     },
     postWebhook: async (req, res) => {
         const body = req.body;
+        console.log('body: ', body);
         // Kiểm tra request có chứa dữ liệu từ WhatsApp
         const params = {};
         let typeMessage = ''; let phone = ''; let fullName = ''; let eventId;
@@ -61,7 +62,8 @@ module.exports.API = {
                             const typeInteractive = message?.interactive?.type; // list_reply
                             phone = message?.from;
                             params.phone = phone;
-                            if (type === 'text' && text.toLowerCase() === 'starting conversation') {
+                            const targetString = 'We\'re excited to hear from you! If you\'re ready to explore sustainable events, simply press "Send"';
+                            if (type === 'text' && text.toLowerCase() === targetString.toLowerCase()) {
                                 typeMessage = 'joinNow';
                             }
                             if (type === 'interactive' && typeInteractive === 'button_reply') {
@@ -87,10 +89,12 @@ module.exports.API = {
                             if (type === 'interactive' && typeInteractive === 'list_reply') {
                                 const id = message?.interactive?.list_reply?.id;
                                 const decodedToken = JSON.parse(Base64.decode(id));
+                                console.log('this log list_reply: ', decodedToken);
+                                console.log('this log decodedToken: ', decodedToken);
                                 eventId = decodedToken?.eventId;
                                 typeMessage = decodedToken?.type;
-                                params.latitude = decodedToken?.latitude || decodedToken?.lf?.lat;
-                                params.longitude = decodedToken?.longitude || decodedToken?.lf?.long;
+                                params.latitude = decodedToken?.lat;
+                                params.longitude = decodedToken?.long;
                                 params.id = decodedToken?.id;
                                 params.lf = decodedToken?.lf;
                                 params.uds = decodedToken.uds;
@@ -103,6 +107,7 @@ module.exports.API = {
                                 const nfmReply = message?.interactive?.nfm_reply;
                                 const responseJson = JSON.parse(nfmReply?.response_json);
                                 const decodedToken = JSON.parse(Base64.decode(responseJson?.flow_token));
+                                console.log('this log nfm_reply: ', decodedToken);
                                 typeMessage = decodedToken?.type;
                                 if (typeMessage === 'checkCountry') {
                                     const customerName = responseJson?.screen_0_name_0;
@@ -111,8 +116,8 @@ module.exports.API = {
                                     params.customerName = customerName;
                                 }
                                 eventId = decodedToken?.eventId;
-                                params.latitude = decodedToken?.latitude;
-                                params.longitude = decodedToken?.longitude;
+                                params.latitude = decodedToken?.lat;
+                                params.longitude = decodedToken?.long;
                                 params.eventId = decodedToken?.eventId;
                             }
                         });
@@ -129,6 +134,7 @@ module.exports.API = {
                 await WhatsappHelper.sendMessageLocation({ phone });
             }
             if (typeMessage === 'location') {
+                console.log('location: ', params);
                 await WhatsappService.listEvent(params);
             }
             if (typeMessage === 'selectEvent') {

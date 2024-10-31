@@ -30,7 +30,7 @@ module.exports.DEFAULT = {
         return res.json(responseSuccess(10261, resData, 'en'));
     },
     sendMessageLocation: async (req, res) => {
-        const resData = await WhatsappHelper.sendMessageLocation({ phone: '84987662808' });
+        const resData = await WhatsappHelper.sendMessageLocation({ phone: '84902103222' });
 
         return res.json(responseSuccess(10261, resData, 'en'));
     },
