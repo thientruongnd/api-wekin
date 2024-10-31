@@ -107,25 +107,7 @@ module.exports.DEFAULT = {
         const resData = await WhatsappService.fillAddress(params);
         return res.json(responseSuccess(10261, resData, 'en'));
     },
-    selectRegion: async (req, res) => {
-        const params = {};
-        params.phone = req.body.phone || '84974418454';
-        const resData = await WhatsappService.selectRegion(params);
-        return res.json(responseSuccess(10261, resData, 'en'));
-    },
-    selectCountry: async (req, res) => {
-        // const regionName = '2_South-central_Asia';
-        // const templateName = convertTemplateName(regionName);
-        // const findCountry = getCountry('2_United_Arab_Emirates');
-        // console.log(util.inspect(findCountry, false, null, true));
-        const params = {};
-        params.phone = req.body.phone || '84974418454';
-        // params.templateName = templateName;
-        // params.flowToken = 'country';
-        // console.log(util.inspect(params, false, null, true));
-        const resData = await WhatsappService.selectCountry(params);
-        return res.json(responseSuccess(10261, resData, 'en'));
-    },
+
     completed: async (req, res) => {
         const params = {};
         params.phone = req.body.phone || '84974418454';
