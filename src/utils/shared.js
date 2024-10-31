@@ -251,9 +251,9 @@ const convertTextToImage = async (data) => {
         }
         function drawTextLeftRight(ctx, text1, text2, y, maxWidth, isBold = false) {
             ctx.font = `${isBold ? 'bold' : 'normal'} 18px Arial`;
-            ctx.fillText(text1, 20, y);
+            ctx.fillText(text1, 40, y);
             const text2Width = ctx.measureText(text2).width;
-            const xText2 = maxWidth - text2Width - 20;
+            const xText2 = maxWidth - text2Width - 40;
             ctx.fillText(text2, xText2, y);
         }
         const image = await loadImage(data.eventImageUrl);
@@ -262,12 +262,12 @@ const convertTextToImage = async (data) => {
         wrapText(ctx, data.date, 0, 310, 600, 30, false, true, 16);
         wrapText(ctx, data.eventName, 0, 340, 600, 30, true, true, 20);
         wrapText(ctx, data.eventLocation, 0, 370, 600, 30, false, true);
-        drawTextLeftRight(ctx, 'Your Emission:', `${data.eventEmissionValue} ${data.eventEmissionUnit}`, 440, 600, true);
-        drawTextLeftRight(ctx, 'Carbon Saved:', `${data.eventCarbonSavedValue} ${data.eventCarbonSavedUnit}`, 470, 600, true);
-        drawTextLeftRight(ctx, 'Total cost:', `${data.unitAmount} ${data.currency}`, 500, 600, true);
-        drawTextLeftRight(ctx, 'Verified blockchain address:', `${String(data.blockchain).substring(0, 15) }...`, 530, 600, true);
-        drawTextLeftRight(ctx, 'Verified by:', `${data.verifiedBy}`, 560, 600, true);
-        drawTextLeftRight(ctx, 'Receipt NO.:', `${data.refNumber}`, 590, 600, false);
+        drawTextLeftRight(ctx, 'Your Emission:', `${data.eventEmissionValue} ${data.eventEmissionUnit}`, 440, 600);
+        drawTextLeftRight(ctx, 'Carbon Saved:', `${data.eventCarbonSavedValue} ${data.eventCarbonSavedUnit}`, 480, 600);
+        drawTextLeftRight(ctx, 'Total cost:', `${data.unitAmount} ${data.currency}`, 520, 600);
+        drawTextLeftRight(ctx, 'Verified blockchain address:', `${String(data.blockchain).substring(0, 15) }...`, 560, 600);
+        drawTextLeftRight(ctx, 'Verified by:', `${data.verifiedBy}`, 600, 600);
+        drawTextLeftRight(ctx, 'Receipt NO.:', `${data.refNumber}`, 640, 600);
         const buffer = canvas.toBuffer('image/png');
         const fileName = getRandomFileName('png');
         const outputPath = path.join(__dirname, '../public/images', fileName);
