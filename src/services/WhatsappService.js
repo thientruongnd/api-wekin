@@ -473,9 +473,8 @@ const checkCountry = async (data) => {
     try {
         console.log(util.inspect(data, false, null, true));
         const customerName = data?.customerName || null;
-        const customerAddress = data?.customerAddress || null;
+        const customerAddress = data?.customerAddress || 'Ha noi';
         const resGetLocationData = await getLocationData({ address: customerAddress });
-        console.log('resGetLocationData:', resGetLocationData);
         const typeCountry = data?.typeCountry || 'differentCountry';
         const eventId = data?.eventId || 230;
         const distance = data?.distance || 0;
@@ -768,6 +767,7 @@ const completed = async (data) => {
 
 const paymentConfirmation = async (data) => {
     try {
+        console.log(util.inspect(data, false, null, true));
         const eventCarbonReceipt = {};
         const resData = await DataVekinHelper.transportationList();
         if (isEmpty(resData)) return false;
@@ -791,6 +791,7 @@ const paymentConfirmation = async (data) => {
         const resDataEvent = await DataVekinHelper.eventCarbonReceipt();
         const event = resDataEvent.find((event) => event.id === eventId);
         countryEvent = event?.country;
+       
         if (typeCountry === 'sameCountry') {
             locationFrom.name = event?.country;
             locationFrom.city = event?.city;
@@ -810,6 +811,8 @@ const paymentConfirmation = async (data) => {
             phone_number: phone,
         };
         eventCarbonReceipt.event_id = eventId;
+        console.log(util.inspect(eventCarbonReceipt, false, null, true));
+        return true;
         const resDataVekin = await DataVekinHelper.eventCarbonReceiptPartner(eventCarbonReceipt);
         if (resDataVekin?.receipt) {
             const name = data?.name || null;
