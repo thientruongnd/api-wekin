@@ -473,12 +473,11 @@ const checkCountry = async (data) => {
     try {
         const customerName = data?.customerName || null;
         const customerAddress = data?.customerAddress || null;
-        const getLocationData = await getLocationData({ address: customerAddress });
-        console.log(util.inspect(getLocationData, false, null, true));
+        const resGetLocationData = await getLocationData({ address: customerAddress });
+        console.log(util.inspect(resGetLocationData, false, null, true));
         return true;
         const typeCountry = data?.typeCountry || 'differentCountry';
         const countryName = data?.countryName || '2_United_Arab_Emirates';
-        const customerName = data?.customerName;
         const eventId = data?.eventId || 230;
         const distance = data?.distance || 0;
         const phone = data?.phone || '84902103222';
