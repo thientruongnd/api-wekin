@@ -90,6 +90,7 @@ module.exports.API = {
                                 const id = message?.interactive?.list_reply?.id;
                                 const decodedToken = JSON.parse(Base64.decode(id));
                                 console.log('this log list_reply: ', decodedToken);
+                                console.log('this log decodedToken: ', decodedToken);
                                 eventId = decodedToken?.eventId;
                                 typeMessage = decodedToken?.type;
                                 params.latitude = decodedToken?.lat;
