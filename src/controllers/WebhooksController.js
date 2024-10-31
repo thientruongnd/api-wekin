@@ -97,7 +97,7 @@ module.exports.API = {
                                 params.uds = decodedToken.uds;
                                 params.eid = decodedToken.eid;
                                 params.distance = decodedToken.d;
-                                params.typeCountry = decodedToken?.typeCountry;
+                                params.typeCountry = decodedToken?.tC;
                             }
                             if (type === 'interactive' && typeInteractive === 'nfm_reply') {
                                 const nfmReply = message?.interactive?.nfm_reply;
