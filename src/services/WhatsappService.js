@@ -479,6 +479,7 @@ const checkCountry = async (data) => {
         const locationFrom = {};
         const userDetails = {};
         if (typeCountry === 'differentCountry') {
+            /// https://maps.googleapis.com/maps/api/geocode/json?address=bang%20coc&key=AIzaSyC0maeFBMYF2Lp4OoD5rq263nRaEgkdb9E
             const myLatitude = data?.latitude || '20.4458553';
             const myLongitude = data?.longitude || '106.1173998';
             const infoCountry = await getCountry(countryName);
