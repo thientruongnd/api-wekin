@@ -806,8 +806,6 @@ const paymentConfirmation = async (data) => {
             phone_number: phone,
         };
         eventCarbonReceipt.event_id = eventId;
-        console.log('this log eventCarbonReceipt: ', eventCarbonReceipt);
-        return true;
         const resDataVekin = await DataVekinHelper.eventCarbonReceiptPartner(eventCarbonReceipt);
         if (resDataVekin?.receipt) {
             const name = data?.name || null;
