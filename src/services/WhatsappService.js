@@ -42,11 +42,10 @@ const joinNow = async (data) => {
                     },
                 },
                 body: {
-                    text: 'Welcome to CERO!\n\n'
-                    + `Hi ${name}!\n\n`
-                    + 'We’re thrilled to have you here at CERO, where we focus on creating sustainable, eco-friendly events and experiences.\n\n'
-                    + 'Would you like to join our exclusive Sustainable Events Community?\n\n'
-                    + 'You’ll receive updates on upcoming events, tips for greener living, and opportunities to make a difference!',
+                    text: `🌍✨ Welcome to CERO, ${name}! ✨🌍!\n\n`
+                    + 'We\'re absolutely thrilled to have you join our mission of crafting unforgettable,'
+                    + ' eco-friendly events that make a positive impact on our planet! Ready to go green together? 🌱\n'
+                    + 'Join us in exploring our exclusive Sustainable Events Community\n\n',
                 },
 
                 action: {
@@ -236,19 +235,19 @@ const selectDistance = async (data) => {
         const eventId = data?.eventId || 230;
 
         const flow1Token = {
-            lat: latitude, long: longitude, eventId, d: 1, type: 'distance',
-        };
-        const flow5Token = {
             lat: latitude, long: longitude, eventId, d: 5, type: 'distance',
         };
+        const flow5Token = {
+            lat: latitude, long: longitude, eventId, d: 20, type: 'distance',
+        };
         const flow10Token = {
-            lat: latitude, long: longitude, eventId, d: 10, type: 'distance',
+            lat: latitude, long: longitude, eventId, d: 30, type: 'distance',
         };
         const flow15Token = {
-            lat: latitude, long: longitude, eventId, d: 15, type: 'distance',
+            lat: latitude, long: longitude, eventId, d: 40, type: 'distance',
         };
         const flow20Token = {
-            lat: latitude, long: longitude, eventId, d: 20, type: 'distance',
+            lat: latitude, long: longitude, eventId, d: 50, type: 'distance',
         };
         const rows = [
             {
@@ -257,19 +256,19 @@ const selectDistance = async (data) => {
             },
             {
                 id: await Base64.encode(JSON.stringify(flow5Token)),
-                title: '5-10 km',
+                title: '6-20 km',
             },
             {
                 id: await Base64.encode(JSON.stringify(flow10Token)),
-                title: '10-15 km',
+                title: '21-30 km',
             },
             {
                 id: await Base64.encode(JSON.stringify(flow15Token)),
-                title: '15-20 km',
+                title: '31-40 km',
             },
             {
                 id: await Base64.encode(JSON.stringify(flow20Token)),
-                title: 'More than 20 km',
+                title: 'More than 40 km',
             },
         ];
         const template = {
@@ -283,7 +282,7 @@ const selectDistance = async (data) => {
                     text: 'Select distance',
                 },
                 body: {
-                    text: 'How far did you travel to attend the event?\n',
+                    text: 'How far did you travel to attend the event? (Approximation)\n',
                 },
                 action: {
                     button: 'Select distance',
@@ -411,19 +410,15 @@ const checkCountry = async (data) => {
                     type: 'interactive',
                     interactive: {
                         type: 'list',
-                        header: {
-                            type: 'text',
-                            text: 'Transportation',
-                        },
                         body: {
-                            text: 'The amount of CO2 emission is different depended on the type of your transportation.\n'
-                            + 'Please select the transportation for offset receipt.\n',
+                            text: 'The amount of CO2 emission is different depended on the type of your transportation.'
+                            + ' Please select the transportation to display your CO2 emission..\n',
                         },
                         action: {
                             button: 'Transportation',
                             sections: [
                                 {
-                                    title: 'Options',
+                                    title: 'Choose your',
                                     rows,
                                 },
                             ],
@@ -432,6 +427,7 @@ const checkCountry = async (data) => {
                 };
             }
             const resDataWhatsapp = await WhatsappHelper.sendMessage(template);
+            console.log(util.inspect(resDataWhatsapp, false, null, true));
             const response = {};
             if (resData?.status && resDataWhatsapp?.status !== 200) {
                 response.status = resDataWhatsapp.status;
