@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const winston = require('winston');
 const empty = require('is-empty');
-const { createCanvas, loadImage } = require('canvas');
+const nodeHtmlToImage = require('node-html-to-image');
 const { countries: dataCountries } = require('./dataSample/data.countries');
 const { CODES_SUCCESS, CODES_ERROR } = require('./messages');
 const { configEvn } = require('../configs/configEnvSchema');
@@ -221,54 +221,59 @@ const downloadImage = async (url, outputPath) => {
 
 const convertTextToImage = async (data) => {
     try {
-        const width = 600;
-        const height = 700;
-        const canvas = createCanvas(width, height);
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, width, height);
-        ctx.fillStyle = '#000000';
-        function wrapText(ctx, text, x, y, maxWidth = 500, lineHeight = 25, isBold = false, isCenter = false) {
-            ctx.font = `${isBold ? 'bold' : 'normal'} 20px Arial`;
-            let line = '';
-            let currentY = y;
-            for (const char of text) {
-                const testLine = line + char;
-                const { width: testWidth } = ctx.measureText(testLine);
-                if (testWidth > maxWidth) {
-                    ctx.fillText(line, x, currentY);
-                    line = char;
-                    currentY += lineHeight;
-                } else {
-                    line = testLine;
-                }
-            }
-            const drawX = isCenter ? ((width - ctx.measureText(line).width) / 2) : x;
-            ctx.fillText(line, drawX, currentY);
-        }
-        const image = await loadImage(data.eventImageUrl);
-        ctx.drawImage(image, (width - 150) / 2, 0, 150, 150); // X, Y, width, height
-        wrapText(ctx, data.title, 100, 190, 600, 30, true, true);
-        wrapText(ctx, data.date, 100, 220, 600, 30, false, true);
-        wrapText(ctx, data.eventName, 5, 250, 600, 30, true);
-        wrapText(ctx, data.eventLocation, 5, 280, 600, 30);
-        wrapText(ctx, `Your Emission                                       ${data.eventEmissionValue} ${data.eventEmissionUnit}`, 5, 310, 600, 30, true);
-        wrapText(ctx, `Carbon Saved                                        ${data.eventCarbonSavedValue} ${data.eventCarbonSavedUnit}`, 5, 340, 600, 30, true);
-        wrapText(ctx, `Total cost                                               ${data.unitAmount} ${data.currency}`, 5, 370, 600, 30, true);
-        wrapText(ctx, 'Verified blockchain address:', 5, 400, 600, 25);
-        wrapText(ctx, data.blockchain, 5, 430, 580, 30, true);
-        wrapText(ctx, `Verified by: ${data.verifiedBy}`, 5, 520, 600, 30, true);
-        wrapText(ctx, `Receipt NO.: ${data.refNumber}`, 5, 550, 600, 30);
-        // wrapText(ctx, 'Would you like us to donate on behalf of your attendance', 5, 580, 600, 30);
-        const buffer = canvas.toBuffer('image/png');
         const fileName = getRandomFileName('png');
         const outputPath = path.join(__dirname, '../public/images', fileName);
-        await fs.writeFileSync(outputPath, buffer);
         const eventImage = `${data.host}/images/${fileName}`;
-        console.log('Image created');
+        await nodeHtmlToImage({
+            output: outputPath,
+            html: `
+              <html>
+                <head>
+                  <style>
+                    body {
+                      width: 600px;
+                      height: 700px;
+                    }
+                    p {
+                      font-size: 22px;
+                      line-height: 28px;
+                      margin: 0px;
+                    }
+                  </style>
+                </head>
+                <body style="margin:0; padding:15px;background-color: #fff;">
+                  <div style="width: 150px; height: 150px; margin: 0 auto;margin-bottom: 10px;background-color: #fff">
+                    <img src="${data.eventImageUrl}" style="width: 100%; height: 100%;"/>
+                  </div>
+                  <p style="text-align: center;font-weight: bold;">${data.title}</p>
+                  <p style="text-align: center;">${data.date}</p>
+                  <p style="font-weight: bold;">${data.eventName}</p>
+                  <p>${data.eventLocation}</p>
+                  <div style="display: flex; justify-content: space-between;font-weight: bold;">
+                    <p>Your Emission</p>
+                    <p>${data.eventEmissionValue} ${data.eventEmissionUnit}</p>
+                  </div>
+                  <div style="display: flex; justify-content: space-between;font-weight: bold;">
+                    <p>Carbon Saved</p>
+                    <p>${data.eventCarbonSavedValue} ${data.eventCarbonSavedUnit}</p>
+                  </div>
+                  <div style="display: flex; justify-content: space-between;font-weight: bold;">
+                    <p>Total cost</p>
+                    <p>${data.unitAmount} ${data.currency}</p>
+                  </div>
+                  <p>Verified blockchain address:</p>
+                  <p style="font-weight: bold;word-wrap: break-word; overflow-wrap: break-word;">${data.blockchain}</p>
+                  <p style="font-weight: bold;margin-top: 10px;">Verified by ${data.verifiedBy}</p>
+                  <p>Receipt NO.: ${data.refNumber}</p>
+                </body>
+              </html>
+            `,
+        });
+        console.log('The image was created successfully!');
         return eventImage;
     } catch (error) {
         console.error('error create image:', error.message);
+        return null;
     }
 };
 const getCountryFromCoordinates = async (latitude, longitude) => {
