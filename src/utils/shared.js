@@ -277,7 +277,6 @@ const convertTextToImage = async (data) => {
 const getCountryFromCoordinates = async (latitude, longitude) => {
     const apiKey = configEvn.GOOGLE_MAP_KEY; // Replace with your actual API key
     const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`;
-
     try {
         const response = await axios.get(url);
         const results = response.data.results;
@@ -288,10 +287,36 @@ const getCountryFromCoordinates = async (latitude, longitude) => {
             const country = addressComponents.find((component) => component.types.includes('country'));
             return country ? { country_code: country.short_name, country: country.long_name } : null; // country.short_name : country.long_name : null;
         }
-
         return null;
     } catch (error) {
         console.error('Error fetching location data:', error);
+        return null;
+    }
+};
+const getLocationData = async (data) => {
+    const apiKey = configEvn.GOOGLE_MAP_KEY; // Replace with your actual API key
+    const address = data?.address;
+    const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
+
+    try {
+        const response = await axios.get(url);
+        const data = response.data;
+
+        if (data.status === 'OK') {
+            const result = data.results[0];
+            const location = result.geometry.location;
+            const country = result.address_components.find((component) => component.types.includes('country'));
+            return {
+                latitude: location?.lat,
+                longitude: location.lng,
+                country_code: country ? country.short_name : 'Not found',
+                country: country ? country.long_name : 'Not found',
+            };
+        }
+        console.error('Geocoding API error:', data.status);
+        return null;
+    } catch (error) {
+        console.error('Error fetching data:', error);
         return null;
     }
 };
@@ -326,4 +351,5 @@ module.exports = {
     getRandomFileName,
     getCountryFromCoordinates,
     convertTextToImage,
+    getLocationData,
 };

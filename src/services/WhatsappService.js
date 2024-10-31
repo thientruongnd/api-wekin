@@ -21,6 +21,7 @@ const {
     getCountry,
     getCountryFromCoordinates,
     convertTextToImage,
+    getLocationData,
 } = require('../utils/shared');
 
 const joinNow = async (data) => {
@@ -416,13 +417,14 @@ const selectRegion = async (data) => {
 
 const selectCountry = async (data) => {
     console.log(util.inspect(data, false, null, true));
-    // const regionName = data?.regionName || '2_South-central_Asia';
-    // const customerName = data?.customerName || null;
-    // const templateName = convertTemplateName(regionName);
-    // const phone = data?.phone || '84902103222';
-    // const latitude = data?.latitude || '13.7379374';
-    // const longitude = data?.longitude || '100.5239999';
-    // const eventId = data?.eventId || 230;
+    const regionName = data?.regionName || '2_South-central_Asia';
+    const customerName = data?.customerName || null;
+    const customerAddress = data?.customerAddress || null;
+    const templateName = convertTemplateName(regionName);
+    const phone = data?.phone || '84902103222';
+    const latitude = data?.latitude || '13.7379374';
+    const longitude = data?.longitude || '100.5239999';
+    const eventId = data?.eventId || 230;
     // const flowToken = {
     //     latitude, longitude, eventId, customerName, type: 'country',
     // };
@@ -469,6 +471,11 @@ const selectCountry = async (data) => {
 };
 const checkCountry = async (data) => {
     try {
+        const customerName = data?.customerName || null;
+        const customerAddress = data?.customerAddress || null;
+        const getLocationData = await getLocationData({ address: customerAddress });
+        console.log(util.inspect(getLocationData, false, null, true));
+        return true;
         const typeCountry = data?.typeCountry || 'differentCountry';
         const countryName = data?.countryName || '2_United_Arab_Emirates';
         const customerName = data?.customerName;
@@ -478,7 +485,6 @@ const checkCountry = async (data) => {
         const locationFrom = {};
         const userDetails = {};
         if (typeCountry === 'differentCountry') {
-            /// https://maps.googleapis.com/maps/api/geocode/json?address=bang%20coc&key=AIzaSyC0maeFBMYF2Lp4OoD5rq263nRaEgkdb9E
             const myLatitude = data?.latitude || '20.4458553';
             const myLongitude = data?.longitude || '106.1173998';
             const infoCountry = await getCountry(countryName);
