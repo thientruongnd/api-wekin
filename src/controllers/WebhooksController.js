@@ -102,13 +102,12 @@ module.exports.API = {
                             if (type === 'interactive' && typeInteractive === 'nfm_reply') {
                                 const nfmReply = message?.interactive?.nfm_reply;
                                 const responseJson = JSON.parse(nfmReply?.response_json);
-                                console.log('this log responseJson: ', responseJson);
                                 const decodedToken = JSON.parse(Base64.decode(responseJson?.flow_token));
                                 typeMessage = decodedToken?.type;
                                 if (typeMessage === 'region') {
-                                    const customerName = responseJson?.screen_0_TextInput_0;
-                                    const regionName = responseJson?.screen_0_Dropdown_1;
-                                    params.regionName = regionName;
+                                    const customerName = responseJson?.screen_0_name_0;
+                                    const customerAddress = responseJson?.screen_0_description_1;
+                                    params.customerAddress = customerAddress;
                                     params.customerName = customerName;
                                 }
                                 if (typeMessage === 'country') {
@@ -146,12 +145,12 @@ module.exports.API = {
                 await WhatsappService.fillAddress(params);
             }
             if (typeMessage === 'region') {
-                await WhatsappService.selectCountry(params);
-            }
-            if (typeMessage === 'country') {
-                params.typeCountry = 'differentCountry';
                 await WhatsappService.checkCountry(params);
             }
+            // if (typeMessage === 'country') {
+            //     params.typeCountry = 'differentCountry';
+            //     await WhatsappService.checkCountry(params);
+            // }
             if (typeMessage === 'receipt') {
                 await WhatsappService.paymentConfirmation(params);
             }
