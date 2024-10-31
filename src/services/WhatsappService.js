@@ -296,14 +296,7 @@ const selectDistance = async (data) => {
                 },
             },
         };
-        const resData = await WhatsappHelper.sendMessage(template);
-        const response = {};
-        if (resData?.status && resData?.status !== 200) {
-            response.status = resData.status;
-            response.message = resData.message;
-            response.code = resData.code;
-            return response;
-        }
+        await WhatsappHelper.sendMessage(template);
         return true;
     } catch (err) {
         return err;
@@ -391,6 +384,8 @@ const checkCountry = async (data) => {
             }
         }
         locationFrom.d = distance;
+        console.log('this log có vot xuong day khong');
+        return true;
         const resData = await DataVekinHelper.transportationList();
         const rows = [];
         if (!isEmpty(resData)) {
