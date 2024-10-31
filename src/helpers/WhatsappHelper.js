@@ -36,7 +36,9 @@ class WhatsappHelper {
             interactive: {
                 type: 'location_request_message',
                 body: {
-                    text: 'Let’s start by helping you find upcoming Sustainable Events around your location. Please share your current location to begin!?',
+                    text: '🌟 Let’s kick off your sustainable journey!'
+                    + ' We’d love to help you discover exciting upcoming Sustainable Events right in your area.'
+                    + ' Just hit the share your current location below to explore.🌱✨',
                 },
                 action: {
                     name: 'send_location',
