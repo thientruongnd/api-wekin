@@ -177,11 +177,11 @@ const ecoTravel = async (data) => {
         const longitude = data?.longitude || '100.5239999';
         const eventId = data?.eventId;
         const flowToken = {
-            lat: latitude, long: longitude, eventId, type: 'sameCountry',
+            lat: latitude, long: longitude, eventId, type: 'sC',
         };
         const sameCountryEncode = Base64.encode(JSON.stringify(flowToken));
         const differentCountry = {
-            lat: latitude, long: longitude, eventId, type: 'differentCountry',
+            lat: latitude, long: longitude, eventId, type: 'dC',
         };
         const differentCountryEncode = Base64.encode(JSON.stringify(differentCountry));
         const template = {
@@ -471,21 +471,24 @@ const selectCountry = async (data) => {
 };
 const checkCountry = async (data) => {
     try {
-        console.log(util.inspect(data, false, null, true));
-        const customerName = data?.customerName || null;
-        const customerAddress = data?.customerAddress || 'Ha noi';
+        const customerName = data?.customerName || ' Damg xian truong ơi';
+        const customerAddress = data?.customerAddress || 'Thai lan';
         const resGetLocationData = await getLocationData({ address: customerAddress });
-        const typeCountry = data?.typeCountry || 'differentCountry';
+        if (isEmpty(resGetLocationData)) {
+            // gui ti nhăn lại khong tim thay địa chỉ
+            return false;
+        }
+        const typeCountry = data?.typeCountry || 'dCountry';
         const eventId = data?.eventId || 230;
         const distance = data?.distance || 0;
         const phone = data?.phone || '84902103222';
         const locationFrom = {};
         const userDetails = {};
-        if (typeCountry === 'differentCountry') {
+        locationFrom.lat = resGetLocationData?.latitude || '21.0058166';
+        locationFrom.long = resGetLocationData?.longitude || '105.8473071';
+        if (typeCountry === 'dCountry') {
             const myLatitude = data?.latitude || '20.4458553';
             const myLongitude = data?.longitude || '106.1173998';
-            // const latitudeFrom = resGetLocationData?.latitude || '13.7379374';
-            // const longitudeFrom = resGetLocationData?.longitude || '100.5239999';
             userDetails.name = customerName;
             const myCountry = await getCountryFromCoordinates(myLatitude, myLongitude);
             if (myCountry?.country_code === resGetLocationData?.country_code) {
@@ -505,7 +508,7 @@ const checkCountry = async (data) => {
                 flowToken.uds = userDetails;
                 flowToken.eid = eventId;
                 flowToken.type = 'receipt';
-                flowToken.typeCountry = typeCountry;
+                flowToken.tC = typeCountry;
                 const encodedToken = Base64.encode(JSON.stringify(flowToken));
                 element.id = encodedToken;
                 element.title = emissionList[i].name;
@@ -783,7 +786,7 @@ const paymentConfirmation = async (data) => {
         };
         const customerName = data?.uds?.name;
         const phone = data?.uds?.phone || '84902103222';
-        const typeCountry = data?.typeCountry || 'differentCountry';
+        const typeCountry = data?.typeCountry || 'dC';
         const distance = data?.lf?.d || 0;
         const eventId = data?.eid;
         const locationFrom = {};
@@ -791,7 +794,7 @@ const paymentConfirmation = async (data) => {
         const resDataEvent = await DataVekinHelper.eventCarbonReceipt();
         const event = resDataEvent.find((event) => event.id === eventId);
         countryEvent = event?.country;
-        if (typeCountry === 'sameCountry') {
+        if (typeCountry === 'sC') {
             locationFrom.name = event?.country;
             locationFrom.city = event?.city;
             locationFrom.lat = event?.latitude;
