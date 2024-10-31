@@ -8,7 +8,7 @@ const indexRoute = (apiRouter) => {
     apiRouter.route('/').get(DEFAULT.index);
     apiRouter.route('/tests/joinNow').post(DEFAULT.joinNow);
     apiRouter.route('/tests/sendMessageLocation').post(DEFAULT.sendMessageLocation);
-    apiRouter.route('/tests/eventCarbonReceipt').get(DEFAULT.eventCarbonReceipt);
+    apiRouter.route('/tests/listEvent').get(DEFAULT.listEvent);
     apiRouter.route('/tests/eventLocations').get(DEFAULT.eventLocations);
     apiRouter.route('/tests/transportationList').get(DEFAULT.transportationList);
     apiRouter.route('/tests/eventCarbonReceiptPartner').post(DEFAULT.eventCarbonReceiptPartner);
