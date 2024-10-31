@@ -130,6 +130,7 @@ module.exports.API = {
                 await WhatsappHelper.sendMessageLocation({ phone });
             }
             if (typeMessage === 'location') {
+                console.log('location: ', params);
                 await WhatsappService.listEvent(params);
             }
             if (typeMessage === 'selectEvent') {
