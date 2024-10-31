@@ -471,7 +471,6 @@ const selectCountry = async (data) => {
 };
 const checkCountry = async (data) => {
     try {
-        console.log('this log checkCountry: ', data);
         const customerName = data?.customerName || ' Damg xian truong ơi';
         const customerAddress = data?.customerAddress || 'Thai lan';
         const resGetLocationData = await getLocationData({ address: customerAddress });
@@ -487,7 +486,6 @@ const checkCountry = async (data) => {
         const userDetails = {};
         locationFrom.lat = resGetLocationData?.latitude || '21.0058166';
         locationFrom.long = resGetLocationData?.longitude || '105.8473071';
-        locationFrom.name = resGetLocationData?.country || null;
         if (typeCountry === 'dC') {
             const myLatitude = data?.latitude || '20.4458553';
             const myLongitude = data?.longitude || '106.1173998';
@@ -497,7 +495,6 @@ const checkCountry = async (data) => {
                 return await selectDistance(data);
             }
         }
-        userDetails.phone = phone;
         locationFrom.d = distance;
         const resData = await DataVekinHelper.transportationList();
         const rows = [];
