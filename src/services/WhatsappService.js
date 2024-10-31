@@ -320,7 +320,7 @@ const fillAddress = async (data) => {
         const longitude = data?.longitude || '100.5239999';
         const eventId = data?.eventId || 230;
         const flowToken = {
-            latitude, longitude, eventId, type: 'region',
+            latitude, longitude, eventId, type: 'checkCountry',
         };
         const encodedToken = Base64.encode(JSON.stringify(flowToken));
         const template = {
@@ -364,114 +364,9 @@ const fillAddress = async (data) => {
     }
 };
 
-const selectRegion = async (data) => {
-    try {
-        const phone = data?.phone || '84902103222';
-        const latitude = data?.latitude || '13.7379374';
-        const longitude = data?.longitude || '100.5239999';
-        const eventId = data?.eventId || 230;
-        const flowToken = {
-            latitude, longitude, eventId, type: 'region',
-        };
-        const encodedToken = Base64.encode(JSON.stringify(flowToken));
-        const template = {
-            messaging_product: 'whatsapp',
-            to: phone,
-            type: 'template',
-            template: {
-                name: 'fill_travel_information',
-                language: {
-                    code: 'en_US',
-                },
-                components: [
-                    {
-                        type: 'button',
-                        sub_type: 'flow',
-                        index: 0,
-                        parameters: [
-                            {
-                                type: 'action',
-                                action: {
-                                    flow_token: encodedToken,
-                                },
-                            },
-                        ],
-                    },
-                ],
-            },
-        };
-        // const decodedToken = JSON.parse(Base64.decode(encodedToken));
-        const resData = await WhatsappHelper.sendMessage(template);
-        const response = {};
-        if (resData?.status && resData?.status !== 200) {
-            response.status = resData.status;
-            response.message = resData.message;
-            response.code = resData.code;
-            return promiseResolve(response);
-        }
-        return promiseResolve(resData);
-    } catch (err) {
-        return promiseReject(err);
-    }
-};
-
-const selectCountry = async (data) => {
-    console.log(util.inspect(data, false, null, true));
-    const regionName = data?.regionName || '2_South-central_Asia';
-    const customerName = data?.customerName || null;
-    const customerAddress = data?.customerAddress || null;
-    const templateName = convertTemplateName(regionName);
-    const phone = data?.phone || '84902103222';
-    const latitude = data?.latitude || '13.7379374';
-    const longitude = data?.longitude || '100.5239999';
-    const eventId = data?.eventId || 230;
-    // const flowToken = {
-    //     latitude, longitude, eventId, customerName, type: 'country',
-    // };
-    // const encodedToken = Base64.encode(JSON.stringify(flowToken));
-    // try {
-    //     const template = {
-    //         messaging_product: 'whatsapp',
-    //         to: phone,
-    //         type: 'template',
-    //         template: {
-    //             name: templateName || 'select_country',
-    //             language: {
-    //                 code: 'en_US',
-    //             },
-    //             components: [
-    //                 {
-    //                     type: 'button',
-    //                     sub_type: 'flow',
-    //                     index: 0,
-    //                     parameters: [
-    //                         {
-    //                             type: 'action',
-    //                             action: {
-    //                                 flow_token: encodedToken,
-    //                             },
-    //                         },
-    //                     ],
-    //                 },
-    //             ],
-    //         },
-    //     };
-    //     const resData = await WhatsappHelper.sendMessage(template);
-    //     const response = {};
-    //     if (resData?.status && resData?.status !== 200) {
-    //         response.status = resData.status;
-    //         response.message = resData.message;
-    //         response.code = resData.code;
-    //         return promiseResolve(response);
-    //     }
-    //     return true;
-    // } catch (err) {
-    //     return promiseReject(err);
-    // }
-};
 const checkCountry = async (data) => {
     try {
-        const customerName = data?.customerName || ' Damg xian truong ơi';
+        const customerName = data?.customerName || ' Damg xian truong';
         const customerAddress = data?.customerAddress || 'Thai lan';
         const resGetLocationData = await getLocationData({ address: customerAddress });
         if (isEmpty(resGetLocationData)) {
@@ -769,7 +664,6 @@ const completed = async (data) => {
 
 const paymentConfirmation = async (data) => {
     try {
-        console.log('paymentConfirmation data: ', data);
         const eventCarbonReceipt = {};
         const resData = await DataVekinHelper.transportationList();
         if (isEmpty(resData)) return false;
@@ -930,8 +824,6 @@ module.exports = {
     ecoTravel,
     selectDistance,
     fillAddress,
-    selectRegion,
-    selectCountry,
     paymentConfirmation,
     paymentSuccess,
     paymentFailure,

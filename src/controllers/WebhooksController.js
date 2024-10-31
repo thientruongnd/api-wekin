@@ -104,7 +104,7 @@ module.exports.API = {
                                 const responseJson = JSON.parse(nfmReply?.response_json);
                                 const decodedToken = JSON.parse(Base64.decode(responseJson?.flow_token));
                                 typeMessage = decodedToken?.type;
-                                if (typeMessage === 'region') {
+                                if (typeMessage === 'checkCountry') {
                                     const customerName = responseJson?.screen_0_name_0;
                                     const customerAddress = responseJson?.screen_0_description_1;
                                     params.customerAddress = customerAddress;
@@ -140,14 +140,10 @@ module.exports.API = {
             if (typeMessage === 'dC') {
                 await WhatsappService.fillAddress(params);
             }
-            if (typeMessage === 'region') {
+            if (typeMessage === 'checkCountry') {
                 params.typeCountry = 'dC';
                 await WhatsappService.checkCountry(params);
             }
-            // if (typeMessage === 'country') {
-            //     params.typeCountry = 'dC';
-            //     await WhatsappService.checkCountry(params);
-            // }
             if (typeMessage === 'receipt') {
                 console.log('this log paymentConfirmation: ', params);
                 await WhatsappService.paymentConfirmation(params);
