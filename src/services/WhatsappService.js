@@ -446,10 +446,6 @@ const checkCountry = async (data) => {
 const paymentSuccess = async (data) => {
     try {
         const phone = data?.phone || '84902103222';
-        const eventEmissionValue = data?.eventEmissionValue || null;
-        const eventEmissionUnit = data?.eventEmissionUnit || null;
-        const unitAmount = data?.unitAmount || '0';
-        const currency = data?.currency || '$';
         const eventImage = data?.eventImage || 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
         const template = {
             messaging_product: 'whatsapp',
@@ -458,9 +454,9 @@ const paymentSuccess = async (data) => {
             type: 'image',
             image: {
                 link: eventImage,
-                caption: 'Thank you for offsetting your carbon footprint of\n\n'
-                  + `${`${eventEmissionValue } ${ eventEmissionUnit}`}\n\n`
-                  + `${`(${unitAmount } ${String(currency).toUpperCase()})`}\n\n`,
+                caption: 'Thank you for your dedication to offsetting; '
+                  + 'your efforts are not just commendable but essential in weaving a brighter,'
+                  + ' more sustainable future for our planet.\n',
             },
         };
         const resData = await WhatsappHelper.sendMessage(template);
