@@ -14,8 +14,6 @@ const indexRoute = (apiRouter) => {
     apiRouter.route('/tests/eventCarbonReceiptPartner').post(DEFAULT.eventCarbonReceiptPartner);
     apiRouter.route('/tests/paymentSuccess').post(DEFAULT.paymentSuccess);
     apiRouter.route('/tests/paymentFailure').post(DEFAULT.paymentFailure);
-    apiRouter.route('/tests/selectRegion').post(DEFAULT.selectRegion);
-    apiRouter.route('/tests/selectCountry').post(DEFAULT.selectCountry);
     apiRouter.route('/tests/completed').post(DEFAULT.completed);
     apiRouter.route('/tests/ecoTravel').get(DEFAULT.ecoTravel);
     apiRouter.route('/tests/checkCountry').post(DEFAULT.checkCountry);
