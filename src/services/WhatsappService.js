@@ -81,7 +81,6 @@ const joinNow = async (data) => {
  * */
 const listEvent = async (data) => {
     try {
-        console.log(util.inspect(data, false, null, true));
         const phone = data?.phone || '84902103222';
         const latitude = data?.latitude || '13.7379374';
         const longitude = data?.longitude || '100.5239999';
@@ -357,7 +356,6 @@ const fillAddress = async (data) => {
 
 const checkCountry = async (data) => {
     try {
-        console.log('checkCountry: ', data);
         const customerName = data?.customerName || ' Damg xian truong';
         const customerAddress = data?.customerAddress || 'Thai lan';
         const resGetLocationData = await getLocationData({ address: customerAddress });
@@ -375,18 +373,14 @@ const checkCountry = async (data) => {
         const userDetails = {};
         locationFrom.lat = resGetLocationData?.latitude || '21.0058166';
         locationFrom.long = resGetLocationData?.longitude || '105.8473071';
-        console.log('resGetLocationData: ', resGetLocationData);
         if (typeCountry === 'dC') {
             userDetails.name = customerName;
             const myCountry = await getCountryFromCoordinates(myLatitude, myLongitude);
-            console.log('myCountry: ', myCountry);
             if (myCountry?.country_code === resGetLocationData?.country_code) {
                 return await selectDistance(data);
             }
         }
         locationFrom.d = distance;
-        console.log('this log có vot xuong day khdfdfong');
-        return true;
         const resData = await DataVekinHelper.transportationList();
         const rows = [];
         if (!isEmpty(resData)) {
