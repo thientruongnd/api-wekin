@@ -363,6 +363,7 @@ const fillAddress = async (data) => {
 
 const checkCountry = async (data) => {
     try {
+        console.log('checkCountry: ', checkCountry);
         const customerName = data?.customerName || ' Damg xian truong';
         const customerAddress = data?.customerAddress || 'Thai lan';
         const resGetLocationData = await getLocationData({ address: customerAddress });
@@ -374,15 +375,17 @@ const checkCountry = async (data) => {
         const eventId = data?.eventId || 230;
         const distance = data?.distance || 0;
         const phone = data?.phone || '84902103222';
+        const myLatitude = data?.latitude || '20.4458553';
+        const myLongitude = data?.longitude || '106.1173998';
         const locationFrom = {};
         const userDetails = {};
         locationFrom.lat = resGetLocationData?.latitude || '21.0058166';
         locationFrom.long = resGetLocationData?.longitude || '105.8473071';
+        console.log('resGetLocationData: ', resGetLocationData);
         if (typeCountry === 'dC') {
-            const myLatitude = data?.latitude || '20.4458553';
-            const myLongitude = data?.longitude || '106.1173998';
             userDetails.name = customerName;
             const myCountry = await getCountryFromCoordinates(myLatitude, myLongitude);
+            console.log('myCountry: ', myCountry);
             if (myCountry?.country_code === resGetLocationData?.country_code) {
                 return await selectDistance(data);
             }
