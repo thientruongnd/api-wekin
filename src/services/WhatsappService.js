@@ -83,15 +83,34 @@ const joinNow = async (data) => {
  * */
 const listEvent = async (data) => {
     try {
-        const phone = data?.phone || '84912038102';
+        const phone = data?.phone || '84902103222';
         const latitude = data?.latitude || '13.7379374';
         const longitude = data?.longitude || '100.5239999';
         const resDataVekin = await DataVekinHelper.eventCarbonReceipt();
         const flowToken = { lat: latitude, long: longitude, type: 'selectEvent' };
-        const rows = [];
+        let template = {
+            messaging_product: 'whatsapp',
+            to: phone,
+            type: 'interactive',
+            interactive: {
+                type: 'cta_url',
+                body: {
+                    text: 'Unfortunately, there are no events currently taking place at the selected location.'
+                     + ' We encourage you to explore options in other place.',
+                },
+                action: {
+                    name: 'cta_url',
+                    parameters: {
+                        display_text: 'More information',
+                        url: 'https://www.cero.org/',
+                    },
+                },
+            },
+        };
         if (!isEmpty(resDataVekin)) {
             // khi có sự kiện
             const nearestLocations = getNearestLocations(resDataVekin, latitude, longitude);
+            const rows = [];
             for (let i = 0; i < nearestLocations.length; i++) {
                 const element = {};
                 flowToken.eventId = nearestLocations[i].id;
@@ -106,7 +125,6 @@ const listEvent = async (data) => {
                     rows.push(element);
                 }
             }
-            let template;
             if (!isEmpty(rows)) {
                 template = {
                     messaging_product: 'whatsapp',
@@ -134,37 +152,17 @@ const listEvent = async (data) => {
                         },
                     },
                 };
-            } else {
-                template = {
-                    messaging_product: 'whatsapp',
-                    to: phone,
-                    type: 'interactive',
-                    interactive: {
-                        type: 'cta_url',
-                        body: {
-                            text: 'Unfortunately, there are no events currently taking place at the selected location.'
-                             + ' We encourage you to explore options in other place.',
-                        },
-                        action: {
-                            name: 'cta_url',
-                            parameters: {
-                                display_text: 'More information',
-                                url: 'https://www.cero.org/',
-                            },
-                        },
-                    },
-                };
             }
-            const resData = await WhatsappHelper.sendMessage(template);
-            const response = {};
-            if (resData?.status && resData?.status !== 200) {
-                response.status = resData.status;
-                response.message = resData.message;
-                response.code = resData.code;
-                return promiseResolve(response);
-            }
-            return true;
         }
+        const resData = await WhatsappHelper.sendMessage(template);
+        const response = {};
+        if (resData?.status && resData?.status !== 200) {
+            response.status = resData.status;
+            response.message = resData.message;
+            response.code = resData.code;
+            return promiseResolve(response);
+        }
+        return true;
         // không có sự kiện nào <- redirect to website "https://www.cero.org/"
     } catch (err) {
         return promiseReject(err);
