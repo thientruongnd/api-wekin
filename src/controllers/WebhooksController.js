@@ -102,6 +102,7 @@ module.exports.API = {
                             if (type === 'interactive' && typeInteractive === 'nfm_reply') {
                                 const nfmReply = message?.interactive?.nfm_reply;
                                 const responseJson = JSON.parse(nfmReply?.response_json);
+                                console.log('this log responseJson: ', responseJson);
                                 const decodedToken = JSON.parse(Base64.decode(responseJson?.flow_token));
                                 typeMessage = decodedToken?.type;
                                 if (typeMessage === 'region') {
@@ -142,7 +143,7 @@ module.exports.API = {
                 await WhatsappService.selectDistance(params);
             }
             if (typeMessage === 'differentCountry') {
-                await WhatsappService.selectRegion(params);
+                await WhatsappService.fillAddress(params);
             }
             if (typeMessage === 'region') {
                 await WhatsappService.selectCountry(params);

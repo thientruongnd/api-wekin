@@ -34,7 +34,7 @@ module.exports.DEFAULT = {
 
         return res.json(responseSuccess(10261, resData, 'en'));
     },
-    eventCarbonReceipt: async (req, res) => {
+    listEvent: async (req, res) => {
         const phone = '84902103222';
         const resData = await WhatsappService.listEvent(req.body);
 
@@ -99,6 +99,12 @@ module.exports.DEFAULT = {
             host: req.headers.host,
         };
         const resData = await WhatsappService.paymentFailure(params);
+        return res.json(responseSuccess(10261, resData, 'en'));
+    },
+    fillAddress: async (req, res) => {
+        const params = {};
+        params.phone = req.body.phone || '84974418454';
+        const resData = await WhatsappService.fillAddress(params);
         return res.json(responseSuccess(10261, resData, 'en'));
     },
     selectRegion: async (req, res) => {

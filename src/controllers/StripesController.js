@@ -16,7 +16,8 @@ const {
 module.exports.DEFAULT = {
     createCheckoutSession: async (req, res) => {
         const productName = req.query?.productName;
-        const unitAmount = parseInt(req.query?.unitAmount, 10);
+        const unitAmount = parseFloat(req.query?.unitAmount);
+        const currency = req.query?.currency;
         const image = getImageLink(req.headers.host, '/images/logo_cero.png');
         const eventImage = req.query?.eventImage || image;
         try {
@@ -26,7 +27,7 @@ module.exports.DEFAULT = {
                 line_items: [
                     {
                         price_data: {
-                            currency: 'thb', // Đơn vị tiền tệ (có thể thay đổi theo nhu cầu của bạn)
+                            currency, // SGD,thb  Đơn vị tiền tệ (có thể thay đổi theo nhu cầu của bạn)
                             product_data: {
                                 name: metadata?.eventName || productName, // Tên sản phẩm
                             },
@@ -48,7 +49,6 @@ module.exports.DEFAULT = {
             });
             res.redirect(303, session.url);
         } catch (errors) {
-            console.log(util.inspect(errors, false, null, true));
             return resJsonError(res, errors);
         }
     },
