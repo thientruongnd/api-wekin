@@ -471,11 +471,12 @@ const selectCountry = async (data) => {
 };
 const checkCountry = async (data) => {
     try {
+        console.log(util.inspect(data, false, null, true));
         const customerName = data?.customerName || null;
         const customerAddress = data?.customerAddress || null;
         const resGetLocationData = await getLocationData({ address: customerAddress });
         console.log(util.inspect(resGetLocationData, false, null, true));
-        return true;
+        
         const typeCountry = data?.typeCountry || 'differentCountry';
         const countryName = data?.countryName || '2_United_Arab_Emirates';
         const eventId = data?.eventId || 230;
@@ -497,6 +498,7 @@ const checkCountry = async (data) => {
                 return await selectDistance(data);
             }
         }
+        return true;
         userDetails.phone = phone;
         locationFrom.d = distance;
         const resData = await DataVekinHelper.transportationList();
