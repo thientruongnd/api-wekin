@@ -356,12 +356,64 @@ const fillAddress = async (data) => {
     }
 };
 
+const fillLocationAgain = async (data) => {
+    try {
+        const phone = data?.phone || '84902103222';
+        const latitude = data?.latitude || '13.7379374';
+        const longitude = data?.longitude || '100.5239999';
+        const eventId = data?.eventId || 230;
+        const flowToken = {
+            lat: latitude, long: longitude, eventId, type: 'fill_location_again',
+        };
+        const flowTokenEncode = Base64.encode(JSON.stringify(flowToken));
+        const template = {
+            messaging_product: 'whatsapp',
+            recipient_type: 'individual',
+            to: phone,
+            type: 'interactive',
+            interactive: {
+                type: 'button',
+                body: {
+                    text: 'We couldn’t find the location based on the address provided. '
+                    + 'Please check the details you entered and try again.\n\n',
+                },
+
+                action: {
+                    buttons: [
+                        {
+                            type: 'reply',
+                            reply: {
+                                id: flowTokenEncode,
+                                title: 'Fill location again',
+                            },
+                        },
+                    ],
+                },
+            },
+        };
+
+        const resData = await WhatsappHelper.sendMessage(template);
+        const response = {};
+        if (resData?.status && resData?.status !== 200) {
+            response.status = resData.status;
+            response.message = resData.message;
+            response.code = resData.code;
+            return promiseResolve(response);
+        }
+        return true;
+    } catch (err) {
+        return promiseReject(err);
+    }
+};
 const checkCountry = async (data) => {
     try {
+        console.log('resGetLocationData: ', data);
         const customerName = data?.customerName || ' Damg xian truong';
         const customerAddress = data?.customerAddress || 'Thai lan';
         const resGetLocationData = await getLocationData({ address: customerAddress });
+        console.log(util.inspect(resGetLocationData, false, null, true));
         if (isEmpty(resGetLocationData)) {
+            // return await fillLocationAgain(data);
             // gui ti nhăn lại khong tim thay địa chỉ
             return false;
         }
