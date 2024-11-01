@@ -537,7 +537,6 @@ const checkCountry = async (data) => {
 const paymentSuccess = async (data) => {
     try {
         const phone = data?.phone || '84902103222';
-        const eventImage = data?.eventImage || 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
         const imagePaymentSuccess = data?.imagePaymentSuccess
          || 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
 
@@ -548,9 +547,6 @@ const paymentSuccess = async (data) => {
             type: 'image',
             image: {
                 link: imagePaymentSuccess,
-                caption: 'Thank you for your dedication to offsetting; '
-                  + 'your efforts are not just commendable but essential in weaving a brighter,'
-                  + ' more sustainable future for our planet.\n',
             },
         };
         const resData = await WhatsappHelper.sendMessage(template);
@@ -829,7 +825,6 @@ const paymentConfirmation = async (data) => {
             };
             const eventImage = await convertTextToImage(params);
             const imagePaymentSuccess = await convertTextToImage(params, 'paymentSuccess');
-            console.log('this log imagePaymentSuccess', imagePaymentSuccess);
             if (eventImage) {
                 const paramHeader = [
                     {
@@ -886,7 +881,6 @@ const paymentConfirmation = async (data) => {
                     },
                 };
                 const resData = await WhatsappHelper.sendMessage(template);
-                console.log(util.inspect(resData, false, null, true));
                 const response = {};
                 if (resData?.status && resData?.status !== 200) {
                     response.status = resData.status;
