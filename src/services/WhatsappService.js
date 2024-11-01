@@ -167,13 +167,52 @@ const listEvent = async (data) => {
         return promiseReject(err);
     }
 };
-
+const notEvent = async (data) => {
+    try {
+        const phone = data?.phone || '84902103222';
+        const template = {
+            messaging_product: 'whatsapp',
+            to: phone,
+            type: 'interactive',
+            interactive: {
+                type: 'cta_url',
+                body: {
+                    text: 'The event you selected is no longer available. We encourage you to explore our other events.\n\n',
+                },
+                action: {
+                    name: 'cta_url',
+                    parameters: {
+                        display_text: 'More information',
+                        url: 'https://www.cero.org/',
+                    },
+                },
+            },
+        };
+        const resData = await WhatsappHelper.sendMessage(template);
+        const response = {};
+        if (resData?.status && resData?.status !== 200) {
+            response.status = resData.status;
+            response.message = resData.message;
+            response.code = resData.code;
+            return promiseResolve(response);
+        }
+        return false;
+    } catch (err) {
+        return promiseReject(err);
+    }
+};
 const ecoTravel = async (data) => {
     try {
+        const resDataVekin = await DataVekinHelper.eventCarbonReceipt();
+        const dataVekin = resDataVekin ? resDataVekin : [];
         const phone = data?.phone || '84902103222';
         const latitude = data?.latitude || '13.7379374';
         const longitude = data?.longitude || '100.5239999';
         const eventId = data?.eventId;
+        const event = dataVekin.find((event) => event.id === eventId);
+        if (isEmpty(event)) {
+            return notEvent(data);
+        }
         const flowToken = {
             lat: latitude, long: longitude, eventId, type: 'sC',
         };
@@ -306,7 +345,6 @@ const selectDistance = async (data) => {
 
 const fillAddress = async (data) => {
     try {
-        console.log('this log fillAddress: ', fillAddress);
         const phone = data?.phone || '84902103222';
         const latitude = data?.latitude || '13.7379374';
         const longitude = data?.longitude || '100.5239999';
@@ -408,7 +446,6 @@ const enterLocationAgain = async (data) => {
 };
 const checkCountry = async (data) => {
     try {
-        console.log('checkCountry DATA: ', data);
         const customerName = data?.customerName || ' Damg xian truong';
         const customerAddress = data?.customerAddress || 'Thai lan';
         const typeCountry = data?.typeCountry || 'dC';
@@ -418,14 +455,13 @@ const checkCountry = async (data) => {
         const myLatitude = data?.latitude || '20.4458553';
         const myLongitude = data?.longitude || '106.1173998';
         const resGetLocationData = await getLocationData({ address: customerAddress });
-        console.log('resGetLocationData: ', resGetLocationData);
         if (isEmpty(resGetLocationData)) {
             const params = {
-                phone, latitude:myLatitude, longitude:myLongitude, eventId
-            }
-           return await enterLocationAgain(params);
+                phone, latitude: myLatitude, longitude: myLongitude, eventId,
+            };
+            return await enterLocationAgain(params);
         }
-      
+
         const locationFrom = {};
         const userDetails = {};
         locationFrom.lat = resGetLocationData?.latitude || '21.0058166';
@@ -498,20 +534,180 @@ const checkCountry = async (data) => {
         return promiseReject(err);
     }
 };
+const paymentConfirmation = async (data) => {
+    try {
+        const eventCarbonReceipt = {};
+        const resData = await DataVekinHelper.transportationList();
+        if (isEmpty(resData)) return false;
+        const emissionId = data?.id;
+        const emissionList = resData?.emission_list || [];
+        const transportation = emissionList.find((emission) => emission.id === emissionId);
+        eventCarbonReceipt.transportation = {
+            id: transportation.id,
+            unit: transportation.unit,
+            name: transportation.name,
+            total_co2: transportation.total_co2,
+            unit_converter: [],
+        };
+        const phone = data?.phone || '84902103222';
+        const customerName = data?.uds?.name;
+        const typeCountry = data?.typeCountry || 'dC';
+        const distance = data?.lf?.d || 0;
+        const eventId = data?.eid;
+        const locationFrom = data?.lf || {};
+        let countryEvent = 'Thailand';
+        const resDataEvent = await DataVekinHelper.eventCarbonReceipt();
+        const event = resDataEvent.find((event) => event.id === eventId);
+        if (isEmpty(event)) {
+            return notEvent(data);
+        }
+        countryEvent = event?.country;
+        if (typeCountry === 'sC') {
+            locationFrom.name = event?.country;
+            locationFrom.city = event?.city;
+            locationFrom.lat = event?.latitude;
+            locationFrom.long = event?.longitude;
+            locationFrom.distance = distance;
+        }
+        eventCarbonReceipt.location_from = locationFrom;
+        eventCarbonReceipt.user_details = {
+            name: customerName,
+            phone_number: phone,
+        };
+        eventCarbonReceipt.event_id = eventId;
+        const resDataVekin = await DataVekinHelper.eventCarbonReceiptPartner(eventCarbonReceipt);
+        if (resDataVekin?.receipt) {
+            const name = data?.name || null;
+            const receipt = resDataVekin?.receipt;
+            const title = receipt?.title;
+            const date = receipt?.date;
+            const eventName = receipt?.event_name;
+            const eventLocation = receipt?.event_location;
+            const eventEmission = receipt?.event_emission;
+            const eventCarbonSaved = receipt?.event_carbon_saved;
+            const blockchain = receipt?.blockchain;
+            const refNumber = receipt?.ref_number;
+            const verifiedBy = receipt?.verified_by;
+            const eventId = receipt?.event_id;
+            const formattedDate = moment(date).format('DD MMMM YYYY HH:mm');
+            let amount = calculateCost(eventEmission.value, countryEvent);
+            const currency = countryEvent === 'Singapore' ? 'sgd' : 'thb';
+            if (currency === 'thb' && amount < 18) {
+                amount = 18;
+            }
+            if (currency === 'sgd' && amount < 0.7) {
+                amount = 0.7;
+            }
+            const eventImageUrl = receipt?.event_image;
+            const baseURL = 'stripes/createCheckoutSession';
+            const params = {
+                productName: eventName,
+                unitAmount: amount,
+                blockchain,
+                phone,
+                name,
+                eventEmissionValue: eventEmission.value,
+                eventEmissionUnit: eventEmission.unit,
+                currency,
+                title,
+                date: formattedDate,
+                eventName,
+                eventLocation,
+                eventCarbonSavedValue: eventCarbonSaved.value,
+                eventCarbonSavedUnit: eventCarbonSaved.unit,
+                verifiedBy,
+                refNumber,
+                eventImageUrl,
+                eventId,
+                host: configEvn.URL,
+            };
+            const eventImage = await convertTextToImage(params);
+            const imagePaymentSuccess = await convertTextToImage(params, 'paymentSuccess');
+            if (eventImage) {
+                const paramHeader = [
+                    {
+                        type: 'image',
+                        image: {
+                            link: eventImage,
+                        },
+                    },
+                ];
+                params.eventImage = eventImage;
+                params.imagePaymentSuccess = imagePaymentSuccess;
+                const checkoutSessionURL = buildCheckoutSessionURL(baseURL, params);
+                const paramButton = [
+                    {
+                        type: 'text',
+                        text: checkoutSessionURL,
+                    },
+                ];
+                const payloadParams = { type: 'maybe_later_payload' };
+                const payloadEncode = Base64.encode(JSON.stringify(payloadParams));
+                const template = {
+                    messaging_product: 'whatsapp',
+                    to: phone,
+                    recipient_type: 'individual',
+                    type: 'template',
+                    template: {
+                        name: configEvn.TEMPLATE_CONFIRM_PAYMENT || 'confirm_payment',
+                        language: {
+                            code: 'en_US',
+                        },
+                        components: [
+                            {
+                                type: 'header',
+                                parameters: paramHeader,
+                            },
+                            {
+                                type: 'button',
+                                sub_type: 'url',
+                                index: '0',
+                                parameters: paramButton,
+                            },
+                            {
+                                type: 'button',
+                                sub_type: 'quick_reply',
+                                index: '1',
+                                parameters: [
+                                    {
+                                        type: 'payload',
+                                        payload: payloadEncode,
+                                    },
+                                ],
+                            },
+                        ],
+                    },
+                };
+                const resData = await WhatsappHelper.sendMessage(template);
+                const response = {};
+                if (resData?.status && resData?.status !== 200) {
+                    response.status = resData.status;
+                    response.message = resData.message;
+                    response.code = resData.code;
+                    return promiseResolve(response);
+                }
+                return promiseResolve(resData);
+            }
+            return promiseResolve(resDataVekin);
+        }
+        return promiseResolve(resDataVekin);
+    } catch (err) {
+        return promiseReject(err);
+    }
+};
 const paymentSuccess = async (data) => {
     try {
         const phone = data?.phone || '84902103222';
-        const eventImage = data?.eventImage || 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
+        const imagePaymentSuccess = data?.imagePaymentSuccess
+         || 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
+
         const template = {
             messaging_product: 'whatsapp',
             to: phone,
             recipient_type: 'individual',
             type: 'image',
             image: {
-                link: eventImage,
-                caption: 'Thank you for your dedication to offsetting; '
-                  + 'your efforts are not just commendable but essential in weaving a brighter,'
-                  + ' more sustainable future for our planet.\n',
+                link: imagePaymentSuccess,
             },
         };
         const resData = await WhatsappHelper.sendMessage(template);
@@ -701,162 +897,7 @@ const completed = async (data) => {
     }
 };
 
-const paymentConfirmation = async (data) => {
-    try {
-        const eventCarbonReceipt = {};
-        const resData = await DataVekinHelper.transportationList();
-        if (isEmpty(resData)) return false;
-        const emissionId = data?.id;
-        const emissionList = resData?.emission_list || [];
-        const transportation = emissionList.find((emission) => emission.id === emissionId);
-        eventCarbonReceipt.transportation = {
-            id: transportation.id,
-            unit: transportation.unit,
-            name: transportation.name,
-            total_co2: transportation.total_co2,
-            unit_converter: [],
-        };
-        const phone = data?.phone || '84902103222';
-        const customerName = data?.uds?.name;
-        const typeCountry = data?.typeCountry || 'dC';
-        const distance = data?.lf?.d || 0;
-        const eventId = data?.eid;
-        const locationFrom = data?.lf || {};
-        let countryEvent = 'Thailand';
-        const resDataEvent = await DataVekinHelper.eventCarbonReceipt();
-        const event = resDataEvent.find((event) => event.id === eventId);
-        countryEvent = event?.country;
-        if (typeCountry === 'sC') {
-            locationFrom.name = event?.country;
-            locationFrom.city = event?.city;
-            locationFrom.lat = event?.latitude;
-            locationFrom.long = event?.longitude;
-            locationFrom.distance = distance;
-        }
-        eventCarbonReceipt.location_from = locationFrom;
-        eventCarbonReceipt.user_details = {
-            name: customerName,
-            phone_number: phone,
-        };
-        eventCarbonReceipt.event_id = eventId;
-        const resDataVekin = await DataVekinHelper.eventCarbonReceiptPartner(eventCarbonReceipt);
-        if (resDataVekin?.receipt) {
-            const name = data?.name || null;
-            const receipt = resDataVekin?.receipt;
-            const title = receipt?.title;
-            const date = receipt?.date;
-            const eventName = receipt?.event_name;
-            const eventLocation = receipt?.event_location;
-            const eventEmission = receipt?.event_emission;
-            const eventCarbonSaved = receipt?.event_carbon_saved;
-            const blockchain = receipt?.blockchain;
-            const refNumber = receipt?.ref_number;
-            const verifiedBy = receipt?.verified_by;
-            const eventId = receipt?.event_id;
-            const formattedDate = moment(date).format('DD MMMM YYYY HH:mm');
-            let amount = calculateCost(eventEmission.value, countryEvent);
-            const currency = countryEvent === 'Singapore' ? 'sgd' : 'thb';
-            if (currency === 'thb' && amount < 18) {
-                amount = 18;
-            }
-            if (currency === 'sgd' && amount < 0.7) {
-                amount = 0.7;
-            }
-            const eventImageUrl = receipt?.event_image;
-            const baseURL = 'stripes/createCheckoutSession';
-            const params = {
-                productName: eventName,
-                unitAmount: amount,
-                blockchain,
-                phone,
-                name,
-                eventEmissionValue: eventEmission.value,
-                eventEmissionUnit: eventEmission.unit,
-                currency,
-                title,
-                date: formattedDate,
-                eventName,
-                eventLocation,
-                eventCarbonSavedValue: eventCarbonSaved.value,
-                eventCarbonSavedUnit: eventCarbonSaved.unit,
-                verifiedBy,
-                refNumber,
-                eventImageUrl,
-                eventId,
-                host: configEvn.URL,
-            };
-            const eventImage = await convertTextToImage(params);
-            if (eventImage) {
-                const paramHeader = [
-                    {
-                        type: 'image',
-                        image: {
-                            link: eventImage,
-                        },
-                    },
-                ];
-                params.eventImage = eventImage;
-                const checkoutSessionURL = buildCheckoutSessionURL(baseURL, params);
-                const paramButton = [
-                    {
-                        type: 'text',
-                        text: checkoutSessionURL,
-                    },
-                ];
-                const payloadParams = { type: 'maybe_later_payload' };
-                const payloadEncode = Base64.encode(JSON.stringify(payloadParams));
-                const template = {
-                    messaging_product: 'whatsapp',
-                    to: phone,
-                    recipient_type: 'individual',
-                    type: 'template',
-                    template: {
-                        name: 'confirm_payment',
-                        language: {
-                            code: 'en_US',
-                        },
-                        components: [
-                            {
-                                type: 'header',
-                                parameters: paramHeader,
-                            },
-                            {
-                                type: 'button',
-                                sub_type: 'url',
-                                index: '0',
-                                parameters: paramButton,
-                            },
-                            {
-                                type: 'button',
-                                sub_type: 'quick_reply',
-                                index: '1',
-                                parameters: [
-                                    {
-                                        type: 'payload',
-                                        payload: payloadEncode,
-                                    },
-                                ],
-                            },
-                        ],
-                    },
-                };
-                const resData = await WhatsappHelper.sendMessage(template);
-                const response = {};
-                if (resData?.status && resData?.status !== 200) {
-                    response.status = resData.status;
-                    response.message = resData.message;
-                    response.code = resData.code;
-                    return promiseResolve(response);
-                }
-                return promiseResolve(resData);
-            }
-            return promiseResolve(resDataVekin);
-        }
-        return promiseResolve(resDataVekin);
-    } catch (err) {
-        return promiseReject(err);
-    }
-};
+
 module.exports = {
     joinNow,
     listEvent,
