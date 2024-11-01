@@ -2,7 +2,6 @@
 Mr : Dang Xuan Truong
 Email: truongdx@runsystem.net
 */
-const util = require('util');
 const { Base64 } = require('js-base64');
 const WhatsappService = require('../services/WhatsappService');
 const WhatsappHelper = require('../helpers/WhatsappHelper');

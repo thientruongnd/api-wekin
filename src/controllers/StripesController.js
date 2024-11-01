@@ -55,7 +55,6 @@ module.exports.DEFAULT = {
         const body = req.body;
         try {
             if (body?.type === 'checkout.session.completed') {
-                console.log('--------checkout.session.completed-----');
                 const paymentStatus = body?.data?.object.payment_status;
                 if (paymentStatus === 'paid') {
                     const params = body?.data?.object?.metadata;
@@ -67,7 +66,6 @@ module.exports.DEFAULT = {
                 await WhatsappService.completed(params);
             }
             if (body?.type === 'payment_intent.payment_failed') {
-                console.log('-------- START payment_intent.payment_failed-----');
                 const params = body?.data?.object?.metadata;
                 await WhatsappService.paymentFailure(params);
             }
