@@ -167,13 +167,52 @@ const listEvent = async (data) => {
         return promiseReject(err);
     }
 };
-
+const notEvent = async (data) => {
+    try {
+        const phone = data?.phone || '84902103222';
+        const template = {
+            messaging_product: 'whatsapp',
+            to: phone,
+            type: 'interactive',
+            interactive: {
+                type: 'cta_url',
+                body: {
+                    text: 'The event you selected is no longer available. We encourage you to explore our other events.\n\n',
+                },
+                action: {
+                    name: 'cta_url',
+                    parameters: {
+                        display_text: 'More information',
+                        url: 'https://www.cero.org/',
+                    },
+                },
+            },
+        };
+        const resData = await WhatsappHelper.sendMessage(template);
+        const response = {};
+        if (resData?.status && resData?.status !== 200) {
+            response.status = resData.status;
+            response.message = resData.message;
+            response.code = resData.code;
+            return promiseResolve(response);
+        }
+        return false;
+    } catch (err) {
+        return promiseReject(err);
+    }
+};
 const ecoTravel = async (data) => {
     try {
+        const resDataVekin = await DataVekinHelper.eventCarbonReceipt();
+        const dataVekin = resDataVekin ? resDataVekin : [];
         const phone = data?.phone || '84902103222';
         const latitude = data?.latitude || '13.7379374';
         const longitude = data?.longitude || '100.5239999';
         const eventId = data?.eventId;
+        const event = dataVekin.find((event) => event.id === eventId);
+        if (isEmpty(event)) {
+            return notEvent(data);
+        }
         const flowToken = {
             lat: latitude, long: longitude, eventId, type: 'sC',
         };
@@ -306,7 +345,6 @@ const selectDistance = async (data) => {
 
 const fillAddress = async (data) => {
     try {
-        console.log('this log fillAddress: ', fillAddress);
         const phone = data?.phone || '84902103222';
         const latitude = data?.latitude || '13.7379374';
         const longitude = data?.longitude || '100.5239999';
@@ -408,7 +446,6 @@ const enterLocationAgain = async (data) => {
 };
 const checkCountry = async (data) => {
     try {
-        console.log('checkCountry DATA: ', data);
         const customerName = data?.customerName || ' Damg xian truong';
         const customerAddress = data?.customerAddress || 'Thai lan';
         const typeCountry = data?.typeCountry || 'dC';
@@ -418,14 +455,13 @@ const checkCountry = async (data) => {
         const myLatitude = data?.latitude || '20.4458553';
         const myLongitude = data?.longitude || '106.1173998';
         const resGetLocationData = await getLocationData({ address: customerAddress });
-        console.log('resGetLocationData: ', resGetLocationData);
         if (isEmpty(resGetLocationData)) {
             const params = {
-                phone, latitude:myLatitude, longitude:myLongitude, eventId
-            }
-           return await enterLocationAgain(params);
+                phone, latitude: myLatitude, longitude: myLongitude, eventId,
+            };
+            return await enterLocationAgain(params);
         }
-      
+
         const locationFrom = {};
         const userDetails = {};
         locationFrom.lat = resGetLocationData?.latitude || '21.0058166';
@@ -725,6 +761,9 @@ const paymentConfirmation = async (data) => {
         let countryEvent = 'Thailand';
         const resDataEvent = await DataVekinHelper.eventCarbonReceipt();
         const event = resDataEvent.find((event) => event.id === eventId);
+        if (isEmpty(event)) {
+            return notEvent(data);
+        }
         countryEvent = event?.country;
         if (typeCountry === 'sC') {
             locationFrom.name = event?.country;
@@ -786,6 +825,8 @@ const paymentConfirmation = async (data) => {
                 host: configEvn.URL,
             };
             const eventImage = await convertTextToImage(params);
+            const eventImagePaymentSuccess = await convertTextToImage(params, 'paymentSuccess');
+            console.log('this log eventImage', eventImage);
             if (eventImage) {
                 const paramHeader = [
                     {
@@ -841,6 +882,7 @@ const paymentConfirmation = async (data) => {
                     },
                 };
                 const resData = await WhatsappHelper.sendMessage(template);
+                console.log(util.inspect(resData, false, null, true));
                 const response = {};
                 if (resData?.status && resData?.status !== 200) {
                     response.status = resData.status;

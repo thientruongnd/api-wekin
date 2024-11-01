@@ -15,7 +15,7 @@ const indexRoute = (apiRouter) => {
     apiRouter.route('/tests/paymentSuccess').post(DEFAULT.paymentSuccess);
     apiRouter.route('/tests/paymentFailure').post(DEFAULT.paymentFailure);
     apiRouter.route('/tests/completed').post(DEFAULT.completed);
-    apiRouter.route('/tests/ecoTravel').get(DEFAULT.ecoTravel);
+    apiRouter.route('/tests/ecoTravel').post(DEFAULT.ecoTravel);
     apiRouter.route('/tests/checkCountry').post(DEFAULT.checkCountry);
     apiRouter.route('/tests/eventOffset').post(DEFAULT.eventOffset);
     apiRouter.route('/tests/textToImage').post(DEFAULT.textToImage);

@@ -221,10 +221,13 @@ const downloadImage = async (url, outputPath) => {
         console.error('Lỗi khi tải ảnh:', error.message);
     }
 };
-const convertTextToImage = async (data) => {
+const convertTextToImage = async (data, type = null) => {
     try {
         const width = 600;
-        const height = 700;
+        let height = 700;
+        if (type === 'paymentSuccess') {
+            height = 800;
+        }
         const canvas = createCanvas(width, height);
         const ctx = canvas.getContext('2d');
         ctx.fillStyle = '#ffffff';
@@ -257,16 +260,22 @@ const convertTextToImage = async (data) => {
         }
         const image = await loadImage(data.eventImageUrl);
         ctx.drawImage(image, (width - 200) / 2, 40, 200, 200); // X, Y, width, height
-        wrapText(ctx, String(data.title).toUpperCase(), 0, 280, 600, 30, true, true, 22);
-        wrapText(ctx, data.date, 0, 310, 600, 30, false, true, 16);
-        wrapText(ctx, data.eventName, 0, 340, 600, 30, true, true, 20);
-        wrapText(ctx, data.eventLocation, 0, 370, 600, 30, false, true);
-        drawTextLeftRight(ctx, 'Your Emission:', `${data.eventEmissionValue} ${data.eventEmissionUnit}`, 440, 600);
-        drawTextLeftRight(ctx, 'Carbon Saved:', `${data.eventCarbonSavedValue} ${data.eventCarbonSavedUnit}`, 480, 600);
-        drawTextLeftRight(ctx, 'Total cost:', `${data.unitAmount} ${String(data.currency).toUpperCase()}`, 520, 600);
-        drawTextLeftRight(ctx, 'Verified blockchain address:', `${String(data.blockchain).substring(0, 15) }...`, 560, 600);
-        drawTextLeftRight(ctx, 'Verified by:', `${data.verifiedBy}`, 600, 600);
-        drawTextLeftRight(ctx, 'Receipt NO.:', `${data.refNumber}`, 640, 600);
+        wrapText(ctx, String(data.title).toUpperCase(), 0, 250, 600, 30, true, true, 22);
+        wrapText(ctx, data.date, 0, 280, 600, 30, false, true, 16);
+        wrapText(ctx, data.eventName, 0, 310, 600, 30, true, true, 20);
+        wrapText(ctx, data.eventLocation, 0, 340, 600, 30, false, true);
+        drawTextLeftRight(ctx, 'Your Emission:', `${data.eventEmissionValue} ${data.eventEmissionUnit}`, 410, 600);
+        drawTextLeftRight(ctx, 'Carbon Saved:', `${data.eventCarbonSavedValue} ${data.eventCarbonSavedUnit}`, 450, 600);
+        drawTextLeftRight(ctx, 'Total cost:', `${data.unitAmount} ${String(data.currency).toUpperCase()}`, 490, 600);
+        drawTextLeftRight(ctx, 'Verified blockchain address:', `${String(data.blockchain).substring(0, 15) }...`, 530, 600);
+        if (type === 'paymentSuccess') {
+            drawTextLeftRight(ctx, 'Verified by:', `${data.verifiedBy}`, 570, 600);
+            drawTextLeftRight(ctx, 'Receipt NO.:', `${data.refNumber}`, 610, 600);
+            wrapText(ctx, 'Thank you for your dedication to offsetting; your efforts are not just', 0, 680, 600, 20, false, true, 16);
+            wrapText(ctx, 'commendable but essential in weaving a brighter, more sustainable ', 0, 710, 600, 20, false, true, 16);
+            wrapText(ctx, 'future for our planet.', 0, 740, 600, 30, false, true, 16);
+        }
+
         const buffer = canvas.toBuffer('image/png');
         const fileName = getRandomFileName('png');
         const outputPath = path.join(__dirname, '../public/images', fileName);

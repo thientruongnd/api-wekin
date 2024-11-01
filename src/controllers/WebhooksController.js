@@ -44,7 +44,7 @@ module.exports.API = {
                 const changes = entry.changes;
                 changes.forEach((change) => {
                     const messageData = change?.value?.messages;
-                    const statuses = change?.value?.statuses;
+                    // const statuses = change?.value?.statuses;
                     // console.log(util.inspect(statuses, false, null, true));
                     const contacts = change?.value?.contacts;
                     if (contacts) {
@@ -55,7 +55,6 @@ module.exports.API = {
                     if (messageData) {
                         messageData.forEach((message) => {
                         // Xử lý tin nhắn từ người dùng tại đây
-                            console.log('Message: ', message);
                             const text = message?.text?.body;
                             const type = message?.type;
                             const payload = message?.button?.payload;
@@ -69,7 +68,6 @@ module.exports.API = {
                             if (type === 'interactive' && typeInteractive === 'button_reply') {
                                 const buttonReply = message?.interactive?.button_reply?.id;
                                 const decodedToken = JSON.parse(Base64.decode(buttonReply));
-                                console.log('this log button_reply:', decodedToken);
                                 typeMessage = decodedToken?.type;
                                 params.latitude = decodedToken?.lat;
                                 params.longitude = decodedToken?.long;
@@ -107,7 +105,6 @@ module.exports.API = {
                                 const nfmReply = message?.interactive?.nfm_reply;
                                 const responseJson = JSON.parse(nfmReply?.response_json);
                                 const decodedToken = JSON.parse(Base64.decode(responseJson?.flow_token));
-                                console.log('this log nfm_reply: ', decodedToken);
                                 typeMessage = decodedToken?.type;
                                 if (typeMessage === 'checkCountry') {
                                     const customerName = responseJson?.screen_0_name_0;
@@ -143,12 +140,10 @@ module.exports.API = {
                 await WhatsappService.selectDistance(params);
             }
             if (typeMessage === 'dC' || typeMessage === 'enter_location_again') {
-                console.log('this log fillAddress: ', params);
                 await WhatsappService.fillAddress(params);
             }
             if (typeMessage === 'checkCountry') {
                 params.typeCountry = 'dC';
-                console.log('this log checkCountry: ', params);
                 await WhatsappService.checkCountry(params);
             }
             if (typeMessage === 'receipt') {
