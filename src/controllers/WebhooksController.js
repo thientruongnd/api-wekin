@@ -143,6 +143,7 @@ module.exports.API = {
                 await WhatsappService.selectDistance(params);
             }
             if (typeMessage === 'dC') {
+                console.log('this log fillAddress: ', params);
                 await WhatsappService.fillAddress(params);
             }
             if (typeMessage === 'checkCountry') {
