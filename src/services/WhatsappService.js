@@ -356,14 +356,15 @@ const fillAddress = async (data) => {
     }
 };
 
-const fillLocationAgain = async (data) => {
+const enterLocationAgain = async (data) => {
     try {
         const phone = data?.phone || '84902103222';
+        const eventId = data?.eventId || 230;
         const latitude = data?.latitude || '13.7379374';
         const longitude = data?.longitude || '100.5239999';
-        const eventId = data?.eventId || 230;
+        const typeCountry = data?.typeCountry;
         const flowToken = {
-            lat: latitude, long: longitude, eventId, type: 'fill_location_again',
+            lat: latitude, long: longitude, eventId, typeCountry, type: 'enter_location_again',
         };
         const flowTokenEncode = Base64.encode(JSON.stringify(flowToken));
         const template = {
@@ -384,7 +385,7 @@ const fillLocationAgain = async (data) => {
                             type: 'reply',
                             reply: {
                                 id: flowTokenEncode,
-                                title: 'Fill location again',
+                                title: 'Enter location again',
                             },
                         },
                     ],
@@ -413,8 +414,7 @@ const checkCountry = async (data) => {
         const resGetLocationData = await getLocationData({ address: customerAddress });
         console.log('resGetLocationData: ', resGetLocationData);
         if (isEmpty(resGetLocationData)) {
-            // return await fillLocationAgain(data);
-            // gui ti nhăn lại khong tim thay địa chỉ
+            //return await enterLocationAgain(data);
             return false;
         }
         const typeCountry = data?.typeCountry || 'dC';
