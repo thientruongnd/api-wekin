@@ -407,11 +407,11 @@ const fillLocationAgain = async (data) => {
 };
 const checkCountry = async (data) => {
     try {
-        console.log('resGetLocationData: ', data);
+        console.log('checkCountry DATA: ', data);
         const customerName = data?.customerName || ' Damg xian truong';
         const customerAddress = data?.customerAddress || 'Thai lan';
         const resGetLocationData = await getLocationData({ address: customerAddress });
-        console.log(util.inspect(resGetLocationData, false, null, true));
+        console.log('resGetLocationData: ', resGetLocationData);
         if (isEmpty(resGetLocationData)) {
             // return await fillLocationAgain(data);
             // gui ti nhăn lại khong tim thay địa chỉ
