@@ -8,7 +8,6 @@ const fs = require('fs');
 const path = require('path');
 const winston = require('winston');
 const empty = require('is-empty');
-const nodeHtmlToImage = require('node-html-to-image');
 const { createCanvas, loadImage } = require('canvas');
 const { countries: dataCountries } = require('./dataSample/data.countries');
 const { CODES_SUCCESS, CODES_ERROR } = require('./messages');
@@ -279,63 +278,7 @@ const convertTextToImage = async (data) => {
         console.error('error create image:', error.message);
     }
 };
-const convertTextToImageNodeHtmlToImage = async (data) => {
-    try {
-        const fileName = getRandomFileName('png');
-        const outputPath = path.join(__dirname, '../public/images', fileName);
-        const eventImage = `${data.host}/images/${fileName}`;
-        await nodeHtmlToImage({
-            output: outputPath,
-            html: `
-              <html>
-                <head>
-                  <style>
-                    body {
-                      width: 600px;
-                      height: 700px;
-                    }
-                    p {
-                      font-size: 22px;
-                      line-height: 28px;
-                      margin: 0px;
-                    }
-                  </style>
-                </head>
-                <body style="margin:0; padding:15px;background-color: #fff;">
-                  <div style="width: 150px; height: 150px; margin: 0 auto;margin-bottom: 10px;background-color: #fff">
-                    <img src="${data.eventImageUrl}" style="width: 100%; height: 100%;"/>
-                  </div>
-                  <p style="text-align: center;font-weight: bold;">${data.title}</p>
-                  <p style="text-align: center;">${data.date}</p>
-                  <p style="font-weight: bold;">${data.eventName}</p>
-                  <p>${data.eventLocation}</p>
-                  <div style="display: flex; justify-content: space-between;font-weight: bold;">
-                    <p>Your Emission</p>
-                    <p>${data.eventEmissionValue} ${data.eventEmissionUnit}</p>
-                  </div>
-                  <div style="display: flex; justify-content: space-between;font-weight: bold;">
-                    <p>Carbon Saved</p>
-                    <p>${data.eventCarbonSavedValue} ${data.eventCarbonSavedUnit}</p>
-                  </div>
-                  <div style="display: flex; justify-content: space-between;font-weight: bold;">
-                    <p>Total cost</p>
-                    <p>${data.unitAmount} ${data.currency}</p>
-                  </div>
-                  <p>Verified blockchain address:</p>
-                  <p style="font-weight: bold;word-wrap: break-word; overflow-wrap: break-word;">${data.blockchain}</p>
-                  <p style="font-weight: bold;margin-top: 10px;">Verified by ${data.verifiedBy}</p>
-                  <p>Receipt NO.: ${data.refNumber}</p>
-                </body>
-              </html>
-            `,
-        });
-        console.log('The image was created successfully!');
-        return eventImage;
-    } catch (error) {
-        console.error('error create image:', error.message);
-        return null;
-    }
-};
+
 const getCountryFromCoordinates = async (latitude, longitude) => {
     const apiKey = configEvn.GOOGLE_MAP_KEY; // Replace with your actual API key
     const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}`;
@@ -412,6 +355,5 @@ module.exports = {
     getRandomFileName,
     getCountryFromCoordinates,
     convertTextToImage,
-    convertTextToImageNodeHtmlToImage,
     getLocationData,
 };
