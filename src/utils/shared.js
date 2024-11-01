@@ -221,10 +221,13 @@ const downloadImage = async (url, outputPath) => {
         console.error('Lỗi khi tải ảnh:', error.message);
     }
 };
-const convertTextToImage = async (data) => {
+const convertTextToImage = async (data, type = null) => {
     try {
         const width = 600;
-        const height = 700;
+        let height = 700;
+        if (type === 'paymentSuccess') {
+            height = 800;
+        }
         const canvas = createCanvas(width, height);
         const ctx = canvas.getContext('2d');
         ctx.fillStyle = '#ffffff';
@@ -267,6 +270,12 @@ const convertTextToImage = async (data) => {
         drawTextLeftRight(ctx, 'Verified blockchain address:', `${String(data.blockchain).substring(0, 15) }...`, 560, 600);
         drawTextLeftRight(ctx, 'Verified by:', `${data.verifiedBy}`, 600, 600);
         drawTextLeftRight(ctx, 'Receipt NO.:', `${data.refNumber}`, 640, 600);
+        if (type === 'paymentSuccess') {
+            wrapText(ctx, 'Thank you for your dedication to offsetting; your efforts are not just', 0, 700, 600, 20, false, true, 16);
+            wrapText(ctx, 'commendable but essential in weaving a brighter, more sustainable ', 0, 725, 600, 20, false, true, 16);
+            wrapText(ctx, 'future for our planet.', 0, 750, 600, 20, false, true, 16);
+        }
+
         const buffer = canvas.toBuffer('image/png');
         const fileName = getRandomFileName('png');
         const outputPath = path.join(__dirname, '../public/images', fileName);
