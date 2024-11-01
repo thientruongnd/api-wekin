@@ -411,18 +411,21 @@ const checkCountry = async (data) => {
         console.log('checkCountry DATA: ', data);
         const customerName = data?.customerName || ' Damg xian truong';
         const customerAddress = data?.customerAddress || 'Thai lan';
-        const resGetLocationData = await getLocationData({ address: customerAddress });
-        console.log('resGetLocationData: ', resGetLocationData);
-        if (isEmpty(resGetLocationData)) {
-            //return await enterLocationAgain(data);
-            return false;
-        }
         const typeCountry = data?.typeCountry || 'dC';
         const eventId = data?.eventId || 230;
         const distance = data?.distance || 0;
         const phone = data?.phone || '84902103222';
         const myLatitude = data?.latitude || '20.4458553';
         const myLongitude = data?.longitude || '106.1173998';
+        const resGetLocationData = await getLocationData({ address: customerAddress });
+        console.log('resGetLocationData: ', resGetLocationData);
+        if (isEmpty(resGetLocationData)) {
+            const params = {
+                phone, latitude:myLatitude, longitude:myLongitude, eventId
+            }
+           return await enterLocationAgain(params);
+        }
+      
         const locationFrom = {};
         const userDetails = {};
         locationFrom.lat = resGetLocationData?.latitude || '21.0058166';
