@@ -69,7 +69,7 @@ module.exports.API = {
                             if (type === 'interactive' && typeInteractive === 'button_reply') {
                                 const buttonReply = message?.interactive?.button_reply?.id;
                                 const decodedToken = JSON.parse(Base64.decode(buttonReply));
-                                // console.log('this log button_reply:', decodedToken);
+                                console.log('this log button_reply:', decodedToken);
                                 typeMessage = decodedToken?.type;
                                 params.latitude = decodedToken?.lat;
                                 params.longitude = decodedToken?.long;
@@ -142,7 +142,7 @@ module.exports.API = {
             if (typeMessage === 'sC') {
                 await WhatsappService.selectDistance(params);
             }
-            if (typeMessage === 'dC') {
+            if (typeMessage === 'dC' || typeMessage === 'enter_location_again') {
                 console.log('this log fillAddress: ', params);
                 await WhatsappService.fillAddress(params);
             }
