@@ -538,13 +538,16 @@ const paymentSuccess = async (data) => {
     try {
         const phone = data?.phone || '84902103222';
         const eventImage = data?.eventImage || 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
+        const imagePaymentSuccess = data?.imagePaymentSuccess
+         || 'https://cdn.prod.website-files.com/64f417aa4ab67502c724d8c5/6503dfb8fab9f0c7a354aff6_LOGO_CERO_TEXT.png';
+
         const template = {
             messaging_product: 'whatsapp',
             to: phone,
             recipient_type: 'individual',
             type: 'image',
             image: {
-                link: eventImage,
+                link: imagePaymentSuccess,
                 caption: 'Thank you for your dedication to offsetting; '
                   + 'your efforts are not just commendable but essential in weaving a brighter,'
                   + ' more sustainable future for our planet.\n',
@@ -825,8 +828,8 @@ const paymentConfirmation = async (data) => {
                 host: configEvn.URL,
             };
             const eventImage = await convertTextToImage(params);
-            const eventImagePaymentSuccess = await convertTextToImage(params, 'paymentSuccess');
-            console.log('this log eventImage', eventImage);
+            const imagePaymentSuccess = await convertTextToImage(params, 'paymentSuccess');
+            console.log('this log imagePaymentSuccess', imagePaymentSuccess);
             if (eventImage) {
                 const paramHeader = [
                     {
@@ -837,6 +840,7 @@ const paymentConfirmation = async (data) => {
                     },
                 ];
                 params.eventImage = eventImage;
+                params.imagePaymentSuccess = imagePaymentSuccess;
                 const checkoutSessionURL = buildCheckoutSessionURL(baseURL, params);
                 const paramButton = [
                     {
