@@ -123,7 +123,7 @@ module.exports.DEFAULT = {
         return res.json(responseSuccess(10261, resData, 'en'));
     },
     checkCountry: async (req, res) => {
-        const resData = await WhatsappService.checkCountry();
+        const resData = await WhatsappService.checkCountry(req.body);
         return res.json(responseSuccess(10261, resData, 'en'));
     },
     eventOffset: async (req, res) => {
