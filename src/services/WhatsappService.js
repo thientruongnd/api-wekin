@@ -613,10 +613,10 @@ const checkCountry = async (data) => {
 
 const transportation = async (data) => {
     try {
-        
+        console.log(util.inspect(data, false, null, true));
         const eventId = data?.eventId || 230;
-        const distance = data?.distance || 0;
         const phone = data?.phone || '84902103222';
+        const typeCountry = data?.typeCountry || 'dC';
         const userDetails = {};
         const resData = await DataVekinHelper.transportationList();
         const rows = [];
