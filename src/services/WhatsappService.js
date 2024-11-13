@@ -25,7 +25,7 @@ const joinNow = async (data) => {
     try {
         const phone = data?.phone || '84902103222';
         const name = data?.name || 'Xuan Truong';
-        const imageId = data?.imageId || '1092387271735133';// 439102592147175
+        const imageId = data?.imageId || '887222466884766';// 439102592147175
         const joinNowPayload = { type: 'join_now_payload' };
         const joinNowPayloadId = Base64.encode(JSON.stringify(joinNowPayload));
         const template = {
@@ -38,7 +38,8 @@ const joinNow = async (data) => {
                 header: {
                     type: 'image',
                     image: {
-                        id: imageId,
+                        // id: imageId,
+                        id: 887222466884766,
                     },
                 },
                 body: {
@@ -114,10 +115,12 @@ const listEvent = async (data) => {
                 flowToken.lat = nearestLocations[i].latitude;
                 flowToken.long = nearestLocations[i].longitude;
                 const encodedToken = Base64.encode(JSON.stringify(flowToken));
+                const title = nearestLocations[i].name;
                 element.id = encodedToken;
-                element.title = nearestLocations[i].name;
-                // Gán lại giá trị sau khi cắt chuỗi
-                element.title = element.title.substring(0, 24);
+                // max length is 24
+                element.title = title?.length > 24 ? title?.substring(0, 20) + '...' : title?.substring(0, 24);
+                // element.title = element.title.substring(0, 24);
+
                 element.description = nearestLocations[i].event_code;
                 // Kiểm tra số lượng phần tử trong rows
                 if (rows.length < 10) {
@@ -488,9 +491,11 @@ const checkCountry = async (data) => {
                 flowToken.tC = typeCountry;
                 const encodedToken = Base64.encode(JSON.stringify(flowToken));
                 element.id = encodedToken;
-                element.title = emissionList[i].name;
+                // element.title = emissionList[i].name;
+                const title = emissionList[i].name
                 // Gán lại giá trị sau khi cắt chuỗi
-                element.title = element.title.substring(0, 24);
+                element.title = title?.length > 24 ? title?.substring(0, 20) + '...' : title?.substring(0, 24); // max length is 24
+                // element.title = element.title.substring(0, 24);
                 // element.description = nearestLocations[i].event_code;
                 if (rows.length < 10) {
                     rows.push(element);
@@ -589,7 +594,7 @@ const paymentConfirmation = async (data) => {
             const refNumber = receipt?.ref_number;
             const verifiedBy = receipt?.verified_by;
             const eventId = receipt?.event_id;
-            const formattedDate = moment(date).format('DD MMMM YYYY HH:mm');
+            const formattedDate = moment(date).format('DD MMMM YYYY');
             let amount = calculateCost(eventEmission.value, countryEvent);
             const currency = countryEvent === 'Singapore' ? 'sgd' : 'thb';
             if (currency === 'thb' && amount < 18) {
@@ -884,6 +889,19 @@ const completed = async (data) => {
             },
         };
         const resData = await WhatsappHelper.sendMessage(template);
+
+            //TODO: will need to add this text response to an API so we can make it dynamic
+            const closingMessage = await WhatsappHelper.sendMessage({
+                messaging_product: 'whatsapp',
+                to: phone,
+                type: 'text',
+                text: {
+                    body: 'In collaboration with UOB Finlab, We are proud to announce that this event is a carbon NEUTRAL event.',
+                }
+            });
+      
+
+
         const response = {};
         if (resData?.status && resData?.status !== 200) {
             response.status = resData.status;
