@@ -126,10 +126,11 @@ module.exports.API = {
                 params.imageId = '439102592147175';
                 await WhatsappService.joinNow(params);
             }
+            // if (typeMessage === 'join_now_payload') {// 
+            //     await WhatsappHelper.sendMessageLocation({ phone });
+            // }
+            //if (typeMessage === 'location') {
             if (typeMessage === 'join_now_payload') {
-                await WhatsappHelper.sendMessageLocation({ phone });
-            }
-            if (typeMessage === 'location') {
                 await WhatsappService.listEvent(params);
             }
             if (typeMessage === 'selectEvent') {

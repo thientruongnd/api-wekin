@@ -112,8 +112,8 @@ const listEvent = async (data) => {
             for (let i = 0; i < nearestLocations.length; i++) {
                 const element = {};
                 flowToken.eventId = nearestLocations[i].id;
-                flowToken.lat = nearestLocations[i].latitude;
-                flowToken.long = nearestLocations[i].longitude;
+                flowToken.lat = nearestLocations[i]?.latitude;
+                flowToken.long = nearestLocations[i]?.longitude;
                 const encodedToken = Base64.encode(JSON.stringify(flowToken));
                 const title = nearestLocations[i].name;
                 element.id = encodedToken;
