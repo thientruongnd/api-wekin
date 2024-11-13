@@ -114,6 +114,12 @@ module.exports.DEFAULT = {
         const resData = await WhatsappService.completed(params);
         return res.json(responseSuccess(10261, resData, 'en'));
     },
+    getCountryDataByPhone: async (req, res) => {
+        const params = {};
+        params.phone = req.body.phone || '+84974418454';
+        const resData = await WhatsappService.getCountryDataByPhone(req.body);
+        return res.json(responseSuccess(10261, resData, 'en'));
+    },
     ecoTravel: async (req, res) => {
         const resData = await WhatsappService.ecoTravel(req.body);
         return res.json(responseSuccess(10261, resData, 'en'));

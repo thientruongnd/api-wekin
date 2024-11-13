@@ -338,6 +338,22 @@ const getLocationData = async (data) => {
         return null;
     }
 };
+const getLocationByPhone = async (data) => {
+    const apiKey = '2e2b4d0856584b799f08b2d019705c7e';
+    const phone = data?.phone;
+    const url = `https://phonevalidation.abstractapi.com/v1/?api_key=${apiKey}&phone=${phone}`;
+    try {
+        const response = await axios.get(url);
+        const data = response.data;
+        if (data.valid === true) {
+           return data;
+        }
+        return null;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        return null;
+    }
+};
 module.exports = {
     normalizePort,
     onError,
@@ -370,4 +386,5 @@ module.exports = {
     getCountryFromCoordinates,
     convertTextToImage,
     getLocationData,
+    getLocationByPhone,
 };

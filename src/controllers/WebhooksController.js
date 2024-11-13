@@ -34,7 +34,7 @@ module.exports.API = {
     },
     postWebhook: async (req, res) => {
         const body = req.body;
-        // console.log('body: ', body);
+         console.log('body: ', body);
         // Kiểm tra request có chứa dữ liệu từ WhatsApp
         const params = {};
         let typeMessage = ''; let phone = ''; let fullName = ''; let eventId;
@@ -44,7 +44,7 @@ module.exports.API = {
                 changes.forEach((change) => {
                     const messageData = change?.value?.messages;
                     // const statuses = change?.value?.statuses;
-                    // console.log(util.inspect(statuses, false, null, true));
+                    console.log(util.inspect(messageData, false, null, true));
                     const contacts = change?.value?.contacts;
                     if (contacts) {
                         contacts.forEach((contact) => {
@@ -134,7 +134,7 @@ module.exports.API = {
                 await WhatsappService.listEvent(params);
             }
             if (typeMessage === 'selectEvent') {
-                await WhatsappService.ecoTravel(params);
+               // await WhatsappService.ecoTravel(params);
             }
             if (typeMessage === 'sC') {
                 await WhatsappService.selectDistance(params);

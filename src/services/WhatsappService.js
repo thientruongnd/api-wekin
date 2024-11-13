@@ -9,6 +9,8 @@ const { Base64 } = require('js-base64');
 const WhatsappHelper = require('../helpers/WhatsappHelper');
 const DataVekinHelper = require('../helpers/DataVekinHelper');
 const { configEvn } = require('../configs/configEnvSchema');
+const fs = require('fs');
+const path = require('path');
 const {
     promiseReject,
     promiseResolve,
@@ -19,6 +21,7 @@ const {
     getCountryFromCoordinates,
     convertTextToImage,
     getLocationData,
+    getLocationByPhone,
 } = require('../utils/shared');
 
 const joinNow = async (data) => {
@@ -107,26 +110,45 @@ const listEvent = async (data) => {
         };
         if (!isEmpty(resDataVekin)) {
             // khi có sự kiện
-            const nearestLocations = getNearestLocations(resDataVekin, latitude, longitude);
             const rows = [];
-            for (let i = 0; i < nearestLocations.length; i++) {
+            for (let i = 0; i < resDataVekin.length; i++) {
                 const element = {};
-                flowToken.eventId = nearestLocations[i].id;
-                flowToken.lat = nearestLocations[i]?.latitude;
-                flowToken.long = nearestLocations[i]?.longitude;
+                flowToken.eventId = resDataVekin[i].id;
+                flowToken.lat = resDataVekin[i]?.latitude;
+                flowToken.long = resDataVekin[i]?.longitude;
                 const encodedToken = Base64.encode(JSON.stringify(flowToken));
-                const title = nearestLocations[i].name;
+                const title = resDataVekin[i].name;
                 element.id = encodedToken;
                 // max length is 24
                 element.title = title?.length > 24 ? title?.substring(0, 20) + '...' : title?.substring(0, 24);
                 // element.title = element.title.substring(0, 24);
 
-                element.description = nearestLocations[i].event_code;
+                element.description = resDataVekin[i].event_code;
                 // Kiểm tra số lượng phần tử trong rows
                 if (rows.length < 10) {
                     rows.push(element);
                 }
             }
+            // const nearestLocations = getNearestLocations(resDataVekin, latitude, longitude);
+            // const rows = [];
+            // for (let i = 0; i < nearestLocations.length; i++) {
+            //     const element = {};
+            //     flowToken.eventId = nearestLocations[i].id;
+            //     flowToken.lat = nearestLocations[i]?.latitude;
+            //     flowToken.long = nearestLocations[i]?.longitude;
+            //     const encodedToken = Base64.encode(JSON.stringify(flowToken));
+            //     const title = nearestLocations[i].name;
+            //     element.id = encodedToken;
+            //     // max length is 24
+            //     element.title = title?.length > 24 ? title?.substring(0, 20) + '...' : title?.substring(0, 24);
+            //     // element.title = element.title.substring(0, 24);
+
+            //     element.description = nearestLocations[i].event_code;
+            //     // Kiểm tra số lượng phần tử trong rows
+            //     if (rows.length < 10) {
+            //         rows.push(element);
+            //     }
+            // }
             if (!isEmpty(rows)) {
                 template = {
                     messaging_product: 'whatsapp',
@@ -170,6 +192,54 @@ const listEvent = async (data) => {
         return promiseReject(err);
     }
 };
+
+const getCountryDataByPhone = async (data) => {
+    try {
+        const phone = data?.phone || '+84902103222';
+        const resDataVekin = await DataVekinHelper.eventCarbonReceipt();
+        const dataVekin = resDataVekin ? resDataVekin : [];
+        const eventId = data?.eventId;
+        const event = dataVekin.find((event) => event.id === eventId);
+        if (isEmpty(event)) {
+            return notEvent(data);
+        }
+        const filePath = path.join(__dirname, '..', 'utils', 'countryPhoneCodes.json');
+        const fileData = fs.readFileSync(filePath, 'utf8');
+        const countryPhoneCodes = JSON.parse(fileData);
+        let potentialPrefixes = [];
+        for (let i = 2; i <= 5; i++) {
+            potentialPrefixes.push(phone.substring(0, i));
+        }
+        // Find country data locally in JSON file
+        let countryInfo = countryPhoneCodes.find(data => potentialPrefixes.includes(data.country.prefix));
+       
+        if (isEmpty(countryInfo)) {
+            // call api
+           const apiData =  await getLocationByPhone({ phone });
+            if (apiData && apiData?.valid) {
+                const newCountryData = {
+                    country: apiData.country,
+                };
+                countryPhoneCodes.push(newCountryData);
+                console.log(util.inspect(countryPhoneCodes, false, null, true));
+                fs.writeFileSync(filePath, JSON.stringify(countryPhoneCodes, null, 2), 'utf8');
+                countryInfo = newCountryData;
+            }
+        }
+        if(event?.phone_code === countryInfo?.country?.prefix) {
+            console.log('this log same country');
+            console.log(util.inspect(data, false, null, true));
+            data.typeCountry = 'sC'
+            return await transportation(data);
+        }
+        console.log('this log deterrent country');
+        return countryInfo;
+    } catch (err) {
+        console.log(util.inspect(err, false, null, true));
+        return err;
+    }
+}
+
 const notEvent = async (data) => {
     try {
         const phone = data?.phone || '84902103222';
@@ -447,6 +517,7 @@ const enterLocationAgain = async (data) => {
         return promiseReject(err);
     }
 };
+
 const checkCountry = async (data) => {
     try {
         const customerName = data?.customerName || ' Damg xian truong';
@@ -485,6 +556,75 @@ const checkCountry = async (data) => {
                 const element = {}; const flowToken = {};
                 flowToken.id = emissionList[i].id;
                 flowToken.lf = locationFrom;
+                flowToken.uds = userDetails;
+                flowToken.eid = eventId;
+                flowToken.type = 'receipt';
+                flowToken.tC = typeCountry;
+                const encodedToken = Base64.encode(JSON.stringify(flowToken));
+                element.id = encodedToken;
+                // element.title = emissionList[i].name;
+                const title = emissionList[i].name
+                // Gán lại giá trị sau khi cắt chuỗi
+                element.title = title?.length > 24 ? title?.substring(0, 20) + '...' : title?.substring(0, 24); // max length is 24
+                // element.title = element.title.substring(0, 24);
+                // element.description = nearestLocations[i].event_code;
+                if (rows.length < 10) {
+                    rows.push(element);
+                }
+            }
+            let template;
+            if (!isEmpty(rows)) {
+                template = {
+                    messaging_product: 'whatsapp',
+                    to: phone,
+                    type: 'interactive',
+                    interactive: {
+                        type: 'list',
+                        body: {
+                            text: 'The amount of CO2 emission is different depended on the type of your transportation.'
+                            + ' Please select the transportation to display your CO2 emission.\n',
+                        },
+                        action: {
+                            button: 'Transportation',
+                            sections: [
+                                {
+                                    title: 'Choose',
+                                    rows,
+                                },
+                            ],
+                        },
+                    },
+                };
+            }
+            const resDataWhatsapp = await WhatsappHelper.sendMessage(template);
+            const response = {};
+            if (resData?.status && resDataWhatsapp?.status !== 200) {
+                response.status = resDataWhatsapp.status;
+                response.message = resDataWhatsapp.message;
+                response.code = resDataWhatsapp.code;
+                return promiseResolve(response);
+            }
+            return false;
+        }
+    } catch (err) {
+        return promiseReject(err);
+    }
+};
+
+const transportation = async (data) => {
+    try {
+        
+        const eventId = data?.eventId || 230;
+        const distance = data?.distance || 0;
+        const phone = data?.phone || '84902103222';
+        const userDetails = {};
+        const resData = await DataVekinHelper.transportationList();
+        const rows = [];
+        if (!isEmpty(resData)) {
+            const emissionList = resData?.emission_list || [];
+            for (let i = 0; i < emissionList.length; i++) {
+                const element = {}; const flowToken = {};
+                flowToken.id = emissionList[i].id;
                 flowToken.uds = userDetails;
                 flowToken.eid = eventId;
                 flowToken.type = 'receipt';
@@ -700,6 +840,7 @@ const paymentConfirmation = async (data) => {
         return promiseReject(err);
     }
 };
+
 const paymentSuccess = async (data) => {
     try {
         const phone = data?.phone || '84902103222';
@@ -927,4 +1068,5 @@ module.exports = {
     paymentFailure,
     completed,
     checkCountry,
+    getCountryDataByPhone,
 };
