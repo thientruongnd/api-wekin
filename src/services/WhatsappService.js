@@ -7,10 +7,10 @@ const util = require('util');
 const moment = require('moment');
 const { Base64 } = require('js-base64');
 const fs = require('fs');
+const path = require('path');
 const WhatsappHelper = require('../helpers/WhatsappHelper');
 const DataVekinHelper = require('../helpers/DataVekinHelper');
 const { configEvn } = require('../configs/configEnvSchema');
-const path = require('path');
 const {
     promiseReject,
     promiseResolve,
@@ -28,7 +28,7 @@ const joinNow = async (data) => {
     try {
         const phone = data?.phone || '84902103222';
         const name = data?.name || 'Xuan Truong';
-        const imageId = data?.imageId || '887222466884766';// 439102592147175
+        // const imageId = data?.imageId || '887222466884766';// 439102592147175
         const joinNowPayload = { type: 'join_now_payload' };
         const joinNowPayloadId = Base64.encode(JSON.stringify(joinNowPayload));
         const template = {
@@ -120,7 +120,7 @@ const listEvent = async (data) => {
                 const title = resDataVekin[i].name;
                 element.id = encodedToken;
                 // max length is 24
-                element.title = title?.length > 24 ? `${title?.substring(0, 20)  }...` : title?.substring(0, 24);
+                element.title = title?.length > 24 ? `${title?.substring(0, 20) }...` : title?.substring(0, 24);
                 // element.title = element.title.substring(0, 24);
 
                 element.description = resDataVekin[i].event_code;
@@ -129,26 +129,6 @@ const listEvent = async (data) => {
                     rows.push(element);
                 }
             }
-            // const nearestLocations = getNearestLocations(resDataVekin, latitude, longitude);
-            // const rows = [];
-            // for (let i = 0; i < nearestLocations.length; i++) {
-            //     const element = {};
-            //     flowToken.eventId = nearestLocations[i].id;
-            //     flowToken.lat = nearestLocations[i]?.latitude;
-            //     flowToken.long = nearestLocations[i]?.longitude;
-            //     const encodedToken = Base64.encode(JSON.stringify(flowToken));
-            //     const title = nearestLocations[i].name;
-            //     element.id = encodedToken;
-            //     // max length is 24
-            //     element.title = title?.length > 24 ? title?.substring(0, 20) + '...' : title?.substring(0, 24);
-            //     // element.title = element.title.substring(0, 24);
-
-            //     element.description = nearestLocations[i].event_code;
-            //     // Kiểm tra số lượng phần tử trong rows
-            //     if (rows.length < 10) {
-            //         rows.push(element);
-            //     }
-            // }
             if (!isEmpty(rows)) {
                 template = {
                     messaging_product: 'whatsapp',
@@ -238,7 +218,6 @@ const notEvent = async (data) => {
  */
 const transportation = async (data) => {
     try {
-        console.log(util.inspect(data, false, null, true));
         const eventId = data?.eventId || 230;
         const phone = data?.phone || '84902103222';
         const typeCountry = data?.typeCountry || 'dC';
@@ -259,7 +238,7 @@ const transportation = async (data) => {
                 // element.title = emissionList[i].name;
                 const title = emissionList[i].name;
                 // Gán lại giá trị sau khi cắt chuỗi
-                element.title = title?.length > 24 ? `${title?.substring(0, 20)  }...` : title?.substring(0, 24); // max length is 24
+                element.title = title?.length > 24 ? `${title?.substring(0, 20)}...` : title?.substring(0, 24); // max length is 24
                 // element.title = element.title.substring(0, 24);
                 // element.description = nearestLocations[i].event_code;
                 if (rows.length < 10) {
@@ -326,7 +305,7 @@ const questionCountry = async (data) => {
         locationFrom.lat = data?.latitude || '21.0058166';
         locationFrom.long = data?.longitude || '105.8473071';
         const flowToken = {
-            lf: locationFrom, eid: eventId, tC: 'dC', type: 'receipt',
+            id: 1795, lf: locationFrom, eid: eventId, tC: 'dC', type: 'receipt',
         };
         const sameCountryEncode = Base64.encode(JSON.stringify(flowToken));
         const differentCountry = {
@@ -705,7 +684,7 @@ const checkCountry = async (data) => {
                 // element.title = emissionList[i].name;
                 const title = emissionList[i].name;
                 // Gán lại giá trị sau khi cắt chuỗi
-                element.title = title?.length > 24 ? `${title?.substring(0, 20)  }...` : title?.substring(0, 24); // max length is 24
+                element.title = title?.length > 24 ? `${title?.substring(0, 20)}...` : title?.substring(0, 24); // max length is 24
                 // element.title = element.title.substring(0, 24);
                 // element.description = nearestLocations[i].event_code;
                 if (rows.length < 10) {
