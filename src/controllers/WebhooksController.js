@@ -102,8 +102,7 @@ module.exports.API = {
                                 params.lf = decodedToken?.lf;
                                 params.uds = decodedToken.uds;
                                 params.eid = decodedToken?.eid;
-                                params.eventId = eventId ? eventId : decodedToken?.eid;
-                                params.distance = decodedToken?.d || decodedToken?.lf?.d;
+                                params.eventId = eventId || decodedToken?.eid;
                                 params.typeCountry = decodedToken?.tC;
                             }
                             if (type === 'interactive' && typeInteractive === 'nfm_reply') {
