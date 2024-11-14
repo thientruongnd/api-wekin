@@ -139,6 +139,7 @@ module.exports.API = {
                 await WhatsappService.listEvent(params);
             }
             if (typeMessage === 'selectEvent') {
+                console.log(util.inspect(params, false, null, true));
                 await WhatsappService.getCountryDataByPhone(params);
             }
             if (typeMessage === 'No' || typeMessage === 'enter_location_again') {
@@ -149,6 +150,7 @@ module.exports.API = {
                 await WhatsappService.checkCountry(params);
             }
             if (typeMessage === 'receipt') {
+                console.log('this log paymentConfirmation: ', params);
                 await WhatsappService.paymentConfirmation(params);
             }
             if (typeMessage === 'maybe_later_payload') {
