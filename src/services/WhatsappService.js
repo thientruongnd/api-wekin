@@ -222,14 +222,13 @@ const remind = async (data) => {
                 action: {
                     name: 'cta_url',
                     parameters: {
-                        display_text: 'Don’t forget to claim your Exclusive NFT by Coral!',
+                        display_text: 'Get Your Coral NFT',
                         url: 'https://coralworld.co/collections/green-world',
                     },
                 },
             },
         };
         const resData = await WhatsappHelper.sendMessage(template);
-        console.log(util.inspect(resData, false, null, true));
         const response = {};
         if (resData?.status && resData?.status !== 200) {
             response.status = resData.status;
