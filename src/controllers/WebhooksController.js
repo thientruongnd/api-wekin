@@ -141,6 +141,7 @@ module.exports.API = {
             }
             if (typeMessage === 'selectEvent') {
                 // await WhatsappService.ecoTravel(params);
+                await WhatsappService.getCountryDataByPhone(params);
             }
             // if (typeMessage === 'sC') {
             //     await WhatsappService.selectDistance(params);
@@ -153,7 +154,6 @@ module.exports.API = {
                 await WhatsappService.checkCountry(params);
             }
             if (typeMessage === 'receipt') {
-                console.log(util.inspect(params, false, null, true));
                 await WhatsappService.paymentConfirmation(params);
             }
             // if (typeMessage === 'distance') {
