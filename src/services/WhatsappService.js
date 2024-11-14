@@ -17,8 +17,6 @@ const {
     isEmpty,
     calculateCost,
     buildCheckoutSessionURL,
-    getNearestLocations,
-    getCountryFromCoordinates,
     convertTextToImage,
     getLocationData,
     getLocationByPhone,
@@ -217,9 +215,9 @@ const remind = async (data) => {
             interactive: {
                 type: 'cta_url',
                 body: {
-                    text: 'Thank you for joining this sustainable event.' +
-                    ' Your participation is key to driving a meaningful change.' +
-                    'We look forward to seeing you at your next sustainable event!🌱🌏',
+                    text: 'Thank you for joining this sustainable event.'
+                    + ' Your participation is key to driving a meaningful change.'
+                    + 'We look forward to seeing you at your next sustainable event!🌱🌏',
                 },
                 action: {
                     name: 'cta_url',
@@ -231,6 +229,7 @@ const remind = async (data) => {
             },
         };
         const resData = await WhatsappHelper.sendMessage(template);
+        console.log(util.inspect(resData, false, null, true));
         const response = {};
         if (resData?.status && resData?.status !== 200) {
             response.status = resData.status;
@@ -690,6 +689,8 @@ const enterLocationAgain = async (data) => {
 
 const checkCountry = async (data) => {
     try {
+        console.log('this log checkCountry');
+        console.log(util.inspect(data, false, null, true));
         const customerAddress = data?.customerAddress || 'Thai lan';
         const typeCountry = data?.typeCountry || 'dC';
         const eventId = data?.eventId || 230;
@@ -697,6 +698,7 @@ const checkCountry = async (data) => {
         const myLatitude = data?.latitude || '20.4458553';
         const myLongitude = data?.longitude || '106.1173998';
         const resGetLocationData = await getLocationData({ address: customerAddress });
+        console.log(util.inspect(resGetLocationData, false, null, true));
         if (isEmpty(resGetLocationData)) {
             const params = {
                 phone, latitude: myLatitude, longitude: myLongitude, eventId,
