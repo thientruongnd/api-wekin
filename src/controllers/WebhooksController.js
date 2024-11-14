@@ -53,7 +53,8 @@ module.exports.API = {
                     }
                     if (messageData) {
                         messageData.forEach((message) => {
-                        // Xử lý tin nhắn từ người dùng tại đây
+                            console.log('Message:', message);
+                            // Xử lý tin nhắn từ người dùng tại đây
                             const text = message?.text?.body;
                             const type = message?.type;
                             const payload = message?.button?.payload;
@@ -67,7 +68,6 @@ module.exports.API = {
                             if (type === 'interactive' && typeInteractive === 'button_reply') {
                                 const buttonReply = message?.interactive?.button_reply?.id;
                                 const decodedToken = JSON.parse(Base64.decode(buttonReply));
-                                console.log('button_reply decodedToken: ', decodedToken);
                                 typeMessage = decodedToken?.type;
                                 params.latitude = decodedToken?.lat;
                                 params.longitude = decodedToken?.long;

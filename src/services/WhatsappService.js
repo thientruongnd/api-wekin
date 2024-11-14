@@ -689,16 +689,13 @@ const enterLocationAgain = async (data) => {
 
 const checkCountry = async (data) => {
     try {
-        console.log('this log checkCountry');
-        console.log(util.inspect(data, false, null, true));
-        const customerAddress = data?.customerAddress || 'Thai lan';
+        const customerAddress = data?.customerAddress;
         const typeCountry = data?.typeCountry || 'dC';
         const eventId = data?.eventId || 230;
         const phone = data?.phone || '84902103222';
         const myLatitude = data?.latitude || '20.4458553';
         const myLongitude = data?.longitude || '106.1173998';
         const resGetLocationData = await getLocationData({ address: customerAddress });
-        console.log(util.inspect(resGetLocationData, false, null, true));
         if (isEmpty(resGetLocationData)) {
             const params = {
                 phone, latitude: myLatitude, longitude: myLongitude, eventId,
