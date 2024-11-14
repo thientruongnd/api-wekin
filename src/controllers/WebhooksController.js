@@ -105,6 +105,7 @@ module.exports.API = {
                                 const nfmReply = message?.interactive?.nfm_reply;
                                 const responseJson = JSON.parse(nfmReply?.response_json);
                                 const decodedToken = JSON.parse(Base64.decode(responseJson?.flow_token));
+                                console.log('decodedToken: ', decodedToken);
                                 typeMessage = decodedToken?.type;
                                 if (typeMessage === 'checkCountry') {
                                     const customerName = responseJson?.screen_0_name_0;
@@ -137,23 +138,23 @@ module.exports.API = {
             if (typeMessage === 'selectEvent') {
                // await WhatsappService.ecoTravel(params);
             }
-            if (typeMessage === 'sC') {
-                await WhatsappService.selectDistance(params);
-            }
-            if (typeMessage === 'dC' || typeMessage === 'enter_location_again') {
+            // if (typeMessage === 'sC') {
+            //     await WhatsappService.selectDistance(params);
+            // }
+            if (typeMessage === 'No' || typeMessage === 'enter_location_again') {
                 await WhatsappService.fillAddress(params);
             }
-            if (typeMessage === 'checkCountry') {
-                params.typeCountry = 'dC';
-                await WhatsappService.checkCountry(params);
-            }
+            // if (typeMessage === 'checkCountry') {
+            //     params.typeCountry = 'dC';
+            //     await WhatsappService.checkCountry(params);
+            // }
             if (typeMessage === 'receipt') {
                 await WhatsappService.paymentConfirmation(params);
             }
-            if (typeMessage === 'distance') {
-                params.typeCountry = 'sC';
-                await WhatsappService.checkCountry(params);
-            }
+            // if (typeMessage === 'distance') {
+            //     params.typeCountry = 'sC';
+            //     await WhatsappService.checkCountry(params);
+            // }
             if (typeMessage === 'maybe_later_payload') {
                 await WhatsappService.completed(params);
             }

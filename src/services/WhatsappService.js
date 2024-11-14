@@ -233,7 +233,7 @@ const getCountryDataByPhone = async (data) => {
             return await transportation(data);
         }
         console.log('this log deterrent country');
-        return countryInfo;
+        return await questionCountry(data);
     } catch (err) {
         console.log(util.inspect(err, false, null, true));
         return err;
@@ -258,6 +258,81 @@ const notEvent = async (data) => {
                         display_text: 'More information',
                         url: 'https://www.cero.org/',
                     },
+                },
+            },
+        };
+        const resData = await WhatsappHelper.sendMessage(template);
+        const response = {};
+        if (resData?.status && resData?.status !== 200) {
+            response.status = resData.status;
+            response.message = resData.message;
+            response.code = resData.code;
+            return promiseResolve(response);
+        }
+        return false;
+    } catch (err) {
+        return promiseReject(err);
+    }
+};
+
+/**
+ * Asks the user if they are from a specific country via a WhatsApp interactive message.
+ *
+ * @param {Object} data - The data object containing user and event information.
+ * @param {string} [data.phone='84902103222'] - The phone number to send the message to.
+ * @param {string} [data.countryName=''] - The name of the country.
+ * @param {string} [data.latitude='13.7379374'] - The latitude of the location.
+ * @param {string} [data.longitude='100.5239999'] - The longitude of the location.
+ * @param {string} data.eventId - The ID of the event.
+ * @returns {Promise<Object|boolean>} - Returns a promise that resolves to an object with response details if an error occurs, or false if successful.
+ */
+const questionCountry = async (data) => {
+    try {
+        const resDataVekin = await DataVekinHelper.eventCarbonReceipt();
+        const dataVekin = resDataVekin ? resDataVekin : [];
+        const phone = data?.phone || '84902103222';
+        const countryName = data?.countryName || '';
+        const latitude = data?.latitude || '13.7379374';
+        const longitude = data?.longitude || '100.5239999';
+        const eventId = data?.eventId;
+        const event = dataVekin.find((event) => event.id === eventId);
+        if (isEmpty(event)) {
+            return notEvent(data);
+        }
+        const flowToken = {
+            lat: latitude, long: longitude, eventId, type: 'Yes',
+        };
+        const sameCountryEncode = Base64.encode(JSON.stringify(flowToken));
+        const differentCountry = {
+            lat: latitude, long: longitude, eventId, type: 'No',
+        };
+        const differentCountryEncode = Base64.encode(JSON.stringify(differentCountry));
+        const template = {
+            messaging_product: 'whatsapp',
+            to: phone,
+            type: 'interactive',
+            interactive: {
+                type: 'button',
+                body: {
+                    text: 'Are you from ' + event?.country + '?',
+                },
+                action: {
+                    buttons: [
+                        {
+                            type: 'reply',
+                            reply: {
+                                id: sameCountryEncode,
+                                title: 'Yes',
+                            },
+                        },
+                        {
+                            type: 'reply',
+                            reply: {
+                                id: differentCountryEncode,
+                                title: 'No',
+                            },
+                        },
+                    ],
                 },
             },
         };
@@ -431,7 +506,7 @@ const fillAddress = async (data) => {
             to: phone,
             type: 'template',
             template: {
-                name: 'your_address_complate',
+                name: 'enter_your_address',
                 language: {
                     code: 'en_US',
                 },
@@ -467,6 +542,13 @@ const fillAddress = async (data) => {
     }
 };
 
+/**
+ * This function sends a WhatsApp message prompting the user to enter their location again.
+ * It constructs a message template with a button for the user to re-enter their location.
+ *
+ * @param {Object} data - The data object containing information for the message.
+ * @returns {Promise<boolean|Object>} - Returns true if the message was sent successfully, or an error response object if it failed.
+ */
 const enterLocationAgain = async (data) => {
     try {
         const phone = data?.phone || '84902103222';
@@ -611,6 +693,14 @@ const checkCountry = async (data) => {
     }
 };
 
+/**
+ * This function handles the transportation data processing and sends a WhatsApp message with a list of transportation options.
+ * 
+ * @param {Object} data - The data object containing transportation details.
+ * @returns {Promise<Object|boolean>} - Returns a promise that resolves to a response object if the WhatsApp message fails, or false if successful.
+ * 
+ * @throws {Error} - Throws an error if there is an issue with processing the transportation data or sending the WhatsApp message.
+ */
 const transportation = async (data) => {
     try {
         console.log(util.inspect(data, false, null, true));
@@ -679,6 +769,13 @@ const transportation = async (data) => {
         return promiseReject(err);
     }
 };
+/**
+ * Handles payment confirmation by processing the provided data, generating an event carbon receipt,
+ * and sending a WhatsApp message with the payment details.
+ *
+ * @param {Object} data - The data required for payment confirmation.
+ * @returns {Promise<Object|boolean>} - Returns a promise that resolves to the response data or false if no data is found.
+ */
 const paymentConfirmation = async (data) => {
     try {
         const eventCarbonReceipt = {};
