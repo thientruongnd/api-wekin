@@ -2,6 +2,7 @@
 Mr : Dang Xuan Truong
 Email: truongdx@runsystem.net
 */
+const util = require('util');
 const { Base64 } = require('js-base64');
 const WhatsappService = require('../services/WhatsappService');
 const WhatsappHelper = require('../helpers/WhatsappHelper');
@@ -34,7 +35,6 @@ module.exports.API = {
     },
     postWebhook: async (req, res) => {
         const body = req.body;
-        // console.log('body: ', body);
         // Kiểm tra request có chứa dữ liệu từ WhatsApp
         const params = {};
         let typeMessage = ''; let phone = ''; let fullName = ''; let eventId;
@@ -44,7 +44,7 @@ module.exports.API = {
                 changes.forEach((change) => {
                     const messageData = change?.value?.messages;
                     // const statuses = change?.value?.statuses;
-                    // console.log(util.inspect(statuses, false, null, true));
+                    // console.log(util.inspect(messageData, false, null, true));
                     const contacts = change?.value?.contacts;
                     if (contacts) {
                         contacts.forEach((contact) => {
@@ -53,7 +53,8 @@ module.exports.API = {
                     }
                     if (messageData) {
                         messageData.forEach((message) => {
-                        // Xử lý tin nhắn từ người dùng tại đây
+                            console.log('Message:', message);
+                            // Xử lý tin nhắn từ người dùng tại đây
                             const text = message?.text?.body;
                             const type = message?.type;
                             const payload = message?.button?.payload;
@@ -71,6 +72,11 @@ module.exports.API = {
                                 params.latitude = decodedToken?.lat;
                                 params.longitude = decodedToken?.long;
                                 params.eventId = decodedToken?.eventId;
+                                params.id = decodedToken?.id;
+                                params.lf = decodedToken?.lf;
+                                params.uds = decodedToken.uds;
+                                params.eid = decodedToken?.eid;
+                                params.typeCountry = decodedToken?.tC;
                             }
                             if (type === 'button') {
                                 const decodedToken = JSON.parse(Base64.decode(payload));
@@ -87,7 +93,7 @@ module.exports.API = {
                             if (type === 'interactive' && typeInteractive === 'list_reply') {
                                 const id = message?.interactive?.list_reply?.id;
                                 const decodedToken = JSON.parse(Base64.decode(id));
-                                // console.log('this log list_reply: ', decodedToken);
+                                console.log('this log list_reply: ', decodedToken);
                                 eventId = decodedToken?.eventId;
                                 typeMessage = decodedToken?.type;
                                 params.latitude = decodedToken?.lat;
@@ -104,12 +110,11 @@ module.exports.API = {
                                 const nfmReply = message?.interactive?.nfm_reply;
                                 const responseJson = JSON.parse(nfmReply?.response_json);
                                 const decodedToken = JSON.parse(Base64.decode(responseJson?.flow_token));
+                                console.log('this log nfm_reply: ', decodedToken);
                                 typeMessage = decodedToken?.type;
                                 if (typeMessage === 'checkCountry') {
-                                    const customerName = responseJson?.screen_0_name_0;
-                                    const customerAddress = responseJson?.screen_0_description_1;
+                                    const customerAddress = responseJson?.screen_0_description_0;
                                     params.customerAddress = customerAddress;
-                                    params.customerName = customerName;
                                 }
                                 eventId = decodedToken?.eventId;
                                 params.latitude = decodedToken?.lat;
@@ -126,19 +131,21 @@ module.exports.API = {
                 params.imageId = '439102592147175';
                 await WhatsappService.joinNow(params);
             }
+            // if (typeMessage === 'join_now_payload') {//
+            //     await WhatsappHelper.sendMessageLocation({ phone });
+            // }
+            // if (typeMessage === 'location') {
             if (typeMessage === 'join_now_payload') {
-                await WhatsappHelper.sendMessageLocation({ phone });
-            }
-            if (typeMessage === 'location') {
                 await WhatsappService.listEvent(params);
             }
             if (typeMessage === 'selectEvent') {
-                await WhatsappService.ecoTravel(params);
+                // await WhatsappService.ecoTravel(params);
+                await WhatsappService.getCountryDataByPhone(params);
             }
-            if (typeMessage === 'sC') {
-                await WhatsappService.selectDistance(params);
-            }
-            if (typeMessage === 'dC' || typeMessage === 'enter_location_again') {
+            // if (typeMessage === 'sC') {
+            //     await WhatsappService.selectDistance(params);
+            // }
+            if (typeMessage === 'No' || typeMessage === 'enter_location_again') {
                 await WhatsappService.fillAddress(params);
             }
             if (typeMessage === 'checkCountry') {
@@ -148,10 +155,10 @@ module.exports.API = {
             if (typeMessage === 'receipt') {
                 await WhatsappService.paymentConfirmation(params);
             }
-            if (typeMessage === 'distance') {
-                params.typeCountry = 'sC';
-                await WhatsappService.checkCountry(params);
-            }
+            // if (typeMessage === 'distance') {
+            //     params.typeCountry = 'sC';
+            //     await WhatsappService.checkCountry(params);
+            // }
             if (typeMessage === 'maybe_later_payload') {
                 await WhatsappService.completed(params);
             }

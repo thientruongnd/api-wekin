@@ -6,6 +6,8 @@
 const util = require('util');
 const moment = require('moment');
 const { Base64 } = require('js-base64');
+const fs = require('fs');
+const path = require('path');
 const WhatsappHelper = require('../helpers/WhatsappHelper');
 const DataVekinHelper = require('../helpers/DataVekinHelper');
 const { configEvn } = require('../configs/configEnvSchema');
@@ -15,17 +17,16 @@ const {
     isEmpty,
     calculateCost,
     buildCheckoutSessionURL,
-    getNearestLocations,
-    getCountryFromCoordinates,
     convertTextToImage,
     getLocationData,
+    getLocationByPhone,
 } = require('../utils/shared');
 
 const joinNow = async (data) => {
     try {
         const phone = data?.phone || '84902103222';
         const name = data?.name || 'Xuan Truong';
-        const imageId = data?.imageId || '1092387271735133';// 439102592147175
+        // const imageId = data?.imageId || '887222466884766';// 439102592147175
         const joinNowPayload = { type: 'join_now_payload' };
         const joinNowPayloadId = Base64.encode(JSON.stringify(joinNowPayload));
         const template = {
@@ -38,7 +39,8 @@ const joinNow = async (data) => {
                 header: {
                     type: 'image',
                     image: {
-                        id: imageId,
+                        // id: imageId,
+                        id: 887222466884766,
                     },
                 },
                 body: {
@@ -106,19 +108,20 @@ const listEvent = async (data) => {
         };
         if (!isEmpty(resDataVekin)) {
             // khi có sự kiện
-            const nearestLocations = getNearestLocations(resDataVekin, latitude, longitude);
             const rows = [];
-            for (let i = 0; i < nearestLocations.length; i++) {
+            for (let i = 0; i < resDataVekin.length; i++) {
                 const element = {};
-                flowToken.eventId = nearestLocations[i].id;
-                flowToken.lat = nearestLocations[i].latitude;
-                flowToken.long = nearestLocations[i].longitude;
+                flowToken.eventId = resDataVekin[i].id;
+                flowToken.lat = resDataVekin[i]?.latitude;
+                flowToken.long = resDataVekin[i]?.longitude;
                 const encodedToken = Base64.encode(JSON.stringify(flowToken));
+                const title = resDataVekin[i].name;
                 element.id = encodedToken;
-                element.title = nearestLocations[i].name;
-                // Gán lại giá trị sau khi cắt chuỗi
-                element.title = element.title.substring(0, 24);
-                element.description = nearestLocations[i].event_code;
+                // max length is 24
+                element.title = title?.length > 24 ? `${title?.substring(0, 20) }...` : title?.substring(0, 24);
+                // element.title = element.title.substring(0, 24);
+
+                element.description = resDataVekin[i].event_code;
                 // Kiểm tra số lượng phần tử trong rows
                 if (rows.length < 10) {
                     rows.push(element);
@@ -167,6 +170,7 @@ const listEvent = async (data) => {
         return promiseReject(err);
     }
 };
+
 const notEvent = async (data) => {
     try {
         const phone = data?.phone || '84902103222';
@@ -201,6 +205,236 @@ const notEvent = async (data) => {
         return promiseReject(err);
     }
 };
+const remind = async (data) => {
+    try {
+        const phone = data?.phone || '84902103222';
+        const template = {
+            messaging_product: 'whatsapp',
+            to: phone,
+            type: 'interactive',
+            interactive: {
+                type: 'cta_url',
+                body: {
+                    text: 'Thank you for joining this sustainable event.'
+                    + ' Your participation is key to driving a meaningful change.'
+                    + 'We look forward to seeing you at your next sustainable event!🌱🌏',
+                },
+                action: {
+                    name: 'cta_url',
+                    parameters: {
+                        display_text: 'Get Your Coral NFT',
+                        url: 'https://coralworld.co/collections/green-world',
+                    },
+                },
+            },
+        };
+        const resData = await WhatsappHelper.sendMessage(template);
+        const response = {};
+        if (resData?.status && resData?.status !== 200) {
+            response.status = resData.status;
+            response.message = resData.message;
+            response.code = resData.code;
+            return promiseResolve(response);
+        }
+        return false;
+    } catch (err) {
+        return promiseReject(err);
+    }
+};
+
+/**
+ * This function handles the transportation data processing and sends a WhatsApp message with a list of transportation options.
+ *
+ * @param {Object} data - The data object containing transportation details.
+ * @returns {Promise<Object|boolean>} - Returns a promise that resolves to a response object if the WhatsApp message fails, or false if successful.
+ *
+ * @throws {Error} - Throws an error if there is an issue with processing the transportation data or sending the WhatsApp message.
+ */
+const transportation = async (data) => {
+    try {
+        const eventId = data?.eventId || 230;
+        const phone = data?.phone || '84902103222';
+        const typeCountry = data?.typeCountry || 'dC';
+        const userDetails = {};
+        const resData = await DataVekinHelper.transportationList();
+        const rows = [];
+        if (!isEmpty(resData)) {
+            const emissionList = resData?.emission_list || [];
+            for (let i = 0; i < emissionList.length; i++) {
+                const element = {}; const flowToken = {};
+                flowToken.id = emissionList[i].id;
+                flowToken.uds = userDetails;
+                flowToken.eid = eventId;
+                flowToken.type = 'receipt';
+                flowToken.tC = typeCountry;
+                const encodedToken = Base64.encode(JSON.stringify(flowToken));
+                element.id = encodedToken;
+                // element.title = emissionList[i].name;
+                const title = emissionList[i].name;
+                // Gán lại giá trị sau khi cắt chuỗi
+                element.title = title?.length > 24 ? `${title?.substring(0, 20)}...` : title?.substring(0, 24); // max length is 24
+                // element.title = element.title.substring(0, 24);
+                // element.description = nearestLocations[i].event_code;
+                if (rows.length < 10) {
+                    rows.push(element);
+                }
+            }
+            let template;
+            if (!isEmpty(rows)) {
+                template = {
+                    messaging_product: 'whatsapp',
+                    to: phone,
+                    type: 'interactive',
+                    interactive: {
+                        type: 'list',
+                        body: {
+                            text: 'The amount of CO2 emission is different depended on the type of your transportation.'
+                            + ' Please select the transportation to display your CO2 emission.\n',
+                        },
+                        action: {
+                            button: 'Transportation',
+                            sections: [
+                                {
+                                    title: 'Choose',
+                                    rows,
+                                },
+                            ],
+                        },
+                    },
+                };
+            }
+            const resDataWhatsapp = await WhatsappHelper.sendMessage(template);
+            const response = {};
+            if (resData?.status && resDataWhatsapp?.status !== 200) {
+                response.status = resDataWhatsapp.status;
+                response.message = resDataWhatsapp.message;
+                response.code = resDataWhatsapp.code;
+                return promiseResolve(response);
+            }
+            return false;
+        }
+    } catch (err) {
+        return promiseReject(err);
+    }
+};
+/**
+ * Asks the user if they are from a specific country via a WhatsApp interactive message.
+ * @param {Object} data - The data object containing user and event information.
+ * @returns {Promise<Object|boolean>} - Returns a promise that resolves to an object with response details if an error occurs, or false if successful.
+ */
+const questionCountry = async (data) => {
+    try {
+        const resDataVekin = await DataVekinHelper.eventCarbonReceipt();
+        const dataVekin = resDataVekin ? resDataVekin : [];
+        const phone = data?.phone || '84902103222';
+        const countryName = data?.countryName || '';
+        const latitude = data?.latitude || '13.7379374';
+        const longitude = data?.longitude || '100.5239999';
+        const eventId = data?.eventId;
+        const event = dataVekin.find((event) => event.id === eventId);
+        if (isEmpty(event)) {
+            return notEvent(data);
+        }
+        const locationFrom = {};
+        locationFrom.lat = data?.latitude || '21.0058166';
+        locationFrom.long = data?.longitude || '105.8473071';
+        locationFrom.same_country = false;
+        const flowToken = {
+            id: 1795, lf: locationFrom, eid: eventId, tC: 'dC', type: 'receipt',
+        };
+        const sameCountryEncode = Base64.encode(JSON.stringify(flowToken));
+        const differentCountry = {
+            lat: latitude, long: longitude, eventId, type: 'No', same_country: true,
+        };
+        const differentCountryEncode = Base64.encode(JSON.stringify(differentCountry));
+        const template = {
+            messaging_product: 'whatsapp',
+            to: phone,
+            type: 'interactive',
+            interactive: {
+                type: 'button',
+                body: {
+                    text: `Are you from ${countryName}?`,
+                },
+                action: {
+                    buttons: [
+                        {
+                            type: 'reply',
+                            reply: {
+                                id: sameCountryEncode,
+                                title: 'Yes',
+                            },
+                        },
+                        {
+                            type: 'reply',
+                            reply: {
+                                id: differentCountryEncode,
+                                title: 'No',
+                            },
+                        },
+                    ],
+                },
+            },
+        };
+        const resData = await WhatsappHelper.sendMessage(template);
+        const response = {};
+        if (resData?.status && resData?.status !== 200) {
+            response.status = resData.status;
+            response.message = resData.message;
+            response.code = resData.code;
+            return promiseResolve(response);
+        }
+        return false;
+    } catch (err) {
+        return promiseReject(err);
+    }
+};
+const getCountryDataByPhone = async (data) => {
+    try {
+        const phone = data?.phone || '+84902103222';
+        const resDataVekin = await DataVekinHelper.eventCarbonReceipt();
+        const dataVekin = resDataVekin ? resDataVekin : [];
+        const eventId = data?.eventId;
+        const event = dataVekin.find((event) => event.id === eventId);
+        if (isEmpty(event)) {
+            return notEvent(data);
+        }
+        const filePath = path.join(__dirname, '..', 'utils', 'countryPhoneCodes.json');
+        const fileData = fs.readFileSync(filePath, 'utf8');
+        const countryPhoneCodes = JSON.parse(fileData);
+        const potentialPrefixes = [];
+        for (let i = 2; i <= 5; i++) {
+            potentialPrefixes.push(phone.substring(0, i));
+        }
+        // Find country data locally in JSON file
+        let countryInfo = countryPhoneCodes.find((data) => potentialPrefixes.includes(data.country.prefix));
+        if (isEmpty(countryInfo)) {
+            // call api
+            const apiData = await getLocationByPhone({ phone });
+            if (apiData && apiData?.valid) {
+                const newCountryData = {
+                    country: apiData.country,
+                };
+                countryPhoneCodes.push(newCountryData);
+                fs.writeFileSync(filePath, JSON.stringify(countryPhoneCodes, null, 2), 'utf8');
+                countryInfo = newCountryData;
+            }
+        }
+        const resGetLocationData = await getLocationData({ address: countryInfo?.country?.name });
+        data.latitude = resGetLocationData?.latitude || '13.7379374';
+        data.longitude = resGetLocationData?.longitude || '100.5239999';
+        data.countryName = countryInfo?.country?.name;
+        if (event?.phone_code === countryInfo?.country?.prefix) {
+            data.typeCountry = 'sC';
+            return await transportation(data);
+        }
+        data.typeCountry = 'dC';
+        return await questionCountry(data);
+    } catch (err) {
+        return err;
+    }
+};
+
 const ecoTravel = async (data) => {
     try {
         const resDataVekin = await DataVekinHelper.eventCarbonReceipt();
@@ -358,7 +592,7 @@ const fillAddress = async (data) => {
             to: phone,
             type: 'template',
             template: {
-                name: 'your_address_complate',
+                name: 'enter_your_address',
                 language: {
                     code: 'en_US',
                 },
@@ -394,6 +628,13 @@ const fillAddress = async (data) => {
     }
 };
 
+/**
+ * This function sends a WhatsApp message prompting the user to enter their location again.
+ * It constructs a message template with a button for the user to re-enter their location.
+ *
+ * @param {Object} data - The data object containing information for the message.
+ * @returns {Promise<boolean|Object>} - Returns true if the message was sent successfully, or an error response object if it failed.
+ */
 const enterLocationAgain = async (data) => {
     try {
         const phone = data?.phone || '84902103222';
@@ -444,13 +685,12 @@ const enterLocationAgain = async (data) => {
         return promiseReject(err);
     }
 };
+
 const checkCountry = async (data) => {
     try {
-        const customerName = data?.customerName || ' Damg xian truong';
-        const customerAddress = data?.customerAddress || 'Thai lan';
+        const customerAddress = data?.customerAddress;
         const typeCountry = data?.typeCountry || 'dC';
         const eventId = data?.eventId || 230;
-        const distance = data?.distance || 0;
         const phone = data?.phone || '84902103222';
         const myLatitude = data?.latitude || '20.4458553';
         const myLongitude = data?.longitude || '106.1173998';
@@ -463,17 +703,8 @@ const checkCountry = async (data) => {
         }
 
         const locationFrom = {};
-        const userDetails = {};
         locationFrom.lat = resGetLocationData?.latitude || '21.0058166';
         locationFrom.long = resGetLocationData?.longitude || '105.8473071';
-        if (typeCountry === 'dC') {
-            userDetails.name = customerName;
-            const myCountry = await getCountryFromCoordinates(myLatitude, myLongitude);
-            if (myCountry?.country_code === resGetLocationData?.country_code) {
-                return await selectDistance(data);
-            }
-        }
-        locationFrom.d = distance;
         const resData = await DataVekinHelper.transportationList();
         const rows = [];
         if (!isEmpty(resData)) {
@@ -482,15 +713,16 @@ const checkCountry = async (data) => {
                 const element = {}; const flowToken = {};
                 flowToken.id = emissionList[i].id;
                 flowToken.lf = locationFrom;
-                flowToken.uds = userDetails;
                 flowToken.eid = eventId;
                 flowToken.type = 'receipt';
                 flowToken.tC = typeCountry;
                 const encodedToken = Base64.encode(JSON.stringify(flowToken));
                 element.id = encodedToken;
-                element.title = emissionList[i].name;
+                // element.title = emissionList[i].name;
+                const title = emissionList[i].name;
                 // Gán lại giá trị sau khi cắt chuỗi
-                element.title = element.title.substring(0, 24);
+                element.title = title?.length > 24 ? `${title?.substring(0, 20)}...` : title?.substring(0, 24); // max length is 24
+                // element.title = element.title.substring(0, 24);
                 // element.description = nearestLocations[i].event_code;
                 if (rows.length < 10) {
                     rows.push(element);
@@ -534,6 +766,14 @@ const checkCountry = async (data) => {
         return promiseReject(err);
     }
 };
+
+/**
+ * Handles payment confirmation by processing the provided data, generating an event carbon receipt,
+ * and sending a WhatsApp message with the payment details.
+ *
+ * @param {Object} data - The data required for payment confirmation.
+ * @returns {Promise<Object|boolean>} - Returns a promise that resolves to the response data or false if no data is found.
+ */
 const paymentConfirmation = async (data) => {
     try {
         const eventCarbonReceipt = {};
@@ -550,9 +790,7 @@ const paymentConfirmation = async (data) => {
             unit_converter: [],
         };
         const phone = data?.phone || '84902103222';
-        const customerName = data?.uds?.name;
         const typeCountry = data?.typeCountry || 'dC';
-        const distance = data?.lf?.d || 0;
         const eventId = data?.eid;
         const locationFrom = data?.lf || {};
         let countryEvent = 'Thailand';
@@ -567,11 +805,10 @@ const paymentConfirmation = async (data) => {
             locationFrom.city = event?.city;
             locationFrom.lat = event?.latitude;
             locationFrom.long = event?.longitude;
-            locationFrom.distance = distance;
+            locationFrom.same_country = true;
         }
         eventCarbonReceipt.location_from = locationFrom;
         eventCarbonReceipt.user_details = {
-            name: customerName,
             phone_number: phone,
         };
         eventCarbonReceipt.event_id = eventId;
@@ -589,7 +826,7 @@ const paymentConfirmation = async (data) => {
             const refNumber = receipt?.ref_number;
             const verifiedBy = receipt?.verified_by;
             const eventId = receipt?.event_id;
-            const formattedDate = moment(date).format('DD MMMM YYYY HH:mm');
+            const formattedDate = moment(date).format('DD MMMM YYYY');
             let amount = calculateCost(eventEmission.value, countryEvent);
             const currency = countryEvent === 'Singapore' ? 'sgd' : 'thb';
             if (currency === 'thb' && amount < 18) {
@@ -695,6 +932,7 @@ const paymentConfirmation = async (data) => {
         return promiseReject(err);
     }
 };
+
 const paymentSuccess = async (data) => {
     try {
         const phone = data?.phone || '84902103222';
@@ -884,6 +1122,16 @@ const completed = async (data) => {
             },
         };
         const resData = await WhatsappHelper.sendMessage(template);
+        // TODO: will need to add this text response to an API so we can make it dynamic
+        // await WhatsappHelper.sendMessage({
+        //     messaging_product: 'whatsapp',
+        //     to: phone,
+        //     type: 'text',
+        //     text: {
+        //         body: 'In collaboration with UOB Finlab, We are proud to announce that this event is a carbon NEUTRAL event.',
+        //     },
+        // });
+        await remind(data);
         const response = {};
         if (resData?.status && resData?.status !== 200) {
             response.status = resData.status;
@@ -897,7 +1145,6 @@ const completed = async (data) => {
     }
 };
 
-
 module.exports = {
     joinNow,
     listEvent,
@@ -909,4 +1156,5 @@ module.exports = {
     paymentFailure,
     completed,
     checkCountry,
+    getCountryDataByPhone,
 };

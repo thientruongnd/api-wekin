@@ -12,6 +12,7 @@ const { createCanvas, loadImage } = require('canvas');
 const { countries: dataCountries } = require('./dataSample/data.countries');
 const { CODES_SUCCESS, CODES_ERROR } = require('./messages');
 const { configEvn } = require('../configs/configEnvSchema');
+
 /**
  * Normalize a port into a number, string, or false.
  */
@@ -157,9 +158,11 @@ const capitalizeFirstLetter = (string) => string.charAt(0).toUpperCase() + strin
 const calculateCost = (kgCO2, countryCode) => {
     let ratePerKg = 1;// 1 kg CO2 = 1 THB
     if (countryCode === 'Singapore') {
-        ratePerKg = 0.5; // 1 kg CO2 = 0.5 SGD
+        ratePerKg = 0.04; // 1 kg CO2 = 0.5 SGD
     }
-    return kgCO2 * ratePerKg;
+    // round to 2 decimal places
+    return parseFloat(((kgCO2 ?? 0) * ratePerKg)?.toFixed(2));
+    // return Math.kgCO2 * ratePerKg;
 };
 const buildCheckoutSessionURL = (baseURL, params) => {
     const url = new URL(`https://${ baseURL}`); // Thêm 'https://' vào baseURL
@@ -265,10 +268,12 @@ const convertTextToImage = async (data, type = null) => {
         wrapText(ctx, data.eventName, 0, 340, 600, 30, true, true, 20);
         wrapText(ctx, data.eventLocation, 0, 370, 600, 30, false, true);
         drawTextLeftRight(ctx, 'Your Emission:', `${data.eventEmissionValue} ${data.eventEmissionUnit}`, 440, 600);
-        drawTextLeftRight(ctx, 'Carbon Saved:', `${data.eventCarbonSavedValue} ${data.eventCarbonSavedUnit}`, 480, 600);
+        //TODO --> check the unit format from DEMP backend
+        drawTextLeftRight(ctx, 'Carbon Saved:', `${data.eventCarbonSavedValue} ${data.eventEmissionUnit}`, 480, 600);
         drawTextLeftRight(ctx, 'Total cost:', `${data.unitAmount} ${String(data.currency).toUpperCase()}`, 520, 600);
         drawTextLeftRight(ctx, 'Verified blockchain address:', `${String(data.blockchain).substring(0, 15) }...`, 560, 600);
-        drawTextLeftRight(ctx, 'Verified by:', `${data.verifiedBy}`, 600, 600);
+        // drawTextLeftRight(ctx, 'As Complied By:', `${data.verifiedBy}`, 600, 600);
+        drawTextLeftRight(ctx, 'As Complied By:', "ISO 14064-1", 600, 600);
         drawTextLeftRight(ctx, 'Receipt NO.:', `${data.refNumber}`, 640, 600);
         if (type === 'paymentSuccess') {
             wrapText(ctx, 'Thank you for your dedication to offsetting; your efforts are not just', 0, 700, 600, 20, false, true, 16);
@@ -333,6 +338,22 @@ const getLocationData = async (data) => {
         return null;
     }
 };
+const getLocationByPhone = async (data) => {
+    const apiKey = '2e2b4d0856584b799f08b2d019705c7e';
+    const phone = data?.phone;
+    const url = `https://phonevalidation.abstractapi.com/v1/?api_key=${apiKey}&phone=${phone}`;
+    try {
+        const response = await axios.get(url);
+        const data = response.data;
+        if (data.valid === true) {
+           return data;
+        }
+        return null;
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        return null;
+    }
+};
 module.exports = {
     normalizePort,
     onError,
@@ -365,4 +386,5 @@ module.exports = {
     getCountryFromCoordinates,
     convertTextToImage,
     getLocationData,
+    getLocationByPhone,
 };

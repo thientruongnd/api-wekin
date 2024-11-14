@@ -1,0 +1,478 @@
+[
+  {
+    "country": {
+      "code": "TH",
+      "name": "Thailand",
+      "prefix": "+66"
+    }
+  },
+  {
+    "country": {
+      "code": "VN",
+      "name": "Vietnam",
+      "prefix": "+84"
+    }
+  },
+  {
+    "country": {
+      "code": "US",
+      "name": "United States",
+      "prefix": "+1"
+    }
+  },
+  {
+    "country": {
+      "code": "GB",
+      "name": "United Kingdom",
+      "prefix": "+44"
+    }
+  },
+  {
+    "country": {
+      "code": "IN",
+      "name": "India",
+      "prefix": "+91"
+    }
+  },
+  {
+    "country": {
+      "code": "JP",
+      "name": "Japan",
+      "prefix": "+81"
+    }
+  },
+  {
+    "country": {
+      "code": "KR",
+      "name": "South Korea",
+      "prefix": "+82"
+    }
+  },
+  {
+    "country": {
+      "code": "CN",
+      "name": "China",
+      "prefix": "+86"
+    }
+  },
+  {
+    "country": {
+      "code": "FR",
+      "name": "France",
+      "prefix": "+33"
+    }
+  },
+  {
+    "country": {
+      "code": "DE",
+      "name": "Germany",
+      "prefix": "+49"
+    }
+  },
+  {
+    "country": {
+      "code": "BR",
+      "name": "Brazil",
+      "prefix": "+55"
+    }
+  },
+  {
+    "country": {
+      "code": "AU",
+      "name": "Australia",
+      "prefix": "+61"
+    }
+  },
+  {
+    "country": {
+      "code": "CA",
+      "name": "Canada",
+      "prefix": "+1"
+    }
+  },
+  {
+    "country": {
+      "code": "RU",
+      "name": "Russia",
+      "prefix": "+7"
+    }
+  },
+  {
+    "country": {
+      "code": "ES",
+      "name": "Spain",
+      "prefix": "+34"
+    }
+  },
+  {
+    "country": {
+      "code": "IT",
+      "name": "Italy",
+      "prefix": "+39"
+    }
+  },
+  {
+    "country": {
+      "code": "MX",
+      "name": "Mexico",
+      "prefix": "+52"
+    }
+  },
+  {
+    "country": {
+      "code": "NL",
+      "name": "Netherlands",
+      "prefix": "+31"
+    }
+  },
+  {
+    "country": {
+      "code": "SE",
+      "name": "Sweden",
+      "prefix": "+46"
+    }
+  },
+  {
+    "country": {
+      "code": "CH",
+      "name": "Switzerland",
+      "prefix": "+41"
+    }
+  },
+  {
+    "country": {
+      "code": "ZA",
+      "name": "South Africa",
+      "prefix": "+27"
+    }
+  },
+  {
+    "country": {
+      "code": "NG",
+      "name": "Nigeria",
+      "prefix": "+234"
+    }
+  },
+  {
+    "country": {
+      "code": "PE",
+      "name": "Peru",
+      "prefix": "+51"
+    }
+  },
+  {
+    "country": {
+      "code": "CL",
+      "name": "Chile",
+      "prefix": "+56"
+    }
+  },
+  {
+    "country": {
+      "code": "CO",
+      "name": "Colombia",
+      "prefix": "+57"
+    }
+  },
+  {
+    "country": {
+      "code": "EG",
+      "name": "Egypt",
+      "prefix": "+20"
+    }
+  },
+  {
+    "country": {
+      "code": "HK",
+      "name": "Hong Kong",
+      "prefix": "+852"
+    }
+  },
+  {
+    "country": {
+      "code": "TW",
+      "name": "Taiwan",
+      "prefix": "+886"
+    }
+  },
+  {
+    "country": {
+      "code": "SG",
+      "name": "Singapore",
+      "prefix": "+65"
+    }
+  },
+  {
+    "country": {
+      "code": "PH",
+      "name": "Philippines",
+      "prefix": "+63"
+    }
+  },
+  {
+    "country": {
+      "code": "MY",
+      "name": "Malaysia",
+      "prefix": "+60"
+    }
+  },
+  {
+    "country": {
+      "code": "ID",
+      "name": "Indonesia",
+      "prefix": "+62"
+    }
+  },
+  {
+    "country": {
+      "code": "PK",
+      "name": "Pakistan",
+      "prefix": "+92"
+    }
+  },
+  {
+    "country": {
+      "code": "BD",
+      "name": "Bangladesh",
+      "prefix": "+880"
+    }
+  },
+  {
+    "country": {
+      "code": "TR",
+      "name": "Turkey",
+      "prefix": "+90"
+    }
+  },
+  {
+    "country": {
+      "code": "SA",
+      "name": "Saudi Arabia",
+      "prefix": "+966"
+    }
+  },
+  {
+    "country": {
+      "code": "KE",
+      "name": "Kenya",
+      "prefix": "+254"
+    }
+  },
+  {
+    "country": {
+      "code": "MA",
+      "name": "Morocco",
+      "prefix": "+212"
+    }
+  },
+  {
+    "country": {
+      "code": "DZ",
+      "name": "Algeria",
+      "prefix": "+213"
+    }
+  },
+  {
+    "country": {
+      "code": "IR",
+      "name": "Iran",
+      "prefix": "+98"
+    }
+  },
+  {
+    "country": {
+      "code": "AR",
+      "name": "Argentina",
+      "prefix": "+54"
+    }
+  },
+  {
+    "country": {
+      "code": "RO",
+      "name": "Romania",
+      "prefix": "+40"
+    }
+  },
+  {
+    "country": {
+      "code": "PL",
+      "name": "Poland",
+      "prefix": "+48"
+    }
+  },
+  {
+    "country": {
+      "code": "CZ",
+      "name": "Czech Republic",
+      "prefix": "+420"
+    }
+  },
+  {
+    "country": {
+      "code": "AT",
+      "name": "Austria",
+      "prefix": "+43"
+    }
+  },
+  {
+    "country": {
+      "code": "HU",
+      "name": "Hungary",
+      "prefix": "+36"
+    }
+  },
+  {
+    "country": {
+      "code": "BE",
+      "name": "Belgium",
+      "prefix": "+32"
+    }
+  },
+  {
+    "country": {
+      "code": "SK",
+      "name": "Slovakia",
+      "prefix": "+421"
+    }
+  },
+  {
+    "country": {
+      "code": "BG",
+      "name": "Bulgaria",
+      "prefix": "+359"
+    }
+  },
+  {
+    "country": {
+      "code": "HR",
+      "name": "Croatia",
+      "prefix": "+385"
+    }
+  },
+  {
+    "country": {
+      "code": "NO",
+      "name": "Norway",
+      "prefix": "+47"
+    }
+  },
+  {
+    "country": {
+      "code": "FI",
+      "name": "Finland",
+      "prefix": "+358"
+    }
+  },
+  {
+    "country": {
+      "code": "LT",
+      "name": "Lithuania",
+      "prefix": "+370"
+    }
+  },
+  {
+    "country": {
+      "code": "LV",
+      "name": "Latvia",
+      "prefix": "+371"
+    }
+  },
+  {
+    "country": {
+      "code": "EE",
+      "name": "Estonia",
+      "prefix": "+372"
+    }
+  },
+  {
+    "country": {
+      "code": "IS",
+      "name": "Iceland",
+      "prefix": "+354"
+    }
+  },
+  {
+    "country": {
+      "code": "MT",
+      "name": "Malta",
+      "prefix": "+356"
+    }
+  },
+  {
+    "country": {
+      "code": "LI",
+      "name": "Liechtenstein",
+      "prefix": "+423"
+    }
+  },
+  {
+    "country": {
+      "code": "MC",
+      "name": "Monaco",
+      "prefix": "+377"
+    }
+  },
+  {
+    "country": {
+      "code": "AD",
+      "name": "Andorra",
+      "prefix": "+376"
+    }
+  },
+  {
+    "country": {
+      "code": "SM",
+      "name": "San Marino",
+      "prefix": "+378"
+    }
+  },
+  {
+    "country": {
+      "code": "VA",
+      "name": "Vatican City",
+      "prefix": "+39"
+    }
+  },
+  {
+    "country": {
+      "code": "BJ",
+      "name": "Benin",
+      "prefix": "+229"
+    }
+  },
+  {
+    "country": {
+      "code": "CI",
+      "name": "Ivory Coast",
+      "prefix": "+225"
+    }
+  },
+  {
+    "country": {
+      "code": "ZW",
+      "name": "Zimbabwe",
+      "prefix": "+263"
+    }
+  },
+  {
+    "country": {
+      "code": "UG",
+      "name": "Uganda",
+      "prefix": "+256"
+    }
+  },
+  {
+    "country": {
+      "code": "MM",
+      "name": "Myanmar",
+      "prefix": "+95"
+    }
+  },
+  {
+    "country": {
+      "code": "LA",
+      "name": "Lao People's Democratic Republic",
+      "prefix": "+856"
+    }
+  }
+]

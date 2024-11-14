@@ -21,6 +21,7 @@ const indexRoute = (apiRouter) => {
     apiRouter.route('/tests/textToImage').post(DEFAULT.textToImage);
     apiRouter.route('/tests/selectDistance').post(DEFAULT.selectDistance);
     apiRouter.route('/tests/fillAddress').post(DEFAULT.fillAddress);
+    apiRouter.route('/tests/getCountryDataByPhone').post(DEFAULT.getCountryDataByPhone);
 };
 
 module.exports = {
