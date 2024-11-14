@@ -72,6 +72,7 @@ module.exports = {
         'no-control-regex': 'off',
         'import/no-extraneous-dependencies': 'off',
         'no-unneeded-ternary': 'off',
+        'global-require': 'off',
     },
     settings: {
         'import/extensions': ['.js', '.jsx', '.ts', '.tsx', '.mjs'],
