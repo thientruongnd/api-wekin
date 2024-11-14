@@ -35,7 +35,6 @@ module.exports.API = {
     },
     postWebhook: async (req, res) => {
         const body = req.body;
-         console.log('body: ', body);
         // Kiểm tra request có chứa dữ liệu từ WhatsApp
         const params = {};
         let typeMessage = ''; let phone = ''; let fullName = ''; let eventId;
@@ -45,7 +44,7 @@ module.exports.API = {
                 changes.forEach((change) => {
                     const messageData = change?.value?.messages;
                     // const statuses = change?.value?.statuses;
-                    console.log(util.inspect(messageData, false, null, true));
+                    // console.log(util.inspect(messageData, false, null, true));
                     const contacts = change?.value?.contacts;
                     if (contacts) {
                         contacts.forEach((contact) => {
@@ -104,6 +103,7 @@ module.exports.API = {
                             if (type === 'interactive' && typeInteractive === 'nfm_reply') {
                                 const nfmReply = message?.interactive?.nfm_reply;
                                 const responseJson = JSON.parse(nfmReply?.response_json);
+                                console.log('this log responseJson: ', responseJson);
                                 const decodedToken = JSON.parse(Base64.decode(responseJson?.flow_token));
                                 console.log('decodedToken: ', decodedToken);
                                 typeMessage = decodedToken?.type;
@@ -128,15 +128,15 @@ module.exports.API = {
                 params.imageId = '439102592147175';
                 await WhatsappService.joinNow(params);
             }
-            // if (typeMessage === 'join_now_payload') {// 
+            // if (typeMessage === 'join_now_payload') {//
             //     await WhatsappHelper.sendMessageLocation({ phone });
             // }
-            //if (typeMessage === 'location') {
+            // if (typeMessage === 'location') {
             if (typeMessage === 'join_now_payload') {
                 await WhatsappService.listEvent(params);
             }
             if (typeMessage === 'selectEvent') {
-               // await WhatsappService.ecoTravel(params);
+                // await WhatsappService.ecoTravel(params);
             }
             // if (typeMessage === 'sC') {
             //     await WhatsappService.selectDistance(params);
