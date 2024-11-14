@@ -602,7 +602,6 @@ const enterLocationAgain = async (data) => {
 
 const checkCountry = async (data) => {
     try {
-        const customerName = data?.customerName || ' Tuong';
         const customerAddress = data?.customerAddress || 'Thai lan';
         const typeCountry = data?.typeCountry || 'dC';
         const eventId = data?.eventId || 230;
@@ -618,16 +617,8 @@ const checkCountry = async (data) => {
         }
 
         const locationFrom = {};
-        const userDetails = {};
         locationFrom.lat = resGetLocationData?.latitude || '21.0058166';
         locationFrom.long = resGetLocationData?.longitude || '105.8473071';
-        if (typeCountry === 'dC') {
-            userDetails.name = customerName;
-            const myCountry = await getCountryFromCoordinates(myLatitude, myLongitude);
-            if (myCountry?.country_code === resGetLocationData?.country_code) {
-                return await selectDistance(data);
-            }
-        }
         const resData = await DataVekinHelper.transportationList();
         const rows = [];
         if (!isEmpty(resData)) {
@@ -636,7 +627,6 @@ const checkCountry = async (data) => {
                 const element = {}; const flowToken = {};
                 flowToken.id = emissionList[i].id;
                 flowToken.lf = locationFrom;
-                flowToken.uds = userDetails;
                 flowToken.eid = eventId;
                 flowToken.type = 'receipt';
                 flowToken.tC = typeCountry;
@@ -790,7 +780,6 @@ const paymentConfirmation = async (data) => {
             unit_converter: [],
         };
         const phone = data?.phone || '84902103222';
-        const customerName = data?.uds?.name;
         const typeCountry = data?.typeCountry || 'dC';
         const distance = data?.lf?.d || 0;
         const eventId = data?.eid;
@@ -811,7 +800,6 @@ const paymentConfirmation = async (data) => {
         }
         eventCarbonReceipt.location_from = locationFrom;
         eventCarbonReceipt.user_details = {
-            name: customerName,
             phone_number: phone,
         };
         eventCarbonReceipt.event_id = eventId;
