@@ -207,6 +207,42 @@ const notEvent = async (data) => {
         return promiseReject(err);
     }
 };
+const remind = async (data) => {
+    try {
+        const phone = data?.phone || '84902103222';
+        const template = {
+            messaging_product: 'whatsapp',
+            to: phone,
+            type: 'interactive',
+            interactive: {
+                type: 'cta_url',
+                body: {
+                    text: 'Thank you for joining this sustainable event.' +
+                    ' Your participation is key to driving a meaningful change.' +
+                    'We look forward to seeing you at your next sustainable event!🌱🌏',
+                },
+                action: {
+                    name: 'cta_url',
+                    parameters: {
+                        display_text: 'Don’t forget to claim your Exclusive NFT by Coral!',
+                        url: 'https://coralworld.co/collections/green-world',
+                    },
+                },
+            },
+        };
+        const resData = await WhatsappHelper.sendMessage(template);
+        const response = {};
+        if (resData?.status && resData?.status !== 200) {
+            response.status = resData.status;
+            response.message = resData.message;
+            response.code = resData.code;
+            return promiseResolve(response);
+        }
+        return false;
+    } catch (err) {
+        return promiseReject(err);
+    }
+};
 
 /**
  * This function handles the transportation data processing and sends a WhatsApp message with a list of transportation options.
@@ -304,12 +340,13 @@ const questionCountry = async (data) => {
         const locationFrom = {};
         locationFrom.lat = data?.latitude || '21.0058166';
         locationFrom.long = data?.longitude || '105.8473071';
+        locationFrom.same_country = false;
         const flowToken = {
             id: 1795, lf: locationFrom, eid: eventId, tC: 'dC', type: 'receipt',
         };
         const sameCountryEncode = Base64.encode(JSON.stringify(flowToken));
         const differentCountry = {
-            lat: latitude, long: longitude, eventId, type: 'No',
+            lat: latitude, long: longitude, eventId, type: 'No', same_country: true,
         };
         const differentCountryEncode = Base64.encode(JSON.stringify(differentCountry));
         const template = {
@@ -393,6 +430,7 @@ const getCountryDataByPhone = async (data) => {
             data.typeCountry = 'sC';
             return await transportation(data);
         }
+        data.typeCountry = 'dC';
         return await questionCountry(data);
     } catch (err) {
         return err;
@@ -769,6 +807,7 @@ const paymentConfirmation = async (data) => {
             locationFrom.city = event?.city;
             locationFrom.lat = event?.latitude;
             locationFrom.long = event?.longitude;
+            locationFrom.same_country = true;
         }
         eventCarbonReceipt.location_from = locationFrom;
         eventCarbonReceipt.user_details = {
@@ -1086,14 +1125,15 @@ const completed = async (data) => {
         };
         const resData = await WhatsappHelper.sendMessage(template);
         // TODO: will need to add this text response to an API so we can make it dynamic
-        await WhatsappHelper.sendMessage({
-            messaging_product: 'whatsapp',
-            to: phone,
-            type: 'text',
-            text: {
-                body: 'In collaboration with UOB Finlab, We are proud to announce that this event is a carbon NEUTRAL event.',
-            },
-        });
+        // await WhatsappHelper.sendMessage({
+        //     messaging_product: 'whatsapp',
+        //     to: phone,
+        //     type: 'text',
+        //     text: {
+        //         body: 'In collaboration with UOB Finlab, We are proud to announce that this event is a carbon NEUTRAL event.',
+        //     },
+        // });
+        await remind(data);
         const response = {};
         if (resData?.status && resData?.status !== 200) {
             response.status = resData.status;
