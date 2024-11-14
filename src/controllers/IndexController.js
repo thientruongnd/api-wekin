@@ -120,14 +120,6 @@ module.exports.DEFAULT = {
         const resData = await WhatsappService.getCountryDataByPhone(req.body);
         return res.json(responseSuccess(10261, resData, 'en'));
     },
-    ecoTravel: async (req, res) => {
-        const resData = await WhatsappService.ecoTravel(req.body);
-        return res.json(responseSuccess(10261, resData, 'en'));
-    },
-    selectDistance: async (req, res) => {
-        const resData = await WhatsappService.selectDistance();
-        return res.json(responseSuccess(10261, resData, 'en'));
-    },
     checkCountry: async (req, res) => {
         const resData = await WhatsappService.checkCountry(req.body);
         return res.json(responseSuccess(10261, resData, 'en'));

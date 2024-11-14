@@ -139,12 +139,8 @@ module.exports.API = {
                 await WhatsappService.listEvent(params);
             }
             if (typeMessage === 'selectEvent') {
-                // await WhatsappService.ecoTravel(params);
                 await WhatsappService.getCountryDataByPhone(params);
             }
-            // if (typeMessage === 'sC') {
-            //     await WhatsappService.selectDistance(params);
-            // }
             if (typeMessage === 'No' || typeMessage === 'enter_location_again') {
                 await WhatsappService.fillAddress(params);
             }
@@ -155,10 +151,6 @@ module.exports.API = {
             if (typeMessage === 'receipt') {
                 await WhatsappService.paymentConfirmation(params);
             }
-            // if (typeMessage === 'distance') {
-            //     params.typeCountry = 'sC';
-            //     await WhatsappService.checkCountry(params);
-            // }
             if (typeMessage === 'maybe_later_payload') {
                 await WhatsappService.completed(params);
             }
