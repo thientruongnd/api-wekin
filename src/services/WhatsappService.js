@@ -388,6 +388,7 @@ const getCountryDataByPhone = async (data) => {
         const resGetLocationData = await getLocationData({ address: countryInfo?.country?.name });
         data.latitude = resGetLocationData?.latitude || '13.7379374';
         data.longitude = resGetLocationData?.longitude || '100.5239999';
+        data.countryName = countryInfo?.country?.name;
         if (event?.phone_code === countryInfo?.country?.prefix) {
             data.typeCountry = 'sC';
             return await transportation(data);
