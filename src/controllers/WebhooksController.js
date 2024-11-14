@@ -144,10 +144,10 @@ module.exports.API = {
             if (typeMessage === 'No' || typeMessage === 'enter_location_again') {
                 await WhatsappService.fillAddress(params);
             }
-            // if (typeMessage === 'checkCountry') {
-            //     params.typeCountry = 'dC';
-            //     await WhatsappService.checkCountry(params);
-            // }
+            if (typeMessage === 'checkCountry') {
+                params.typeCountry = 'dC';
+                await WhatsappService.checkCountry(params);
+            }
             if (typeMessage === 'receipt') {
                 await WhatsappService.paymentConfirmation(params);
             }

@@ -602,11 +602,10 @@ const enterLocationAgain = async (data) => {
 
 const checkCountry = async (data) => {
     try {
-        const customerName = data?.customerName || ' Damg xian truong';
+        const customerName = data?.customerName || ' Tuong';
         const customerAddress = data?.customerAddress || 'Thai lan';
         const typeCountry = data?.typeCountry || 'dC';
         const eventId = data?.eventId || 230;
-        const distance = data?.distance || 0;
         const phone = data?.phone || '84902103222';
         const myLatitude = data?.latitude || '20.4458553';
         const myLongitude = data?.longitude || '106.1173998';
@@ -629,7 +628,6 @@ const checkCountry = async (data) => {
                 return await selectDistance(data);
             }
         }
-        locationFrom.d = distance;
         const resData = await DataVekinHelper.transportationList();
         const rows = [];
         if (!isEmpty(resData)) {
