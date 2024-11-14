@@ -113,10 +113,8 @@ module.exports.API = {
                                 console.log('this log nfm_reply: ', decodedToken);
                                 typeMessage = decodedToken?.type;
                                 if (typeMessage === 'checkCountry') {
-                                    const customerName = responseJson?.screen_0_name_0;
-                                    const customerAddress = responseJson?.screen_0_description_1;
+                                    const customerAddress = responseJson?.screen_0_description_0;
                                     params.customerAddress = customerAddress;
-                                    params.customerName = customerName;
                                 }
                                 eventId = decodedToken?.eventId;
                                 params.latitude = decodedToken?.lat;
@@ -152,7 +150,6 @@ module.exports.API = {
             }
             if (typeMessage === 'checkCountry') {
                 params.typeCountry = 'dC';
-                console.log(util.inspect(params, false, null, true));
                 await WhatsappService.checkCountry(params);
             }
             if (typeMessage === 'receipt') {
