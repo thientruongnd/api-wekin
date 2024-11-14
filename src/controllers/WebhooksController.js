@@ -72,6 +72,11 @@ module.exports.API = {
                                 params.latitude = decodedToken?.lat;
                                 params.longitude = decodedToken?.long;
                                 params.eventId = decodedToken?.eventId;
+                                params.id = decodedToken?.id;
+                                params.lf = decodedToken?.lf;
+                                params.uds = decodedToken.uds;
+                                params.eid = decodedToken?.eid;
+                                params.typeCountry = decodedToken?.tC;
                             }
                             if (type === 'button') {
                                 const decodedToken = JSON.parse(Base64.decode(payload));
@@ -104,9 +109,7 @@ module.exports.API = {
                             if (type === 'interactive' && typeInteractive === 'nfm_reply') {
                                 const nfmReply = message?.interactive?.nfm_reply;
                                 const responseJson = JSON.parse(nfmReply?.response_json);
-                                console.log('this log responseJson: ', responseJson);
                                 const decodedToken = JSON.parse(Base64.decode(responseJson?.flow_token));
-                                console.log('decodedToken: ', decodedToken);
                                 typeMessage = decodedToken?.type;
                                 if (typeMessage === 'checkCountry') {
                                     const customerName = responseJson?.screen_0_name_0;
@@ -151,7 +154,7 @@ module.exports.API = {
             }
             if (typeMessage === 'receipt') {
                 console.log(util.inspect(params, false, null, true));
-                // await WhatsappService.paymentConfirmation(params);
+                await WhatsappService.paymentConfirmation(params);
             }
             // if (typeMessage === 'distance') {
             //     params.typeCountry = 'sC';
