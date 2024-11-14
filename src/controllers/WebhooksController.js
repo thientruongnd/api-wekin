@@ -152,6 +152,7 @@ module.exports.API = {
             }
             if (typeMessage === 'checkCountry') {
                 params.typeCountry = 'dC';
+                console.log(util.inspect(params, false, null, true));
                 await WhatsappService.checkCountry(params);
             }
             if (typeMessage === 'receipt') {
