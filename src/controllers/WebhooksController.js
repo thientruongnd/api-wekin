@@ -67,6 +67,7 @@ module.exports.API = {
                             if (type === 'interactive' && typeInteractive === 'button_reply') {
                                 const buttonReply = message?.interactive?.button_reply?.id;
                                 const decodedToken = JSON.parse(Base64.decode(buttonReply));
+                                console.log('button_reply decodedToken: ', decodedToken);
                                 typeMessage = decodedToken?.type;
                                 params.latitude = decodedToken?.lat;
                                 params.longitude = decodedToken?.long;
@@ -149,7 +150,8 @@ module.exports.API = {
                 await WhatsappService.checkCountry(params);
             }
             if (typeMessage === 'receipt') {
-                await WhatsappService.paymentConfirmation(params);
+                console.log(util.inspect(params, false, null, true));
+                // await WhatsappService.paymentConfirmation(params);
             }
             // if (typeMessage === 'distance') {
             //     params.typeCountry = 'sC';
