@@ -2,10 +2,9 @@
 Mr : Dang Xuan Truong
 Email: truongdx@runsystem.net
 */
-const util = require('util');
 const { Base64 } = require('js-base64');
 const WhatsappService = require('../services/WhatsappService');
-const WhatsappHelper = require('../helpers/WhatsappHelper');
+// const WhatsappHelper = require('../helpers/WhatsappHelper');
 
 const verifyTokenApp = process.env.VERIFY_TOKEN;// prasath_token
 
@@ -53,7 +52,7 @@ module.exports.API = {
                     }
                     if (messageData) {
                         messageData.forEach((message) => {
-                            console.log('Message:', message);
+                            // console.log('Message:', message);
                             // Xử lý tin nhắn từ người dùng tại đây
                             const text = message?.text?.body;
                             const type = message?.type;
@@ -93,7 +92,6 @@ module.exports.API = {
                             if (type === 'interactive' && typeInteractive === 'list_reply') {
                                 const id = message?.interactive?.list_reply?.id;
                                 const decodedToken = JSON.parse(Base64.decode(id));
-                                console.log('this log list_reply: ', decodedToken);
                                 eventId = decodedToken?.eventId;
                                 typeMessage = decodedToken?.type;
                                 params.latitude = decodedToken?.lat;
@@ -109,7 +107,6 @@ module.exports.API = {
                                 const nfmReply = message?.interactive?.nfm_reply;
                                 const responseJson = JSON.parse(nfmReply?.response_json);
                                 const decodedToken = JSON.parse(Base64.decode(responseJson?.flow_token));
-                                console.log('this log nfm_reply: ', decodedToken);
                                 typeMessage = decodedToken?.type;
                                 if (typeMessage === 'checkCountry') {
                                     const customerAddress = responseJson?.screen_0_description_0;
@@ -138,7 +135,6 @@ module.exports.API = {
                 await WhatsappService.listEvent(params);
             }
             if (typeMessage === 'selectEvent') {
-                console.log(util.inspect(params, false, null, true));
                 await WhatsappService.getCountryDataByPhone(params);
             }
             if (typeMessage === 'No' || typeMessage === 'enter_location_again') {
@@ -149,7 +145,6 @@ module.exports.API = {
                 await WhatsappService.checkCountry(params);
             }
             if (typeMessage === 'receipt') {
-                console.log('this log paymentConfirmation: ', params);
                 await WhatsappService.paymentConfirmation(params);
             }
             if (typeMessage === 'maybe_later_payload') {
