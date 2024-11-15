@@ -802,6 +802,7 @@ const paymentSuccess = async (data) => {
             total_offset: data.eventEmissionValue,
         };
         await DataVekinHelper.eventOffset(paramEvent);
+        await remind(data);
         const response = {};
         if (resData?.status && resData?.status !== 200) {
             response.status = resData.status;
