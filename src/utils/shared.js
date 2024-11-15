@@ -280,8 +280,6 @@ const convertTextToImage = async (data, type = null) => {
             wrapText(ctx, 'Thank you for your dedication to offsetting; your efforts are not just', 0, 700, 600, 20, false, true, 16);
             wrapText(ctx, 'commendable but essential in weaving a brighter, more sustainable ', 0, 725, 600, 20, false, true, 16);
             wrapText(ctx, 'future for our planet.', 0, 750, 600, 20, false, true, 16);
-        } else {
-            wrapText(ctx, 'Actually please change to Would you like to offset your carbon footprint?', 0, 700, 600, 20, false, true, 18);
         }
 
         const buffer = canvas.toBuffer('image/png');
