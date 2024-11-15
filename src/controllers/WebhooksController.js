@@ -2,10 +2,9 @@
 Mr : Dang Xuan Truong
 Email: truongdx@runsystem.net
 */
-const util = require('util');
 const { Base64 } = require('js-base64');
 const WhatsappService = require('../services/WhatsappService');
-const WhatsappHelper = require('../helpers/WhatsappHelper');
+// const WhatsappHelper = require('../helpers/WhatsappHelper');
 
 const verifyTokenApp = process.env.VERIFY_TOKEN;// prasath_token
 
@@ -53,7 +52,7 @@ module.exports.API = {
                     }
                     if (messageData) {
                         messageData.forEach((message) => {
-                            console.log('Message:', message);
+                            // console.log('Message:', message);
                             // Xử lý tin nhắn từ người dùng tại đây
                             const text = message?.text?.body;
                             const type = message?.type;
@@ -93,7 +92,6 @@ module.exports.API = {
                             if (type === 'interactive' && typeInteractive === 'list_reply') {
                                 const id = message?.interactive?.list_reply?.id;
                                 const decodedToken = JSON.parse(Base64.decode(id));
-                                console.log('this log list_reply: ', decodedToken);
                                 eventId = decodedToken?.eventId;
                                 typeMessage = decodedToken?.type;
                                 params.latitude = decodedToken?.lat;
@@ -102,15 +100,13 @@ module.exports.API = {
                                 params.lf = decodedToken?.lf;
                                 params.uds = decodedToken.uds;
                                 params.eid = decodedToken?.eid;
-                                params.eventId = eventId ? eventId : decodedToken?.eid;
-                                params.distance = decodedToken?.d || decodedToken?.lf?.d;
+                                params.eventId = eventId || decodedToken?.eid;
                                 params.typeCountry = decodedToken?.tC;
                             }
                             if (type === 'interactive' && typeInteractive === 'nfm_reply') {
                                 const nfmReply = message?.interactive?.nfm_reply;
                                 const responseJson = JSON.parse(nfmReply?.response_json);
                                 const decodedToken = JSON.parse(Base64.decode(responseJson?.flow_token));
-                                console.log('this log nfm_reply: ', decodedToken);
                                 typeMessage = decodedToken?.type;
                                 if (typeMessage === 'checkCountry') {
                                     const customerAddress = responseJson?.screen_0_description_0;
@@ -139,12 +135,8 @@ module.exports.API = {
                 await WhatsappService.listEvent(params);
             }
             if (typeMessage === 'selectEvent') {
-                // await WhatsappService.ecoTravel(params);
                 await WhatsappService.getCountryDataByPhone(params);
             }
-            // if (typeMessage === 'sC') {
-            //     await WhatsappService.selectDistance(params);
-            // }
             if (typeMessage === 'No' || typeMessage === 'enter_location_again') {
                 await WhatsappService.fillAddress(params);
             }
@@ -155,10 +147,6 @@ module.exports.API = {
             if (typeMessage === 'receipt') {
                 await WhatsappService.paymentConfirmation(params);
             }
-            // if (typeMessage === 'distance') {
-            //     params.typeCountry = 'sC';
-            //     await WhatsappService.checkCountry(params);
-            // }
             if (typeMessage === 'maybe_later_payload') {
                 await WhatsappService.completed(params);
             }

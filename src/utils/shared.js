@@ -262,18 +262,19 @@ const convertTextToImage = async (data, type = null) => {
             ctx.fillText(text2, xText2, y);
         }
         const image = await loadImage(data.eventImageUrl);
+        const eventName = data?.eventName?.length > 38 ? `${data?.eventName?.substring(0, 38) }...` : data?.eventName?.substring(0, 41);
         ctx.drawImage(image, (width - 200) / 2, 40, 200, 200); // X, Y, width, height
         wrapText(ctx, String(data.title).toUpperCase(), 0, 280, 600, 30, true, true, 22);
         wrapText(ctx, data.date, 0, 310, 600, 30, false, true, 16);
-        wrapText(ctx, data.eventName, 0, 340, 600, 30, true, true, 20);
+        wrapText(ctx, eventName, 0, 340, 600, 30, true, true, 20);
         wrapText(ctx, data.eventLocation, 0, 370, 600, 30, false, true);
         drawTextLeftRight(ctx, 'Your Emission:', `${data.eventEmissionValue} ${data.eventEmissionUnit}`, 440, 600);
-        //TODO --> check the unit format from DEMP backend
+        // TODO --> check the unit format from DEMP backend
         drawTextLeftRight(ctx, 'Carbon Saved:', `${data.eventCarbonSavedValue} ${data.eventEmissionUnit}`, 480, 600);
         drawTextLeftRight(ctx, 'Total cost:', `${data.unitAmount} ${String(data.currency).toUpperCase()}`, 520, 600);
         drawTextLeftRight(ctx, 'Verified blockchain address:', `${String(data.blockchain).substring(0, 15) }...`, 560, 600);
         // drawTextLeftRight(ctx, 'As Complied By:', `${data.verifiedBy}`, 600, 600);
-        drawTextLeftRight(ctx, 'As Complied By:', "ISO 14064-1", 600, 600);
+        drawTextLeftRight(ctx, 'As Complied By:', 'ISO 14064-1', 600, 600);
         drawTextLeftRight(ctx, 'Receipt NO.:', `${data.refNumber}`, 640, 600);
         if (type === 'paymentSuccess') {
             wrapText(ctx, 'Thank you for your dedication to offsetting; your efforts are not just', 0, 700, 600, 20, false, true, 16);
@@ -284,7 +285,7 @@ const convertTextToImage = async (data, type = null) => {
         const buffer = canvas.toBuffer('image/png');
         const fileName = getRandomFileName('png');
         const outputPath = path.join(__dirname, '../public/images', fileName);
-        await fs.writeFileSync(outputPath, buffer);
+        fs.writeFileSync(outputPath, buffer);
         const eventImage = `${data.host}/images/${fileName}`;
         console.log('Image created');
         return eventImage;

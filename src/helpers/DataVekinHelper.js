@@ -33,8 +33,10 @@ class DataVekinHelper {
         return result?.data;
     }
 
-    transportationList = async () => {
-        const uri = `${configEvn.BASE_URL_VEKIN}/api/event/dashboard/controller/transportation-list/`;
+    transportationList = async (data) => {
+        let uri = `${configEvn.BASE_URL_VEKIN}/api/event/dashboard/controller/transportation-list/`;
+        uri = data?.uri ? `${configEvn.BASE_URL_VEKIN}/${data.uri}` : uri;
+        // console.log('this log uri: ', uri);
         const config = {
             method: 'get',
             url: uri,
